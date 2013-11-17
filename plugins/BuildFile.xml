@@ -1,11 +1,12 @@
 <library file="*.cc" name="ExtractorsMttExtractorAnalysisPlugins">
-  <flags EDM_PLUGIN="1" />
   <use name="FWCore/Framework"/>
   <use name="FWCore/ParameterSet"/>
-  <use name="clhep"/>
-  <use name="root" />
+  <use name="Extractors/PatExtractor" />
   <use name="CondFormats/JetMETObjects"/>
   <use name="JetMETCorrections/Objects" />
+  <use name="clhep"/>
+  <use name="root" />
+  <use name="roottmva" />
 
-  <use name="Extractors/PatExtractor" />
+  <flags EDM_PLUGIN="1" />
 </library>

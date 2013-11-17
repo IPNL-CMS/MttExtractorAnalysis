@@ -19,7 +19,6 @@
 #include "Extractors/PatExtractor/interface/ElectronExtractor.h"
 #include "Extractors/PatExtractor/interface/METExtractor.h"
 #include "Extractors/PatExtractor/interface/VertexExtractor.h"
-#include "Extractors/PatExtractor/interface/KinFit.h"
 #include "Extractors/PatExtractor/interface/EventExtractor.h"
 #include "Extractors/PatExtractor/interface/PatExtractor.h"
 
@@ -31,7 +30,8 @@
 
 #include <FWCore/ParameterSet/interface/FileInPath.h>
 
-#include "Extractors/PatExtractor/plugins/BTaggingEfficiencyProvider.h"
+#include "Extractors/MttExtractorAnalysis/plugins/KinFit.h"
+#include "Extractors/MttExtractorAnalysis/plugins/BTaggingEfficiencyProvider.h"
 
 using namespace std;
 

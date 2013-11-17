@@ -86,8 +86,6 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
     else:
       process.PATextraction.triggersXML = readFile("triggers_e.xml")
 
-  process.PATextraction.doMtt      = True
-
   # Jets correction : needs a valid global tags, or an external DB where JEC are stored
   process.PATextraction.jet_PF.redoJetCorrection = False
 
@@ -105,40 +103,11 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   # JES systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
   process.PATextraction.jet_PF.jesSign = 0
-  process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("Extractors/PatExtractor/data/START53_V23_Uncertainty_AK5PFchs.txt")
+  # If uncommented, use the specifiec file for jes uncertainties instead of global tag values
+  #process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("Extractors/PatExtractor/data/START53_V23_Uncertainty_AK5PFchs.txt")
 
   process.PATextraction.MET_PF.redoMetPhiCorrection   = False
   process.PATextraction.MET_PF.redoMetTypeICorrection = False # Automatically true if redoJetCorrection is True
-
-  from Extractor_MTT_ScaleFactors import loadMuonScaleFactor, loadBTagScaleFactors, loadElectronScaleFactor, loadLightJetsScaleFactor
-  loadBTagScaleFactors(process)
-
-  # Scale factors
-  process.PATextraction.muon_scale_factors_tighteff_tightiso = loadMuonScaleFactor("MuonEfficiencies_ISO_Run_2012ReReco_53X.pkl", "MuonEfficiencies_Run2012ReReco_53X.pkl", "Tight", "combRelIsoPF04dBeta<012_Tight")
-  process.PATextraction.muon_scale_factors_tighteff_looseiso = loadMuonScaleFactor("MuonEfficiencies_ISO_Run_2012ReReco_53X.pkl", "MuonEfficiencies_Run2012ReReco_53X.pkl", "Tight", "combRelIsoPF04dBeta<02_Tight")
-  process.PATextraction.muon_scale_factors_looseeff_looseiso = loadMuonScaleFactor("MuonEfficiencies_ISO_Run_2012ReReco_53X.pkl", "MuonEfficiencies_Run2012ReReco_53X.pkl", "Loose", "combRelIsoPF04dBeta<02_Loose")
-  process.PATextraction.muon_scale_factors = cms.vstring("muon_scale_factors_looseeff_looseiso", "muon_scale_factors_tighteff_looseiso", "muon_scale_factors_tighteff_tightiso")
-
-  process.PATextraction.electron_scale_factors_tighteff_tightiso = loadElectronScaleFactor("Electron_scale_factors.json", "Electrons_ScaleFactors_Reco_8TeV.root", "tight")
-  process.PATextraction.electron_scale_factors_looseeff_tightiso = loadElectronScaleFactor("Electron_scale_factors.json", "Electrons_ScaleFactors_Reco_8TeV.root", "loose")
-  process.PATextraction.electron_scale_factors = cms.vstring("electron_scale_factors_tighteff_tightiso", "electron_scale_factors_looseeff_tightiso")
-
-  process.PATextraction.b_tagging_scale_factors_b_jets = cms.PSet(
-          jet_type = cms.string("b"),
-          from_globaltag = cms.bool(True),
-          payload = cms.string("MUJETSWPBTAGTTBARCSVM")
-          )
-  process.PATextraction.b_tagging_scale_factors_c_jets = cms.PSet(
-          jet_type = cms.string("c"),
-          from_globaltag = cms.bool(True),
-          payload = cms.string("MUJETSWPBTAGTTBARCSVM")
-          )
-  process.PATextraction.b_tagging_scale_factors_light_jets = cms.PSet(
-          jet_type = cms.string("light"),
-          from_globaltag = cms.bool(False),
-          scale_factors = loadLightJetsScaleFactor()
-          )
-  process.PATextraction.b_tagging_scale_factors = cms.vstring("b_tagging_scale_factors_b_jets", "b_tagging_scale_factors_c_jets", "b_tagging_scale_factors_light_jets")
 
   # MTT analysis configuration
   process.PATextraction.plugins = cms.PSet(
@@ -211,16 +180,16 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
           ),
 
         mva = cms.PSet(
-          weights = cms.string("Extractors/PatExtractor/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
-                    cms.string("Extractors/PatExtractor/data/TTJets_semie_BDT.weights.xml")
+          weights = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
+                    cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semie_BDT.weights.xml")
           ),
 
         use_mva = cms.bool(True),
         use_chi2 = cms.bool(True),
 
         b_tagging_efficiency = cms.PSet(
-                filename = cms.string("Extractors/PatExtractor/data/TTJets_MassiveBinDECAY_btagging_efficiency_semimu.root") if isSemiMu else
-                           cms.string("Extractors/PatExtractor/data/TTJets_MassiveBinDECAY_btagging_efficiency_semie.root"),
+                filename = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semimu.root") if isSemiMu else
+                           cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semie.root"),
                 b_eff_histo_name = cms.string("btagging_efficiency"),
                 cjets_fakerate_histo_name = cms.string("cjets_fakerate"),
                 lightjets_fakerate_histo_name = cms.string("lightjets_fakerate")
