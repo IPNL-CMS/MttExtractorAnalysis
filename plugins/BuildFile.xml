@@ -1,4 +1,4 @@
-<library file="*.cc" name="ExtractorsPatExtractorPlugins">
+<library file="*.cc" name="ExtractorsMttExtractorAnalysisPlugins">
   <flags EDM_PLUGIN="1" />
   <use name="FWCore/Framework"/>
   <use name="FWCore/ParameterSet"/>

@@ -1,4 +1,4 @@
-#include <Extractors/PatExtractor/plugins/mtt_analysis.h>
+#include <Extractors/MttExtractorAnalysis/plugins/mtt_analysis.h>
 
 #include <iostream>
 #include <vector>
@@ -35,7 +35,7 @@
 
 using namespace std;
 
-namespace patextractor {
+namespace mtt {
 
 mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   Plugin(cmsswSettings),
@@ -1755,4 +1755,4 @@ bool mtt_analysis::isBJet(unsigned int index) {
 
 }
 
-DEFINE_EDM_PLUGIN(PatExtractorPluginFactory, patextractor::mtt_analysis, "mtt_analysis");
+DEFINE_EDM_PLUGIN(PatExtractorPluginFactory, mtt::mtt_analysis, "mtt_analysis");

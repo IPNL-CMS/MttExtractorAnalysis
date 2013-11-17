@@ -46,9 +46,9 @@ namespace TMVA {
   class Reader;
 }
 
-namespace patextractor {
+namespace mtt {
 
-  class mtt_analysis: public Plugin {
+  class mtt_analysis: public patextractor::Plugin {
     public:
       mtt_analysis(const edm::ParameterSet& cmsswSettings);
       ~mtt_analysis();
