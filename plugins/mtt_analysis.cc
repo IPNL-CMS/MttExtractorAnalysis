@@ -710,12 +710,7 @@ int mtt_analysis::JetSel()
   if (m_mtt_NJets < 4)
     return 8;
 
-  /**
-   * Return the correct efficiency for a jet.
-   * For MC, it's the efficiency.
-   * For data, it's the efficiency times SF
-   */
-  auto getEfficiency = [&] (size_t index, bool correctWithScaleFactor) -> float {
+  auto getEfficiencyWithError = [&] (size_t index) -> std::tuple<double, double, double> {
     int mcFlavor = abs(jetFlavor[index]);
     ScaleFactorService::Flavor flavor = ScaleFactorService::B;
     if (mcFlavor == 4) {
@@ -727,86 +722,51 @@ int mtt_analysis::JetSel()
     float pt = m_mtt_JetPt[index];
     float eta = m_mtt_JetEta[index];
 
-    float btag_efficiency = m_b_tagging_efficiency_provider->getEfficiency(flavor, pt, eta);
-    ScaleFactor btag_scalefactor = jetSF[index]; // Flavor taken into account in JetMetExtractor
-
-    return (!correctWithScaleFactor) ? btag_efficiency : btag_efficiency * btag_scalefactor.getValue();
-  };
-
-  auto getEfficiencyError = [&] (size_t index) -> float {
-    int mcFlavor = abs(jetFlavor[index]);
-    ScaleFactorService::Flavor flavor = ScaleFactorService::B;
-    if (mcFlavor == 4) {
-      flavor = ScaleFactorService::C;
-    } else if ((mcFlavor <= 3) || (mcFlavor == 21)) {
-      // If mcFlavor == 0, assume it's a light jet
-      flavor = ScaleFactorService::LIGHT;
-    }
-    float pt = m_mtt_JetPt[index];
-    float eta = m_mtt_JetEta[index];
-
-    return m_b_tagging_efficiency_provider->getEfficiencyError(flavor, pt, eta);
-  };
-
-  /**
-   * Return the probability that this event has the given
-   * b-tag configuration
-   *
-   * @param forMC If true, the probability is calculated for a MC configuration.
-   *              Otherwise, SF are taken into account (data configuration)
-   */
-  auto getBTagProbability = [&] (bool forMC) -> float {
-
-
-    // Loop over all selected jets
-    float p_tagged = 1.f;
-    float p_untagged = 1.f;
-    for (size_t i = 0; i < m_selJetsIds.size(); i++) {
-      if (jetIsBTagged[i]) {
-        p_tagged *= getEfficiency(i, !forMC);
-      } else {
-        p_untagged *= (1 - getEfficiency(i, !forMC));
-      }
-    }
-
-    float p = p_tagged * p_untagged;
-
-    return p;
+    return m_b_tagging_efficiency_provider->getEfficiency(flavor, pt, eta);
   };
 
   if (m_isMC) {
 
     // We use method 1.a) from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods
-    // P(data || mc) is given by getBTagProbability()
-    // so weight is getBTagProbability(DATA) / getBTagProbability(MC)
-    float weight = (getBTagProbability(false) / getBTagProbability(true));
-
-    m_btag_weight *= weight;
     
-    float error_tagged_squared = 0.f;
-    float error_untagged_squared = 0.f;
-    for (size_t i = 0; i < m_selJetsIds.size(); i++) {
-      float eff_i = getEfficiency(i, false);
-      float sf_i = jetSF[i].getValue();
+    float error_tagged_squared_up = 0.f;
+    float error_untagged_squared_up = 0.f;
+    float error_tagged_squared_low = 0.f;
+    float error_untagged_squared_low = 0.f;
 
-      float error_eff_i = getEfficiencyError(i);
-      float error_sf_i = jetSF[i].getErrorHigh();
+    float eff_tagged = 1.;
+    float eff_untagged = 1.;
+    for (size_t i = 0; i < m_selJetsIds.size(); i++) {
+
+      auto eff = getEfficiencyWithError(i);
+      ScaleFactor sf = jetSF[i];
+
+      float eff_i = std::get<0>(eff);
+      float sf_i = sf.getValue();
+
+      float error_eff_i_up = std::get<1>(eff);
+      float error_sf_i_up = jetSF[i].getErrorHigh();
+      float error_eff_i_low = std::get<2>(eff);
+      float error_sf_i_low = jetSF[i].getErrorLow();
 
       if (jetIsBTagged[i]) {
-        float a = (1. / (eff_i * eff_i)) * (2 * error_eff_i * error_eff_i + error_sf_i * error_sf_i);
-        error_tagged_squared += a;
+        eff_tagged *= sf_i;
+        error_tagged_squared_up += ((error_sf_i_up * error_sf_i_up) / (sf_i * sf_i));
+        error_tagged_squared_low += ((error_sf_i_low * error_sf_i_low) / (sf_i * sf_i));
       } else {
-        float a = (1. / ((1 - eff_i) * (1 - eff_i))) * error_eff_i * error_eff_i +
-                  std::pow(((1. - sf_i) / (1 - sf_i * eff_i)), 2) * (error_eff_i * error_eff_i) +
-                  std::pow(((1 - eff_i) / (1 - sf_i * eff_i)), 2) * (error_sf_i * error_sf_i);
-        error_untagged_squared += a;
+        eff_untagged *= ((1. - sf_i * eff_i)) / (1. - eff_i);
+        error_untagged_squared_up += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_up, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_up, 2);
+        error_untagged_squared_low += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_low, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_low, 2);
       }
     }
 
-    float error_weight_squared = (error_tagged_squared + error_untagged_squared) * (weight * weight);
-    m_btag_weight_error_low = m_btag_weight_error_high = error_weight_squared;
+    m_btag_weight = eff_tagged * eff_untagged;
 
-    //std::cout << "BTag weight: " << weight << " +/- " << sqrt(error_weight_squared) << std::endl;
+    float btag_eff_squared = m_btag_weight * m_btag_weight;
+    m_btag_weight_error_high = (error_tagged_squared_up + error_untagged_squared_up) * btag_eff_squared;
+    m_btag_weight_error_low = (error_tagged_squared_low + error_untagged_squared_low) * btag_eff_squared;
+
+    //std::cout << "BTag weight: " << m_btag_weight << " +" << sqrt(m_btag_weight_error_high) << " -" << sqrt(m_btag_weight_error_low) << std::endl;
   }
 
   return 1;

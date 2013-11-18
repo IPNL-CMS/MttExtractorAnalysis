@@ -190,9 +190,9 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
         b_tagging_efficiency = cms.PSet(
                 filename = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semimu.root") if isSemiMu else
                            cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semie.root"),
-                b_eff_histo_name = cms.string("btagging_efficiency"),
-                cjets_fakerate_histo_name = cms.string("cjets_fakerate"),
-                lightjets_fakerate_histo_name = cms.string("lightjets_fakerate")
+                b_eff_histo_name = cms.string("btagging_efficiency_bayes"),
+                cjets_fakerate_histo_name = cms.string("cjets_fakerate_bayes"),
+                lightjets_fakerate_histo_name = cms.string("lightjets_fakerate_bayes")
                 ),
 
         # ------------------------------------------------
