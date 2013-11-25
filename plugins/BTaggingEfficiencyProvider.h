@@ -63,7 +63,8 @@ class BTaggingEfficiencyProvider {
         }
       }
 
-      return std::make_tuple(1., 0., 0.);
+      //std::cout << "Warning: no b-tag efficiency found for flavor: " << f << "; pt: " << pt << "; eta: " << eta << std::endl;
+      return std::make_tuple(0., 0., 0.);
     }
 
   private:
