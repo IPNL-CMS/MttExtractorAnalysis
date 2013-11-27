@@ -87,14 +87,14 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
       process.PATextraction.triggersXML = readFile("triggers_e.xml")
 
   # Jets correction : needs a valid global tags, or an external DB where JEC are stored
-  process.PATextraction.jet_PF.redoJetCorrection = False
+  process.PATextraction.jet_PF.redoJetCorrection = True
 
   if isMC:
     process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3"
   else:
     process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3Residual"
 
-  process.PATextraction.jet_PF.doJER = False # Disable automatically on data
+  process.PATextraction.jet_PF.doJER = True # Disable automatically on data
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
@@ -106,8 +106,8 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   # If uncommented, use the specifiec file for jes uncertainties instead of global tag values
   #process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("Extractors/PatExtractor/data/START53_V23_Uncertainty_AK5PFchs.txt")
 
-  process.PATextraction.MET_PF.redoMetPhiCorrection   = False
-  process.PATextraction.MET_PF.redoMetTypeICorrection = False # Automatically true if redoJetCorrection is True
+  process.PATextraction.MET_PF.redoMetPhiCorrection   = True
+  process.PATextraction.MET_PF.redoMetTypeICorrection = True # Automatically true if redoJetCorrection is True
 
   # MTT analysis configuration
   process.PATextraction.plugins = cms.PSet(
@@ -161,21 +161,21 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 
           use_btagging = cms.bool(False),
 
-          hadronic_top_mass = cms.double(175.164),
-          leptonic_top_mass_semimu = cms.double(170.937),
-          leptonic_top_mass_semie = cms.double(170.875),
-          hadronic_w_mass = cms.double(84.0569),
-          pt_ttbar_system = cms.double(0),
-          ht_frac = cms.double(1),
+          hadronic_top_mass = cms.double(174.688),
+          leptonic_top_mass_semimu = cms.double(171.784),
+          leptonic_top_mass_semie = cms.double(171.751),
+          hadronic_w_mass = cms.double(83.9742),
+          pt_ttbar_system = cms.double(22),
+          ht_frac = cms.double(0.99),
 
-          sigma_hadronic_top_mass = cms.double(17.3484),
-          sigma_leptonic_top_mass_semimu = cms.double(17.3594),
-          sigma_leptonic_top_mass_semie = cms.double(17.2875),
-          sigma_hadronic_w_mass = cms.double(10.1166),
-          sigma_pt_ttbar_system = cms.double(56.93),
-          sigma_ht_frac = cms.double(0.151),
+          sigma_hadronic_top_mass = cms.double(17.1949),
+          sigma_leptonic_top_mass_semimu = cms.double(15.0096),
+          sigma_leptonic_top_mass_semie = cms.double(15.031),
+          sigma_hadronic_w_mass = cms.double(10.1752),
+          sigma_pt_ttbar_system = cms.double(95.6927),
+          sigma_ht_frac = cms.double(0.153778),
 
-          use_pt_syst = cms.bool(False),
+          use_pt_syst = cms.bool(True),
           use_ht_frac = cms.bool(False)
           ),
 
@@ -188,8 +188,9 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
         use_chi2 = cms.bool(True),
 
         b_tagging_efficiency = cms.PSet(
-                filename = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semimu.root") if isSemiMu else
-                           cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semie.root"),
+                filename = cms.string("Extractors/MttExtractorAnalysis/data/TT_powheg_btagging_efficiency.root"),
+                #filename = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semimu.root") if isSemiMu else
+                           #cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semie.root"),
                 b_eff_histo_name = cms.string("btagging_efficiency_bayes"),
                 cjets_fakerate_histo_name = cms.string("cjets_fakerate_bayes"),
                 lightjets_fakerate_histo_name = cms.string("lightjets_fakerate_bayes")
