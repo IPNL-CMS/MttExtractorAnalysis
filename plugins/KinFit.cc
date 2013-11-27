@@ -449,11 +449,11 @@ double KinFit::GlobalSimpleChi2(double totPt)
   float chi2 = ((MtopH - chi2_hadronic_top_mass) * (MtopH - chi2_hadronic_top_mass) / (chi2_sigma_hadronic_top_mass_square)) + 
     ((MW - chi2_hadronic_w_mass) * (MW - chi2_hadronic_w_mass) / (chi2_sigma_hadronic_w_mass_square));
 
-  if (m_usePtSystInChi2) {
+  if (m_useHtFracInChi2) {
     chi2 += ((SolPtSystem - chi2_ht_frac) * (SolPtSystem - chi2_ht_frac) / (chi2_sigma_ht_frac_square));
   }
 
-  if (m_useHtFracInChi2) {
+  if (m_usePtSystInChi2) {
     chi2 += ((TTbarSystemPt - chi2_pt_ttbar_system) * (TTbarSystemPt - chi2_pt_ttbar_system) / chi2_sigma_pt_ttbar_system_square);
   }
 
