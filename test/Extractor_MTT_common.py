@@ -175,8 +175,8 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
           sigma_pt_ttbar_system = cms.double(95.6927),
           sigma_ht_frac = cms.double(0.153778),
 
-          use_pt_syst = cms.bool(True),
-          use_ht_frac = cms.bool(False)
+          use_pt_syst = cms.bool(False),
+          use_ht_frac = cms.bool(True)
           ),
 
         mva = cms.PSet(
