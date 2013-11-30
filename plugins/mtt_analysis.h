@@ -22,6 +22,7 @@
 
 #include <TTree.h>
 #include <TLorentzVector.h>
+#include <TClonesArray.h>
 #include <TRef.h>
 #include <TH2.h>
 
@@ -193,17 +194,17 @@ namespace mtt {
       float m_MC_eta_tt;
       float m_MC_beta_tt;
 
-      TLorentzVector* m_MC_lepton_p4;
-      TLorentzVector* m_MC_neutrino_p4;
+      TClonesArray* m_MC_lepton_p4;
+      TClonesArray* m_MC_neutrino_p4;
 
-      TLorentzVector* m_MC_leptonic_B_p4;
-      TLorentzVector* m_MC_hadronic_B_p4;
+      TClonesArray* m_MC_leptonic_B_p4;
+      TClonesArray* m_MC_hadronic_B_p4;
 
-      TLorentzVector* m_MC_lightJet1_p4;
-      TLorentzVector* m_MC_lightJet2_p4;
+      TClonesArray* m_MC_lightJet1_p4;
+      TClonesArray* m_MC_lightJet2_p4;
 
-      TLorentzVector* m_MC_Top1_p4;
-      TLorentzVector* m_MC_Top2_p4;
+      TClonesArray* m_MC_Top1_p4;
+      TClonesArray* m_MC_Top2_p4;
 
       /// Number of lepton/neutrino from Top->W and quark b from Top
       int nEle;
@@ -252,11 +253,11 @@ namespace mtt {
 
       float m_lepTopPt_AfterChi2;
       float m_lepTopEta_AfterChi2;
-      TLorentzVector* m_lepTopP4_AfterChi2;
+      TClonesArray* m_lepTopP4_AfterChi2;
 
       float m_hadTopPt_AfterChi2;
       float m_hadTopEta_AfterChi2;
-      TLorentzVector* m_hadTopP4_AfterChi2;
+      TClonesArray* m_hadTopP4_AfterChi2;
 
       // Indexes of selected particles for mtt computation
       int m_selectedLeptonIndex_AfterChi2;
@@ -265,12 +266,12 @@ namespace mtt {
       int m_selectedHadronicFirstJetIndex_AfterChi2;
       int m_selectedHadronicSecondJetIndex_AfterChi2;
 
-      TLorentzVector* m_selectedLeptonP4_AfterChi2;
-      TLorentzVector* m_selectedNeutrinoP4_AfterChi2;
-      TLorentzVector* m_selectedLeptonicBP4_AfterChi2;
-      TLorentzVector* m_selectedHadronicBP4_AfterChi2;
-      TLorentzVector* m_selectedFirstJetP4_AfterChi2;
-      TLorentzVector* m_selectedSecondJetP4_AfterChi2;
+      TClonesArray* m_selectedLeptonP4_AfterChi2;
+      TClonesArray* m_selectedNeutrinoP4_AfterChi2;
+      TClonesArray* m_selectedLeptonicBP4_AfterChi2;
+      TClonesArray* m_selectedHadronicBP4_AfterChi2;
+      TClonesArray* m_selectedFirstJetP4_AfterChi2;
+      TClonesArray* m_selectedSecondJetP4_AfterChi2;
 
       // MVA values
       bool m_mtt_recoJetsAssociatedWithMVA;
@@ -287,11 +288,11 @@ namespace mtt {
 
       float m_lepTopPt_AfterMVA;
       float m_lepTopEta_AfterMVA;
-      TLorentzVector* m_lepTopP4_AfterMVA;
+      TClonesArray* m_lepTopP4_AfterMVA;
 
       float m_hadTopPt_AfterMVA;
       float m_hadTopEta_AfterMVA;
-      TLorentzVector* m_hadTopP4_AfterMVA;
+      TClonesArray* m_hadTopP4_AfterMVA;
 
       // Indexes of selected particles for mtt computation, after MVA selection
       int m_selectedLeptonIndex_AfterMVA;
@@ -300,13 +301,12 @@ namespace mtt {
       int m_selectedHadronicFirstJetIndex_AfterMVA;
       int m_selectedHadronicSecondJetIndex_AfterMVA;
 
-      TLorentzVector* m_selectedLeptonP4_AfterMVA;
-      TLorentzVector* m_selectedNeutrinoP4_AfterMVA;
-      TLorentzVector* m_selectedLeptonicBP4_AfterMVA;
-      TLorentzVector* m_selectedHadronicBP4_AfterMVA;
-      TLorentzVector* m_selectedFirstJetP4_AfterMVA;
-      TLorentzVector* m_selectedSecondJetP4_AfterMVA;
-
+      TClonesArray* m_selectedLeptonP4_AfterMVA;
+      TClonesArray* m_selectedNeutrinoP4_AfterMVA;
+      TClonesArray* m_selectedLeptonicBP4_AfterMVA;
+      TClonesArray* m_selectedHadronicBP4_AfterMVA;
+      TClonesArray* m_selectedFirstJetP4_AfterMVA;
+      TClonesArray* m_selectedSecondJetP4_AfterMVA;
 
       int m_mtt_NGoodMuons;
       int m_mtt_NLooseGoodMuons;
@@ -361,7 +361,6 @@ namespace mtt {
       int Elepass2Dcut_veto;
 
       //variables for semie selection
-
 
       bool itsaZ;
       TVector3 el3P;

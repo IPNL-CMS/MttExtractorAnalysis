@@ -55,38 +55,38 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_useChi2 = cmsswSettings.getParameter<bool>("use_chi2");
   m_useMVA = cmsswSettings.getParameter<bool>("use_mva");
 
-  m_MC_lepton_p4 = new TLorentzVector(0., 0., 0., 0.);
-  m_MC_neutrino_p4 = new TLorentzVector(0., 0., 0., 0.);
+  m_MC_lepton_p4 = new TClonesArray("TLorentzVector");
+  m_MC_neutrino_p4 = new TClonesArray("TLorentzVector");
 
-  m_MC_leptonic_B_p4 = new TLorentzVector(0., 0., 0., 0.);
-  m_MC_hadronic_B_p4 = new TLorentzVector(0., 0., 0., 0.);
+  m_MC_leptonic_B_p4 = new TClonesArray("TLorentzVector");
+  m_MC_hadronic_B_p4 = new TClonesArray("TLorentzVector");
 
-  m_MC_lightJet1_p4 = new TLorentzVector(0., 0., 0., 0.);
-  m_MC_lightJet2_p4 = new TLorentzVector(0., 0., 0., 0.);
+  m_MC_lightJet1_p4 = new TClonesArray("TLorentzVector");
+  m_MC_lightJet2_p4 = new TClonesArray("TLorentzVector");
 
-  m_MC_Top1_p4 = new TLorentzVector(0., 0., 0., 0.);
-  m_MC_Top2_p4 = new TLorentzVector(0., 0., 0., 0.);
+  m_MC_Top1_p4 = new TClonesArray("TLorentzVector");
+  m_MC_Top2_p4 = new TClonesArray("TLorentzVector");
 
   if (m_useChi2) {
-    m_selectedLeptonP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedNeutrinoP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedLeptonicBP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedHadronicBP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedFirstJetP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedSecondJetP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_lepTopP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
-    m_hadTopP4_AfterChi2 = new TLorentzVector(0., 0., 0., 0.);
+    m_selectedLeptonP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_selectedNeutrinoP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_selectedLeptonicBP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_selectedHadronicBP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_selectedFirstJetP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_selectedSecondJetP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_hadTopP4_AfterChi2 = new TClonesArray("TLorentzVector");
+    m_lepTopP4_AfterChi2 = new TClonesArray("TLorentzVector");
   }
 
   if (m_useMVA) {
-    m_selectedLeptonP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedNeutrinoP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedLeptonicBP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedHadronicBP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedFirstJetP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_selectedSecondJetP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_lepTopP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
-    m_hadTopP4_AfterMVA = new TLorentzVector(0., 0., 0., 0.);
+    m_selectedLeptonP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_selectedNeutrinoP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_selectedLeptonicBP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_selectedHadronicBP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_selectedFirstJetP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_selectedSecondJetP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_hadTopP4_AfterMVA = new TClonesArray("TLorentzVector");
+    m_lepTopP4_AfterMVA = new TClonesArray("TLorentzVector");
   }
 
   reset();
@@ -119,14 +119,14 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("MC_beta_tt"         , &m_MC_beta_tt             , "MC_beta_tt/F");
 
   // Easy access
-  m_tree_Mtt->Branch("MC_lepton_p4."      , &m_MC_lepton_p4);
-  m_tree_Mtt->Branch("MC_neutrino_p4."    , &m_MC_neutrino_p4);
-  m_tree_Mtt->Branch("MC_leptonic_B_p4."  , &m_MC_leptonic_B_p4);
-  m_tree_Mtt->Branch("MC_hadronic_B_p4."  , &m_MC_hadronic_B_p4);
-  m_tree_Mtt->Branch("MC_lightJet1_B_p4." , &m_MC_lightJet1_p4);
-  m_tree_Mtt->Branch("MC_lightJet2_B_p4." , &m_MC_lightJet2_p4);
-  m_tree_Mtt->Branch("MC_Top1_p4."        , &m_MC_Top1_p4);
-  m_tree_Mtt->Branch("MC_Top2_p4."        , &m_MC_Top2_p4);
+  m_tree_Mtt->Branch("MC_lepton_p4"      , &m_MC_lepton_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_neutrino_p4"    , &m_MC_neutrino_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_leptonic_B_p4"  , &m_MC_leptonic_B_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_hadronic_B_p4"  , &m_MC_hadronic_B_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_lightJet1_B_p4" , &m_MC_lightJet1_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_lightJet2_B_p4" , &m_MC_lightJet2_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_Top1_p4"        , &m_MC_Top1_p4, 32000, -1);
+  m_tree_Mtt->Branch("MC_Top2_p4"        , &m_MC_Top2_p4, 32000, -1);
 
   m_tree_Mtt->Branch("nGoodMuons"         , &m_mtt_NGoodMuons         , "nGoodMuons/I");
   m_tree_Mtt->Branch("nLooseGoodMuons"    , &m_mtt_NLooseGoodMuons    , "nLooseGoodMuons/I");
@@ -199,12 +199,12 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("mLepTop_AfterChi2"      , &m_mLepTop_AfterChi2     , "mLepTop_AfterChi2/F");
     m_tree_Mtt->Branch("lepTopPt_AfterChi2"     , &m_lepTopPt_AfterChi2    , "lepTopPt_AfterChi2/F");
     m_tree_Mtt->Branch("lepTopEta_AfterChi2"    , &m_lepTopEta_AfterChi2   , "lepTopEta_AfterChi2/F");
-    m_tree_Mtt->Branch("lepTopP4_AfterChi2."    , &m_lepTopP4_AfterChi2);
+    m_tree_Mtt->Branch("lepTopP4_AfterChi2"    , &m_lepTopP4_AfterChi2, 32000, -1);
 
     m_tree_Mtt->Branch("mHadTop_AfterChi2"      , &m_mHadTop_AfterChi2     , "mHadTop_AfterChi2/F");
     m_tree_Mtt->Branch("hadTopPt_AfterChi2"     , &m_hadTopPt_AfterChi2    , "hadTopPt_AfterChi2/F");
     m_tree_Mtt->Branch("hadTopEta_AfterChi2"    , &m_hadTopEta_AfterChi2   , "hadTopEta_AfterChi2/F");
-    m_tree_Mtt->Branch("hadTopP4_AfterChi2."    , &m_hadTopP4_AfterChi2);
+    m_tree_Mtt->Branch("hadTopP4_AfterChi2"    , &m_hadTopP4_AfterChi2, 32000, -1);
 
     m_tree_Mtt->Branch("pt_tt_AfterChi2"        , &m_pt_tt_AfterChi2       , "pt_tt_AfterChi2/F");
     m_tree_Mtt->Branch("eta_tt_AfterChi2"       , &m_eta_tt_AfterChi2      , "eta_tt_AfterChi2/F");
@@ -218,12 +218,12 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterChi2"  , &m_selectedHadronicFirstJetIndex_AfterChi2  , "selectedHadronicFirstJetIndex_AfterChi2/I");
     m_tree_Mtt->Branch("selectedHadronicSecondJetIndex_AfterChi2" , &m_selectedHadronicSecondJetIndex_AfterChi2 , "selectedHadronicSecondJetIndex_AfterChi2/I");
 
-    m_tree_Mtt->Branch("selectedLeptonP4_AfterChi2."      , &m_selectedLeptonP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterChi2."    , &m_selectedNeutrinoP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterChi2."   , &m_selectedLeptonicBP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedHadronicBP4_AfterChi2."   , &m_selectedHadronicBP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedFirstJetP4_AfterChi2."    , &m_selectedFirstJetP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedSecondJetP4_AfterChi2."   , &m_selectedSecondJetP4_AfterChi2);
+    m_tree_Mtt->Branch("selectedLeptonP4_AfterChi2"      , &m_selectedLeptonP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterChi2"    , &m_selectedNeutrinoP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterChi2"   , &m_selectedLeptonicBP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedHadronicBP4_AfterChi2"   , &m_selectedHadronicBP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedFirstJetP4_AfterChi2"    , &m_selectedFirstJetP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedSecondJetP4_AfterChi2"   , &m_selectedSecondJetP4_AfterChi2, 32000, -1);
   }
 
   if (m_useMVA) {
@@ -234,12 +234,12 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("mLepTop_AfterMVA"      , &m_mLepTop_AfterMVA     , "mLepTop_AfterMVA/F");
     m_tree_Mtt->Branch("lepTopPt_AfterMVA"     , &m_lepTopPt_AfterMVA    , "lepTopPt_AfterMVA/F");
     m_tree_Mtt->Branch("lepTopEta_AfterMVA"    , &m_lepTopEta_AfterMVA   , "lepTopEta_AfterMVA/F");
-    m_tree_Mtt->Branch("lepTopP4_AfterMVA."    , &m_lepTopP4_AfterMVA);
+    m_tree_Mtt->Branch("lepTopP4_AfterMVA"    , &m_lepTopP4_AfterMVA, 32000, -1);
 
     m_tree_Mtt->Branch("mHadTop_AfterMVA"      , &m_mHadTop_AfterMVA     , "mHadTop_AfterMVA/F");
     m_tree_Mtt->Branch("hadTopPt_AfterMVA"     , &m_hadTopPt_AfterMVA    , "hadTopPt_AfterMVA/F");
     m_tree_Mtt->Branch("hadTopEta_AfterMVA"    , &m_hadTopEta_AfterMVA   , "hadTopEta_AfterMVA/F");
-    m_tree_Mtt->Branch("hadTopP4_AfterMVA."    , &m_hadTopP4_AfterMVA);
+    m_tree_Mtt->Branch("hadTopP4_AfterMVA"    , &m_hadTopP4_AfterMVA, 32000, -1);
 
     m_tree_Mtt->Branch("pt_tt_AfterMVA"        , &m_pt_tt_AfterMVA       , "pt_tt_AfterMVA/F");
     m_tree_Mtt->Branch("eta_tt_AfterMVA"       , &m_eta_tt_AfterMVA      , "eta_tt_AfterMVA/F");
@@ -253,12 +253,12 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterMVA"  , &m_selectedHadronicFirstJetIndex_AfterMVA  , "selectedHadronicFirstJetIndex_AfterMVA/I");
     m_tree_Mtt->Branch("selectedHadronicSecondJetIndex_AfterMVA" , &m_selectedHadronicSecondJetIndex_AfterMVA , "selectedHadronicSecondJetIndex_AfterMVA/I");
 
-    m_tree_Mtt->Branch("selectedLeptonP4_AfterChi2."      , &m_selectedLeptonP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterChi2."    , &m_selectedNeutrinoP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterChi2."   , &m_selectedLeptonicBP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedHadronicBP4_AfterChi2."   , &m_selectedHadronicBP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedFirstJetP4_AfterChi2."    , &m_selectedFirstJetP4_AfterChi2);
-    m_tree_Mtt->Branch("selectedSecondJetP4_AfterChi2."   , &m_selectedSecondJetP4_AfterChi2);
+    m_tree_Mtt->Branch("selectedLeptonP4_AfterChi2"      , &m_selectedLeptonP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterChi2"    , &m_selectedNeutrinoP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterChi2"   , &m_selectedLeptonicBP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedHadronicBP4_AfterChi2"   , &m_selectedHadronicBP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedFirstJetP4_AfterChi2"    , &m_selectedFirstJetP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedSecondJetP4_AfterChi2"   , &m_selectedSecondJetP4_AfterChi2, 32000, -1);
   }
 
   m_tree_Mtt->Branch("trigger_passed", &m_trigger_passed, "trigger_passed/O");
@@ -1037,12 +1037,12 @@ void mtt_analysis::loopOverCombinations()
     const TLorentzVector& measuredHadronicSecondJet = m_KinFit->GetMeasuredSecondLightJet();
 
     // Copy P4 for Tree
-    *m_selectedLeptonP4_AfterChi2 = measuredLepton;
-    *m_selectedNeutrinoP4_AfterChi2 = measuredNeutrino;
-    *m_selectedLeptonicBP4_AfterChi2 = measuredLeptonicB;
-    *m_selectedHadronicBP4_AfterChi2 = measuredHadronicB;
-    *m_selectedFirstJetP4_AfterChi2 = measuredHadronicFirstJet;
-    *m_selectedSecondJetP4_AfterChi2 = measuredHadronicSecondJet;
+    new ((*m_selectedLeptonP4_AfterChi2)[0]) TLorentzVector(measuredLepton);
+    new ((*m_selectedNeutrinoP4_AfterChi2)[0]) TLorentzVector(measuredNeutrino);
+    new ((*m_selectedLeptonicBP4_AfterChi2)[0]) TLorentzVector(measuredLeptonicB);
+    new ((*m_selectedHadronicBP4_AfterChi2)[0]) TLorentzVector(measuredHadronicB);
+    new ((*m_selectedFirstJetP4_AfterChi2)[0]) TLorentzVector(measuredHadronicFirstJet);
+    new ((*m_selectedSecondJetP4_AfterChi2)[0]) TLorentzVector(measuredHadronicSecondJet);
 
     /**
      * Compute Mtt before doing KinFit
@@ -1050,17 +1050,19 @@ void mtt_analysis::loopOverCombinations()
     m_mLepW_AfterChi2   = (measuredNeutrino + measuredLepton).M();
     m_mHadW_AfterChi2   = (measuredHadronicFirstJet + measuredHadronicSecondJet).M();
 
-    *m_lepTopP4_AfterChi2 = (measuredLepton + measuredNeutrino + measuredLeptonicB);
-    m_mLepTop_AfterChi2 = m_lepTopP4_AfterChi2->M();
-    m_lepTopPt_AfterChi2 = m_lepTopP4_AfterChi2->Pt();
-    m_lepTopEta_AfterChi2 = m_lepTopP4_AfterChi2->Eta();
+    TLorentzVector lepTopP4_AfterChi2 = (measuredLepton + measuredNeutrino + measuredLeptonicB);
+    new ((*m_lepTopP4_AfterChi2)[0]) TLorentzVector(lepTopP4_AfterChi2);
+    m_mLepTop_AfterChi2 = lepTopP4_AfterChi2.M();
+    m_lepTopPt_AfterChi2 = lepTopP4_AfterChi2.Pt();
+    m_lepTopEta_AfterChi2 = lepTopP4_AfterChi2.Eta();
 
-    *m_hadTopP4_AfterChi2 = (measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB);
-    m_mHadTop_AfterChi2 = m_hadTopP4_AfterChi2->M();
-    m_hadTopPt_AfterChi2 = m_hadTopP4_AfterChi2->Pt();
-    m_hadTopEta_AfterChi2 = m_hadTopP4_AfterChi2->Eta();
+    TLorentzVector hadTopP4_AfterChi2 = (measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB);
+    new ((*m_hadTopP4_AfterChi2)[0]) TLorentzVector((measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB));
+    m_mHadTop_AfterChi2 = hadTopP4_AfterChi2.M();
+    m_hadTopPt_AfterChi2 = hadTopP4_AfterChi2.Pt();
+    m_hadTopEta_AfterChi2 = hadTopP4_AfterChi2.Eta();
 
-    TLorentzVector res = (*m_lepTopP4_AfterChi2 + *m_hadTopP4_AfterChi2);
+    TLorentzVector res = (lepTopP4_AfterChi2 + hadTopP4_AfterChi2);
     m_mtt_AfterChi2     = res.M();
     m_pt_tt_AfterChi2   = res.Pt();
     m_eta_tt_AfterChi2   = res.Eta();
@@ -1094,12 +1096,12 @@ void mtt_analysis::loopOverCombinations()
     const TLorentzVector& measuredHadronicSecondJet = m_KinFit->GetMeasuredSecondLightJet();
 
     // Copy P4 for Tree
-    *m_selectedLeptonP4_AfterMVA = measuredLepton;
-    *m_selectedNeutrinoP4_AfterMVA = measuredNeutrino;
-    *m_selectedLeptonicBP4_AfterMVA = measuredLeptonicB;
-    *m_selectedHadronicBP4_AfterMVA = measuredHadronicB;
-    *m_selectedFirstJetP4_AfterMVA = measuredHadronicFirstJet;
-    *m_selectedSecondJetP4_AfterMVA = measuredHadronicSecondJet;
+    new ((*m_selectedLeptonP4_AfterMVA)[0]) TLorentzVector(measuredLepton);
+    new ((*m_selectedNeutrinoP4_AfterMVA)[0]) TLorentzVector(measuredNeutrino);
+    new ((*m_selectedLeptonicBP4_AfterMVA)[0]) TLorentzVector(measuredLeptonicB);
+    new ((*m_selectedHadronicBP4_AfterMVA)[0]) TLorentzVector(measuredHadronicB);
+    new ((*m_selectedFirstJetP4_AfterMVA)[0]) TLorentzVector(measuredHadronicFirstJet);
+    new ((*m_selectedSecondJetP4_AfterMVA)[0]) TLorentzVector(measuredHadronicSecondJet);
 
     /**
      * Compute Mtt before doing KinFit
@@ -1107,17 +1109,19 @@ void mtt_analysis::loopOverCombinations()
     m_mLepW_AfterMVA   = (measuredNeutrino + measuredLepton).M();
     m_mHadW_AfterMVA   = (measuredHadronicFirstJet + measuredHadronicSecondJet).M();
 
-    *m_lepTopP4_AfterMVA = (measuredLepton + measuredNeutrino + measuredLeptonicB);
-    m_mLepTop_AfterMVA = m_lepTopP4_AfterMVA->M();
-    m_lepTopPt_AfterMVA = m_lepTopP4_AfterMVA->Pt();
-    m_lepTopEta_AfterMVA = m_lepTopP4_AfterMVA->Eta();
+    TLorentzVector lepTopP4_AfterMVA = (measuredLepton + measuredNeutrino + measuredLeptonicB);
+    new ((*m_lepTopP4_AfterMVA)[0]) TLorentzVector(lepTopP4_AfterMVA);
+    m_mLepTop_AfterMVA = lepTopP4_AfterMVA.M();
+    m_lepTopPt_AfterMVA = lepTopP4_AfterMVA.Pt();
+    m_lepTopEta_AfterMVA = lepTopP4_AfterMVA.Eta();
 
-    *m_hadTopP4_AfterMVA = (measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB);
-    m_mHadTop_AfterMVA = m_hadTopP4_AfterMVA->M();
-    m_hadTopPt_AfterMVA = m_hadTopP4_AfterMVA->Pt();
-    m_hadTopEta_AfterMVA = m_hadTopP4_AfterMVA->Eta();
+    TLorentzVector hadTopP4_AfterMVA = (measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB);
+    new ((*m_hadTopP4_AfterMVA)[0]) TLorentzVector((hadTopP4_AfterMVA));
+    m_mHadTop_AfterMVA = hadTopP4_AfterMVA.M();
+    m_hadTopPt_AfterMVA = hadTopP4_AfterMVA.Pt();
+    m_hadTopEta_AfterMVA = hadTopP4_AfterMVA.Eta();
 
-    TLorentzVector res = (*m_lepTopP4_AfterMVA + *m_hadTopP4_AfterMVA);
+    TLorentzVector res = (lepTopP4_AfterMVA + hadTopP4_AfterMVA);
     m_mtt_AfterMVA     = res.M();
     m_pt_tt_AfterMVA   = res.Pt();
     m_eta_tt_AfterMVA   = res.Eta();
@@ -1286,8 +1290,8 @@ void mtt_analysis::MCidentification()
     m_MC_eta_tt = mc_resonance.Eta();
     m_MC_beta_tt = fabs(mc_resonance.Pz() / mc_resonance.E());
 
-    *m_MC_Top1_p4 = Top[0];
-    *m_MC_Top2_p4 = Top[1];
+    new ((*m_MC_Top1_p4)[0]) TLorentzVector(Top[0]);
+    new ((*m_MC_Top2_p4)[0]) TLorentzVector(Top[1]);
   }
 
   if (m_MC_channel != 1 && m_MC_channel != 2) {
@@ -1438,14 +1442,14 @@ void mtt_analysis::MCidentification()
   m_MC_leptonicTopMass = mc_lept_top.M();
 
   // Store ref to various P4
-  *m_MC_lepton_p4 = *m_MC->getP4(m_leptonIndex);
-  *m_MC_neutrino_p4 = *m_MC->getP4(m_neutrinoIndex);
+  new ((*m_MC_lepton_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonIndex));
+  new ((*m_MC_neutrino_p4)[0]) TLorentzVector(*m_MC->getP4(m_neutrinoIndex));
 
-  *m_MC_leptonic_B_p4 = *m_MC->getP4(m_leptonicBIndex);
-  *m_MC_hadronic_B_p4 = *m_MC->getP4(m_hadronicBIndex);
+  new ((*m_MC_leptonic_B_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonicBIndex));
+  new ((*m_MC_hadronic_B_p4)[0]) TLorentzVector(*m_MC->getP4(m_hadronicBIndex));
 
-  *m_MC_lightJet1_p4 = *m_MC->getP4(m_firstJetIndex);
-  *m_MC_lightJet2_p4 = *m_MC->getP4(m_secondJetIndex);
+  new ((*m_MC_lightJet1_p4)[0]) TLorentzVector(*m_MC->getP4(m_firstJetIndex));
+  new ((*m_MC_lightJet2_p4)[0]) TLorentzVector(*m_MC->getP4(m_secondJetIndex));
 }
 
 bool mtt_analysis::hasRecoPartner(int mcIndex) const {
@@ -1588,17 +1592,17 @@ void mtt_analysis::reset()
   m_hadTopPt_AfterMVA  = -1;
   m_hadTopEta_AfterMVA = -1;
 
-  m_MC_lepton_p4->SetPxPyPzE(0., 0., 0., 0.);
-  m_MC_neutrino_p4->SetPxPyPzE(0., 0., 0., 0.);
+  m_MC_lepton_p4->Clear("C");
+  m_MC_neutrino_p4->Clear("C");
 
-  m_MC_leptonic_B_p4->SetPxPyPzE(0., 0., 0., 0.);
-  m_MC_hadronic_B_p4->SetPxPyPzE(0., 0., 0., 0.);
+  m_MC_leptonic_B_p4->Clear("C");
+  m_MC_hadronic_B_p4->Clear("C");
 
-  m_MC_lightJet1_p4->SetPxPyPzE(0., 0., 0., 0.);
-  m_MC_lightJet2_p4->SetPxPyPzE(0., 0., 0., 0.);
+  m_MC_lightJet1_p4->Clear("C");
+  m_MC_lightJet2_p4->Clear("C");
 
-  m_MC_Top1_p4->SetPxPyPzE(0., 0., 0., 0.);
-  m_MC_Top2_p4->SetPxPyPzE(0., 0., 0., 0.);
+  m_MC_Top1_p4->Clear("C");
+  m_MC_Top2_p4->Clear("C");
 
   m_selectedLeptonIndex_AfterChi2               = -1;
   m_selectedLeptonicBIndex_AfterChi2            = -1;
@@ -1676,25 +1680,25 @@ void mtt_analysis::reset()
   m_MC_leptonicTopMass = -1;
 
   if (m_useChi2) {
-    m_selectedLeptonP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedNeutrinoP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedLeptonicBP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedHadronicBP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedFirstJetP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedSecondJetP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_lepTopP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
-    m_hadTopP4_AfterChi2->SetPxPyPzE(0., 0., 0., 0.);
+    m_selectedLeptonP4_AfterChi2->Clear("C");
+    m_selectedNeutrinoP4_AfterChi2->Clear("C");
+    m_selectedLeptonicBP4_AfterChi2->Clear("C");
+    m_selectedHadronicBP4_AfterChi2->Clear("C");
+    m_selectedFirstJetP4_AfterChi2->Clear("C");
+    m_selectedSecondJetP4_AfterChi2->Clear("C");
+    m_lepTopP4_AfterChi2->Clear("C");
+    m_hadTopP4_AfterChi2->Clear("C");
   }
 
   if (m_useMVA) {
-    m_selectedLeptonP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedNeutrinoP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedLeptonicBP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedHadronicBP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedFirstJetP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_selectedSecondJetP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_lepTopP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
-    m_hadTopP4_AfterMVA->SetPxPyPzE(0., 0., 0., 0.);
+    m_selectedLeptonP4_AfterMVA->Clear("C");
+    m_selectedNeutrinoP4_AfterMVA->Clear("C");
+    m_selectedLeptonicBP4_AfterMVA->Clear("C");
+    m_selectedHadronicBP4_AfterMVA->Clear("C");
+    m_selectedFirstJetP4_AfterMVA->Clear("C");
+    m_selectedSecondJetP4_AfterMVA->Clear("C");
+    m_lepTopP4_AfterMVA->Clear("C");
+    m_hadTopP4_AfterMVA->Clear("C");
   }
 
   m_lepton_weight = 1.;
