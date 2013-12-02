@@ -727,46 +727,82 @@ int mtt_analysis::JetSel()
 
   if (m_isMC) {
 
-    // We use method 1.a) from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods
-    
-    float error_tagged_squared_up = 0.f;
-    float error_untagged_squared_up = 0.f;
-    float error_tagged_squared_low = 0.f;
-    float error_untagged_squared_low = 0.f;
+    if (m_mtt_NBtaggedJets_CSVM == 1) {
 
-    float eff_tagged = 1.;
-    float eff_untagged = 1.;
-    for (size_t i = 0; i < m_selJetsIds.size(); i++) {
+      // We use method 1.a) from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods
 
-      auto eff = getEfficiencyWithError(i);
-      ScaleFactor sf = jetSF[i];
+      float error_tagged_squared_up = 0.f;
+      float error_untagged_squared_up = 0.f;
+      float error_tagged_squared_low = 0.f;
+      float error_untagged_squared_low = 0.f;
 
-      float eff_i = std::get<0>(eff);
-      float sf_i = sf.getValue();
+      float eff_tagged = 1.;
+      float eff_untagged = 1.;
 
-      float error_eff_i_up = std::get<1>(eff);
-      float error_sf_i_up = jetSF[i].getErrorHigh();
-      float error_eff_i_low = std::get<2>(eff);
-      float error_sf_i_low = jetSF[i].getErrorLow();
+      for (size_t i = 0; i < m_selJetsIds.size(); i++) {
 
-      if (jetIsBTagged[i]) {
-        eff_tagged *= sf_i;
-        error_tagged_squared_up += ((error_sf_i_up * error_sf_i_up) / (sf_i * sf_i));
-        error_tagged_squared_low += ((error_sf_i_low * error_sf_i_low) / (sf_i * sf_i));
-      } else {
-        eff_untagged *= ((1. - sf_i * eff_i)) / (1. - eff_i);
-        error_untagged_squared_up += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_up, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_up, 2);
-        error_untagged_squared_low += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_low, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_low, 2);
+        auto eff = getEfficiencyWithError(i);
+        ScaleFactor sf = jetSF[i];
+
+        float eff_i = std::get<0>(eff);
+        float sf_i = sf.getValue();
+
+        float error_eff_i_up = std::get<1>(eff);
+        float error_sf_i_up = jetSF[i].getErrorHigh();
+        float error_eff_i_low = std::get<2>(eff);
+        float error_sf_i_low = jetSF[i].getErrorLow();
+
+        if (jetIsBTagged[i]) {
+          eff_tagged *= sf_i;
+          error_tagged_squared_up += ((error_sf_i_up * error_sf_i_up) / (sf_i * sf_i));
+          error_tagged_squared_low += ((error_sf_i_low * error_sf_i_low) / (sf_i * sf_i));
+        } else {
+          eff_untagged *= ((1. - sf_i * eff_i)) / (1. - eff_i);
+          error_untagged_squared_up += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_up, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_up, 2);
+          error_untagged_squared_low += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_low, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_low, 2);
+        }
       }
+
+      m_btag_weight = eff_tagged * eff_untagged;
+
+      float btag_eff_squared = m_btag_weight * m_btag_weight;
+      m_btag_weight_error_high = (error_tagged_squared_up + error_untagged_squared_up) * btag_eff_squared;
+      m_btag_weight_error_low = (error_tagged_squared_low + error_untagged_squared_low) * btag_eff_squared;
+
+    } else if (m_mtt_NBtaggedJets_CSVM > 1) {
+
+      // In this case, the weight is simply the product
+      // of the two leading B jets scale factors
+
+      int nBTag = 0;
+      m_btag_weight = 1;
+      for (size_t i = 0; i < m_selJetsIds.size(); i++) {
+        if (jetIsBTagged[i]) {
+          nBTag++;
+        } else {
+          continue;
+        }
+
+        if (nBTag > 2)
+          break;
+
+        ScaleFactor sf = jetSF[i];
+
+        float sf_i = sf.getValue();
+
+        float error_sf_i_up = jetSF[i].getErrorHigh();
+        float error_sf_i_low = jetSF[i].getErrorLow();
+
+        m_btag_weight *= sf_i;
+        m_btag_weight_error_high += (error_sf_i_up * error_sf_i_up) / (sf_i * sf_i);
+        m_btag_weight_error_low += (error_sf_i_low * error_sf_i_low) / (sf_i * sf_i);
+      }
+
+      float btag_eff_squared = m_btag_weight * m_btag_weight;
+      m_btag_weight_error_high *= btag_eff_squared;
+      m_btag_weight_error_low *= btag_eff_squared;
     }
 
-    m_btag_weight = eff_tagged * eff_untagged;
-
-    float btag_eff_squared = m_btag_weight * m_btag_weight;
-    m_btag_weight_error_high = (error_tagged_squared_up + error_untagged_squared_up) * btag_eff_squared;
-    m_btag_weight_error_low = (error_tagged_squared_low + error_untagged_squared_low) * btag_eff_squared;
-
-    //std::cout << "BTag weight: " << m_btag_weight << " +" << sqrt(m_btag_weight_error_high) << " -" << sqrt(m_btag_weight_error_low) << std::endl;
   }
 
   return 1;
