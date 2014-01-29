@@ -65,6 +65,19 @@ namespace mtt {
         m_gen_bjets->Write();
         m_gen_cjets->Write();
         m_gen_lightjets->Write();
+
+        m_selected_jets_flavor->Write();
+        m_selected_jets_flavor_btagged->Write();
+
+        m_selected_light_jets_sf->Write();
+        m_selected_b_jets_sf->Write();
+        m_selected_c_jets_sf->Write();
+
+        m_1b_sf_flavor->Write();
+        m_1b_sf->Write();
+
+        m_2b_sf_flavor->Write();
+        m_2b_sf->Write();
       }
 
     private:
@@ -417,6 +430,18 @@ namespace mtt {
       TH2* m_reco_bjets; // Number of b-jets at reco level correctly tagged
       TH2* m_reco_fake_bjets_among_cjets; // Number of tagged b-jets at reco level which are C jets
       TH2* m_reco_fake_bjets_among_lightjets; // Number of tagged b-jets at reco level which are light jets
+
+      TH1* m_selected_jets_flavor;
+      TH1* m_selected_jets_flavor_btagged;
+
+      TH1* m_selected_b_jets_sf;
+      TH1* m_selected_c_jets_sf;
+      TH1* m_selected_light_jets_sf;
+
+      TH1* m_1b_sf_flavor;
+      TH1* m_1b_sf;
+      TH1* m_2b_sf_flavor;
+      TH1* m_2b_sf;
 
       std::shared_ptr<BTaggingEfficiencyProvider> m_b_tagging_efficiency_provider;
   };

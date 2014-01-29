@@ -357,6 +357,32 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_reco_fake_bjets_among_cjets = new TH2F("number_of_reco_fake_bjets_among_cjets", "", 16, ptBinning, 3, etaBinning);
   m_reco_fake_bjets_among_lightjets = new TH2F("number_of_reco_fake_bjets_among_lightjets", "", 16, ptBinning, 3, etaBinning);
 
+  m_selected_jets_flavor = new TH1F("selected_jets_flavor", "True flavor of selected jets", 3, 0, 3);
+  m_selected_jets_flavor->GetXaxis()->SetBinLabel(1, "b jets");
+  m_selected_jets_flavor->GetXaxis()->SetBinLabel(2, "c jets");
+  m_selected_jets_flavor->GetXaxis()->SetBinLabel(3, "light jets");
+
+  m_selected_jets_flavor_btagged = new TH1F("selected_jets_flavor_btagged", "True flavor of selected b-tagged jets", 3, 0, 3);
+  m_selected_jets_flavor_btagged->GetXaxis()->SetBinLabel(1, "b jets");
+  m_selected_jets_flavor_btagged->GetXaxis()->SetBinLabel(2, "c jets");
+  m_selected_jets_flavor_btagged->GetXaxis()->SetBinLabel(3, "light jets");
+
+  m_2b_sf = new TH1F("2b_sf", "Event weight for the 2b category", 50, 0.5, 1.5);
+  m_2b_sf_flavor = new TH1F("2b_sf_flavor", "True flavor of the 2 b-tagged jets in 2b category", 3, 0, 3);
+  m_2b_sf_flavor->GetXaxis()->SetBinLabel(1, "b jets");
+  m_2b_sf_flavor->GetXaxis()->SetBinLabel(2, "c jets");
+  m_2b_sf_flavor->GetXaxis()->SetBinLabel(3, "light jets");
+
+  m_1b_sf = new TH1F("1b_sf", "Event weight for the 1b category", 50, 0.5, 1.5);
+  m_1b_sf_flavor = new TH1F("1b_sf_flavor", "True flavor of the jets in 1b category", 3, 0, 3);
+  m_1b_sf_flavor->GetXaxis()->SetBinLabel(1, "b jets");
+  m_1b_sf_flavor->GetXaxis()->SetBinLabel(2, "c jets");
+  m_1b_sf_flavor->GetXaxis()->SetBinLabel(3, "light jets");
+
+  m_selected_b_jets_sf = new TH1F("selected_b_jets_sf", "Scale factor for selected b jets", 50, 0.5, 1.5);
+  m_selected_c_jets_sf = new TH1F("selected_c_jets_sf", "Scale factor for selected c jets", 50, 0.5, 1.5);
+  m_selected_light_jets_sf = new TH1F("selected_light_jets_sf", "Scale factor for selected light jets", 50, 0.5, 1.5);
+
   m_b_tagging_efficiency_provider = std::make_shared<BTaggingEfficiencyProvider>(cmsswSettings);
 }
 
@@ -627,9 +653,9 @@ int mtt_analysis::JetSel()
   if (! n_jet)
     return 8;
 
-  ScaleFactor jetSF[n_jet];
-  int jetFlavor[n_jet];
-  bool jetIsBTagged[n_jet];
+  std::vector<ScaleFactor> jetSF;
+  std::vector<int> jetFlavor;
+  std::vector<bool> jetIsBTagged;
 
   for (int i = 0; i < n_jet; i++)
   {
@@ -641,8 +667,8 @@ int mtt_analysis::JetSel()
     m_mtt_JetEta[m_mtt_NJets] = jetP->Eta();
     m_mtt_JetPt[m_mtt_NJets]  = jetP->Pt();
     if (m_isMC) {
-      jetSF[m_mtt_NJets] = m_jetMet->getScaleFactor(i);
-      jetFlavor[m_mtt_NJets] = m_jetMet->getAlgoPartonFlavor(i);
+      jetSF.push_back(m_jetMet->getScaleFactor(i));
+      jetFlavor.push_back(m_jetMet->getAlgoPartonFlavor(i));
     }
 
     ++m_mtt_NJets;
@@ -657,47 +683,15 @@ int mtt_analysis::JetSel()
 
       if ((m_jetMet->getJetBTagProb_CSV(i)) > m_JET_btag_CSVM) {
         ++m_mtt_NBtaggedJets_CSVM;
-        jetIsBTagged[m_mtt_NJets] = true;
+        jetIsBTagged.push_back(true);
       } else {
-        jetIsBTagged[m_mtt_NJets] = false;
+        jetIsBTagged.push_back(false);
       }
 
       if ((m_jetMet->getJetBTagProb_CSV(i)) > m_JET_btag_CSVT)
         ++m_mtt_NBtaggedJets_CSVT;
       if ((m_jetMet->getJetBTagProb_TCHP(i)) > m_JET_btag_TCHPT)
         ++m_mtt_NBtaggedJets_TCHPT;
-
-      int flavor = abs(m_jetMet->getAlgoPartonFlavor(i));
-      float eta = fabs(jetP->Eta());
-      if (flavor == 5) {
-        // The true flavor of this jet is B
-        m_gen_bjets->Fill(jetP->Pt(), eta);
-
-        if ((m_jetMet->getJetBTagProb_CSV(i)) > m_JET_btag_CSVM) {
-          // This reco jet is tagged as a B
-          m_reco_bjets->Fill(jetP->Pt(), eta);
-        }
-      }
-
-      if (flavor == 4) {
-        // The true flavor of this jet is C
-        m_gen_cjets->Fill(jetP->Pt(), eta);
-
-        if ((m_jetMet->getJetBTagProb_CSV(i)) > m_JET_btag_CSVM) {
-          // This reco jet is tagged as a B
-          m_reco_fake_bjets_among_cjets->Fill(jetP->Pt(), eta);
-        }
-      }
-
-      if ((flavor <= 3) || (flavor == 21)) {
-        // The true flavor of this jet is u, d, s or g
-        m_gen_lightjets->Fill(jetP->Pt(), eta);
-
-        if ((m_jetMet->getJetBTagProb_CSV(i)) > m_JET_btag_CSVM) {
-          // This reco jet is tagged as a B
-          m_reco_fake_bjets_among_lightjets->Fill(jetP->Pt(), eta);
-        }
-      }
     }
 
     if (m_mtt_NJets == 1) m_mtt_1stjetpt = m_mtt_JetPt[m_mtt_NJets - 1];
@@ -710,8 +704,8 @@ int mtt_analysis::JetSel()
   if (m_mtt_NJets < 4)
     return 8;
 
-  auto getEfficiencyWithError = [&] (size_t index) -> std::tuple<double, double, double> {
-    int mcFlavor = abs(jetFlavor[index]);
+  auto getEfficiencyWithError = [&] (int mcFlavor, float pt, float eta) -> std::tuple<double, double, double> {
+    mcFlavor = abs(mcFlavor);
     ScaleFactorService::Flavor flavor = ScaleFactorService::B;
     if (mcFlavor == 4) {
       flavor = ScaleFactorService::C;
@@ -719,13 +713,63 @@ int mtt_analysis::JetSel()
       // If mcFlavor == 0, assume it's a light jet
       flavor = ScaleFactorService::LIGHT;
     }
-    float pt = m_mtt_JetPt[index];
-    float eta = m_mtt_JetEta[index];
 
     return m_b_tagging_efficiency_provider->getEfficiency(flavor, pt, eta);
   };
 
   if (m_isMC) {
+
+    assert(jetIsBTagged.size() == m_selJetsIds.size());
+
+    for (size_t i = 0; i < m_selJetsIds.size(); i++) {
+      int extractorIndex = m_selJetsIds[i];
+
+      TLorentzVector *jetP = m_jetMet->getP4(extractorIndex);
+
+      float pt = jetP->Pt();
+      float eta = fabs(jetP->Eta());
+
+      int mcFlavor = abs(jetFlavor[i]);
+      int flavorBin = 0;
+      if (mcFlavor == 5) {
+        // The true flavor of this jet is B
+        m_gen_bjets->Fill(pt, eta);
+
+        if (jetIsBTagged[i]) {
+          // This reco jet is tagged as a B
+          m_reco_bjets->Fill(pt, eta);
+        }
+
+        m_selected_b_jets_sf->Fill(jetSF[i].getValue());
+      } else if (mcFlavor == 4) {
+        // The true flavor of this jet is C
+        m_gen_cjets->Fill(pt, eta);
+
+        if (jetIsBTagged[i]) {
+          // This reco jet is tagged as a B
+          m_reco_fake_bjets_among_cjets->Fill(pt, eta);
+        }
+
+        flavorBin = 1;
+        m_selected_c_jets_sf->Fill(jetSF[i].getValue());
+      } else if ((mcFlavor <= 3) || (mcFlavor == 21)) {
+        // The true flavor of this jet is u, d, s or g
+        m_gen_lightjets->Fill(pt, eta);
+
+        if (jetIsBTagged[i]) {
+          // This reco jet is tagged as a B
+          m_reco_fake_bjets_among_lightjets->Fill(pt, eta);
+        }
+
+        flavorBin = 2;
+        m_selected_light_jets_sf->Fill(jetSF[i].getValue());
+      }
+
+      m_selected_jets_flavor->Fill(flavorBin);
+
+      if (jetIsBTagged[i])
+        m_selected_jets_flavor_btagged->Fill(flavorBin);
+    }
 
     if (m_mtt_NBtaggedJets_CSVM == 1) {
 
@@ -741,7 +785,23 @@ int mtt_analysis::JetSel()
 
       for (size_t i = 0; i < m_selJetsIds.size(); i++) {
 
-        auto eff = getEfficiencyWithError(i);
+        int extractorIndex = m_selJetsIds[i];
+        TLorentzVector *p4 = m_jetMet->getP4(extractorIndex);
+
+        int mcFlavor = fabs(jetFlavor[i]);
+        int flavor = 0;
+        if (mcFlavor == 4) {
+          flavor = 1;
+        } else if ((mcFlavor <= 3) || (mcFlavor == 21)) {
+          // If mcFlavor == 0, assume it's a light jet
+          flavor = 2;
+        }
+        m_1b_sf_flavor->Fill(flavor);
+
+        float pt = p4->Pt();
+        float eta = fabs(p4->Eta());
+
+        auto eff = getEfficiencyWithError(jetFlavor[i], pt, eta);
         ScaleFactor sf = jetSF[i];
 
         float eff_i = std::get<0>(eff);
@@ -769,6 +829,8 @@ int mtt_analysis::JetSel()
       m_btag_weight_error_high = (error_tagged_squared_up + error_untagged_squared_up) * btag_eff_squared;
       m_btag_weight_error_low = (error_tagged_squared_low + error_untagged_squared_low) * btag_eff_squared;
 
+      m_1b_sf->Fill(m_btag_weight);
+
     } else if (m_mtt_NBtaggedJets_CSVM > 1) {
 
       // In this case, the weight is simply the product
@@ -786,6 +848,16 @@ int mtt_analysis::JetSel()
         if (nBTag > 2)
           break;
 
+        int mcFlavor = fabs(jetFlavor[i]);
+        int flavor = 0;
+        if (mcFlavor == 4) {
+          flavor = 1;
+        } else if ((mcFlavor <= 3) || (mcFlavor == 21)) {
+          // If mcFlavor == 0, assume it's a light jet
+          flavor = 2;
+        }
+        m_2b_sf_flavor->Fill(flavor);
+
         ScaleFactor sf = jetSF[i];
 
         float sf_i = sf.getValue();
@@ -798,11 +870,11 @@ int mtt_analysis::JetSel()
         m_btag_weight_error_low += (error_sf_i_low * error_sf_i_low) / (sf_i * sf_i);
       }
 
+      m_2b_sf->Fill(m_btag_weight);
       float btag_eff_squared = m_btag_weight * m_btag_weight;
       m_btag_weight_error_high *= btag_eff_squared;
       m_btag_weight_error_low *= btag_eff_squared;
     }
-
   }
 
   return 1;
