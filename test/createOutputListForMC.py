@@ -28,7 +28,7 @@ for crabFolder in crabFolders:
       print("'%s' already exists. Skipping." % outputName)
       continue
 
-    p = subprocess.Popen(["crabOutputList.py", fullPath, "analysis", "true", "true"], stdout=subprocess.PIPE)
+    p = subprocess.Popen(["crabOutputList.py", "--check", "--xrootd", fullPath], stdout=subprocess.PIPE)
     dpmFiles = [line.replace("\n", "") for line in p.stdout.readlines()]
     p.wait()
 
