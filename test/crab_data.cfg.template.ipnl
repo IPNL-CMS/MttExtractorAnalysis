@@ -1,10 +1,10 @@
 [CRAB]
 jobtype = cmssw
-scheduler = glite
+scheduler = remoteGlideIn
 use_server = 0
 
 [CMSSW]
-
+allow_NonProductionCMSSW = 1
 dbs_url = http://cmsdbsprod.cern.ch/cms_dbs_ph_analysis_02/servlet/DBSServlet
 datasetpath = @datasetname@
 
@@ -36,6 +36,5 @@ user_remote_dir = @outputdir@
 check_user_remote_dir = 0
 
 [GRID]
-rb = CERN
-virtual_organization = cms
-ce_white_list=T3_FR_IPNL
+#data_location_override = None
+#additional_jdl_parameters = +DESIRED_Gatekeepers="lyogrid07.in2p3.fr:8443/cream-pbs-cral"
