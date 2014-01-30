@@ -256,6 +256,7 @@ namespace mtt {
 
       // Values after Chi2 selection
       float m_mtt_AfterChi2;
+      float m_mtt_resolution_AfterChi2;
       float m_eta_tt_AfterChi2;
       float m_pt_tt_AfterChi2;
       float m_beta_tt_AfterChi2;
@@ -291,6 +292,7 @@ namespace mtt {
       bool m_mtt_recoJetsAssociatedWellPlacedWithMVA;
 
       float m_mtt_AfterMVA;
+      float m_mtt_resolution_AfterMVA;
       float m_eta_tt_AfterMVA;
       float m_pt_tt_AfterMVA;
       float m_beta_tt_AfterMVA;

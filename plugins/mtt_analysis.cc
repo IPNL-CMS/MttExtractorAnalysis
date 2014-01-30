@@ -210,7 +210,8 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("eta_tt_AfterChi2"       , &m_eta_tt_AfterChi2      , "eta_tt_AfterChi2/F");
     m_tree_Mtt->Branch("beta_tt_AfterChi2"      , &m_beta_tt_AfterChi2     , "eta_tt_AfterChi2/F");
     m_tree_Mtt->Branch("mtt_AfterChi2"          , &m_mtt_AfterChi2         , "mtt_AfterChi2/F");
-
+    m_tree_Mtt->Branch("mttResolution_AfterChi2"          , &m_mtt_resolution_AfterChi2         , "mttResolution_AfterChi2/F");
+    
     // Index of selected particles inside respective collection for mtt computation
     m_tree_Mtt->Branch("selectedLeptonIndex_AfterChi2"        , &m_selectedLeptonIndex_AfterChi2       , "selectedLeptonIndex_AfterChi2/I");
     m_tree_Mtt->Branch("selectedLeptonicBIndex_AfterChi2"     , &m_selectedLeptonicBIndex_AfterChi2    , "selectedLeptonicBIndex_AfterChi2/I");
@@ -245,6 +246,7 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("eta_tt_AfterMVA"       , &m_eta_tt_AfterMVA      , "eta_tt_AfterMVA/F");
     m_tree_Mtt->Branch("beta_tt_AfterMVA"      , &m_beta_tt_AfterMVA     , "eta_tt_AfterMVA/F");
     m_tree_Mtt->Branch("mtt_AfterMVA"          , &m_mtt_AfterMVA         , "mtt_AfterMVA/F");
+    m_tree_Mtt->Branch("mttResolution_AfterMVA"          , &m_mtt_resolution_AfterMVA         , "mttResolution_AfterMVA/F");
 
     // Index of selected particles inside respective collection for mtt computation
     m_tree_Mtt->Branch("selectedLeptonIndex_AfterMVA"        , &m_selectedLeptonIndex_AfterMVA       , "selectedLeptonIndex_AfterMVA/I");
@@ -1172,6 +1174,7 @@ void mtt_analysis::loopOverCombinations()
 
     TLorentzVector res = (lepTopP4_AfterChi2 + hadTopP4_AfterChi2);
     m_mtt_AfterChi2     = res.M();
+    m_mtt_resolution_AfterChi2 = m_mtt_AfterChi2 - m_MC_mtt;
     m_pt_tt_AfterChi2   = res.Pt();
     m_eta_tt_AfterChi2   = res.Eta();
     m_beta_tt_AfterChi2  = fabs(res.Pz() / res.E());
@@ -1231,6 +1234,7 @@ void mtt_analysis::loopOverCombinations()
 
     TLorentzVector res = (lepTopP4_AfterMVA + hadTopP4_AfterMVA);
     m_mtt_AfterMVA     = res.M();
+    m_mtt_resolution_AfterMVA = m_mtt_AfterMVA - m_MC_mtt;
     m_pt_tt_AfterMVA   = res.Pt();
     m_eta_tt_AfterMVA   = res.Eta();
     m_beta_tt_AfterMVA  = fabs(res.Pz() / res.E());
@@ -1674,13 +1678,14 @@ void mtt_analysis::reset()
   m_mtt_NumComb_chi2 = 0;
   m_mtt_NumComb_MVA = 0;
 
-  m_mtt_AfterChi2     = -1.;
-  m_pt_tt_AfterChi2   = -1.;
-  m_eta_tt_AfterChi2  = -1.;
-  m_beta_tt_AfterChi2 = -1.;
-  m_mLepTop_AfterChi2 = -1.;
-  m_mHadTop_AfterChi2 = -1.;
-  m_mHadW_AfterChi2   = -1.;
+  m_mtt_AfterChi2            = -1.;
+  m_mtt_resolution_AfterChi2 = -1.;
+  m_pt_tt_AfterChi2          = -1.;
+  m_eta_tt_AfterChi2         = -1.;
+  m_beta_tt_AfterChi2        = -1.;
+  m_mLepTop_AfterChi2        = -1.;
+  m_mHadTop_AfterChi2        = -1.;
+  m_mHadW_AfterChi2          = -1.;
 
   m_lepTopPt_AfterChi2  = -1;
   m_lepTopEta_AfterChi2 = -1;
@@ -1688,6 +1693,7 @@ void mtt_analysis::reset()
   m_hadTopEta_AfterChi2 = -1;
 
   m_mtt_AfterMVA     = -1.;
+  m_mtt_resolution_AfterMVA = -1.;
   m_pt_tt_AfterMVA   = -1.;
   m_eta_tt_AfterMVA  = -1.;
   m_beta_tt_AfterMVA = -1.;
