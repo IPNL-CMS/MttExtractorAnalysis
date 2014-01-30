@@ -128,7 +128,7 @@ for dataset in datasets:
     output_dir_semimu = ("HTT/Extracted/MC/Summer12/%s/semimu/%s" % (d, dataset_name))
 
     full_template = copy.copy(multicrab)
-    if "EMEnriched" in dataset_path:
+    if "EMEnriched" in dataset_path or "BCtoE" in dataset_path:
       full_template.template += multicrab_semie
     elif "MuEnriched" in dataset_path:
       full_template.template += multicrab_semimu
