@@ -73,7 +73,45 @@ datasets = [
     ["/S0_S_i_M600_cpl1_scalar_15Dec13_START53_V7C-GEN/sbrochet-S0_S_i_M600_cpl1_scalar_START53_V7C_18Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "S0_S_i_M600_cpl1_scalar"],
     ["/S0_S_i_M700_cpl1_scalar_15Dec13_START53_V7C-GEN/sbrochet-S0_S_i_M700_cpl1_scalar_START53_V7C_18Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "S0_S_i_M700_cpl1_scalar"],
     ["/S0_S_i_M800_cpl1_scalar_15Dec13_START53_V7C-GEN/sbrochet-S0_S_i_M800_cpl1_scalar_START53_V7C_18Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "S0_S_i_M800_cpl1_scalar"],
-
+    
+    # Z' narrow
+    ["/ZPrimeToTTJets_M500GeV_W5GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_500_Narrow_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M500GeV_W5GeV"],
+    ["/ZPrimeToTTJets_M750GeV_W7p5GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_750_Narrow_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M750GeV_W7p5GeV"],
+    ["/ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_1000_Narrow_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1000GeV_W10GeV"],
+    ["/ZPrimeToTTJets_M1250GeV_W12p5GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_1250_Narrow_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1250GeV_W12p5GeV"],
+    ["/ZPrimeToTTJets_M1500GeV_W15GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_1500_Narrow_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1500GeV_W15GeV"],
+    ["/ZPrimeToTTJets_M2000GeV_W20GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_2000_Narrow_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M2000GeV_W20GeV"],
+    
+    # Z' narrow ext
+    ["/ZPrimeToTTJets_M500GeV_W5GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_500_Narrow_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M500GeV_W5GeV_ext"],
+    ["/ZPrimeToTTJets_M750GeV_W7p5GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_750_Narrow_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M750GeV_W7p5GeV_ext"],
+    ["/ZPrimeToTTJets_M1000GeV_W10GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_1000_Narrow_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1000GeV_W10GeV_ext"],
+    ["/ZPrimeToTTJets_M1250GeV_W12p5GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_1250_Narrow_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1250GeV_W12p5GeV_ext"],
+    ["/ZPrimeToTTJets_M1500GeV_W15GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_1500_Narrow_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1500GeV_W15GeV_ext"],
+    ["/ZPrimeToTTJets_M2000GeV_W20GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_2000_Narrow_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M2000GeV_W20GeV_ext"],
+    
+    # Z' large
+    ["/ZPrimeToTTJets_M500GeV_W50GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_500_Large_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M500GeV_W50GeV"],
+    ["/ZPrimeToTTJets_M750GeV_W75GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_750_Large_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M750GeV_W75GeV"],
+    ["/ZPrimeToTTJets_M1000GeV_W100GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_1000_Large_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1000GeV_W100GeV"],
+    ["/ZPrimeToTTJets_M1250GeV_W125GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_1250_Large_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1250GeV_W125GeV"],
+    ["/ZPrimeToTTJets_M1500GeV_W150GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_1500_Large_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1500GeV_W150GeV"], 
+    ["/ZPrimeToTTJets_M2000GeV_W200GeV_TuneZ2star_8TeV-madgraph-tauola/apequegn-Zprime_2000_Large_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M2000GeV_W200GeV"], 
+    
+    # Z' large ext
+    ["/ZPrimeToTTJets_M500GeV_W50GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_500_Large_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M500GeV_W50GeV_ext"],
+    ["/ZPrimeToTTJets_M750GeV_W75GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_750_Large_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M750GeV_W75GeV_ext"],
+    ["/ZPrimeToTTJets_M1000GeV_W100GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_1000_Large_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1000GeV_W100GeV_ext"], 
+    ["/ZPrimeToTTJets_M1250GeV_W125GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_1250_Large_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1250GeV_W125GeV_ext"],
+    ["/ZPrimeToTTJets_M1500GeV_W150GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_1500_Large_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M1500GeV_W150GeV_ext"],
+    ["/ZPrimeToTTJets_M2000GeV_W200GeV_TuneZ2star_8TeV_ext-madgraph-tauola/apequegn-Zprime_2000_Large_ext_START53_V7C_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "ZPrimeToTTJets_M2000GeV_W200GeV_ext"], 
+    
+    # RS gluons
+    ["/RSGluonToTT_M-700_Tune4C_8TeV-pythia8/apequegn-RSGluon700_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-700"],
+    ["/RSGluonToTT_M-1000_Tune4C_8TeV-pythia8/apequegn-RSGluon1000_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-1000"],
+    ["/RSGluonToTT_M-1200_Tune4C_8TeV-pythia8/apequegn-RSGluon1200_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-1200"],
+    ["/RSGluonToTT_M-1500_Tune4C_8TeV-pythia8/apequegn-RSGluon1500_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-1500"],
+    ["/RSGluonToTT_M-2000_Tune4C_8TeV-pythia8/apequegn-RSGluon2000_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-2000"],
     ]
 
 # Get email address
