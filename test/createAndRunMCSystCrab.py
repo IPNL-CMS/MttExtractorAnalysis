@@ -85,8 +85,8 @@ for dataset in datasets:
   ui_working_dir = ("multicrab_MC_%s") % (dataset_name)
 
   if options.create_cfg:
-    output_dir_semie = ("HTT/Extracted/MC/Summer12/%s/semie/%s" % (d, dataset_name))
-    output_dir_semimu = ("HTT/Extracted/MC/Summer12/%s/semimu/%s" % (d, dataset_name))
+    output_dir_semie = ("HTT/Extracted/Systematics/%s/semie/%s" % (d, dataset_name))
+    output_dir_semimu = ("HTT/Extracted/Systematics/%s/semimu/%s" % (d, dataset_name))
 
     full_template = copy.copy(multicrab)
     if "EMEnriched" in dataset_path or "BCtoE" in dataset_path:
