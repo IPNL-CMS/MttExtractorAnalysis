@@ -1,20 +1,21 @@
 #! /usr/bin/env python
 # Launch crab for every datasets in mc_signal_datasets.list
 
-import os, shutil, subprocess
+import os, shutil, subprocess, re
 from optparse import OptionParser
 
 isCastor = os.system("uname -n | grep cern &> /dev/null") == 0
 
 parser = OptionParser()
 parser.add_option("-p", "--path", dest="path", type="string", help="where to store crab folders")
+parser.add_option("", "--filter", dest="filter", type="string", help="name filter", default=".*")
 
 (options, args) = parser.parse_args()
 
 if options.path is None or not os.path.isdir(options.path):
   parser.error("you must specify a valid path")
 
-crabFolders = [name for name in os.listdir(options.path) if os.path.isdir(os.path.join(options.path, name)) and name.startswith("multicrab_MC_")]
+crabFolders = [name for name in os.listdir(options.path) if os.path.isdir(os.path.join(options.path, name)) and name.startswith("multicrab_MC_") and re.search(options.filter, name)]
 
 for crabFolder in crabFolders:
   dataset = crabFolder.rstrip("/").replace("multicrab_MC_", "")
