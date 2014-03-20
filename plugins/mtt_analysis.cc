@@ -526,7 +526,7 @@ int mtt_analysis::MuonSel()
 
       if ((m_muon_loose->getMuisGlobal(i) || m_muon_loose->getMuisTracker(i)) &&
           (p4->Pt() > 10) &&
-          (p4->Eta() < 2.5) &&
+          (fabs(p4->Eta()) < 2.5) &&
           (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.20)) {
 
         m_lepton_sel_flag = m_lepton_sel_flag & ~PASS_MUON_VETO;
@@ -542,7 +542,7 @@ int mtt_analysis::MuonSel()
       TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
 
       if ((eP->Pt() > 20) &&
-          (eP->Eta() < 2.5) &&
+          (fabs(eP->Eta()) < 2.5) &&
           (m_electron_loose->passVetoId(i)) &&
           (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.15)) {
 
@@ -647,7 +647,7 @@ int mtt_analysis::ElectronSel()
 
       if ((m_muon_loose->getMuisGlobal(i) || m_muon_loose->getMuisTracker(i)) &&
           (p4->Pt() > 10) &&
-          (p4->Eta() < 2.5) &&
+          (fabs(p4->Eta()) < 2.5) &&
           (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.20)) {
 
         m_lepton_sel_flag = m_lepton_sel_flag & ~PASS_MUON_VETO;
@@ -667,7 +667,7 @@ int mtt_analysis::ElectronSel()
       TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
 
       if ((eP->Pt() > 20) &&
-          (eP->Eta() < 2.5) &&
+          (fabs(eP->Eta()) < 2.5) &&
           (m_electron_loose->passVetoId(i)) &&
           (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.15)) {
 
