@@ -129,19 +129,14 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("MC_Top2_p4"        , &m_MC_Top2_p4, 32000, -1);
 
   m_tree_Mtt->Branch("nGoodMuons"         , &m_mtt_NGoodMuons         , "nGoodMuons/I");
-  m_tree_Mtt->Branch("nLooseGoodMuons"    , &m_mtt_NLooseGoodMuons    , "nLooseGoodMuons/I");
   m_tree_Mtt->Branch("muonPt"             , &m_mtt_MuonPt             , "muonPt[nGoodMuons]/F");
   m_tree_Mtt->Branch("muonEta"            , &m_mtt_MuonEta            , "muonEta[nGoodMuons]/F");
-  m_tree_Mtt->Branch("2DDrMin"            , &m_mtt_2DDrMin            , "2DDrMin[nGoodMuons]/F");
-  m_tree_Mtt->Branch("2DpTrel"            , &m_mtt_2DpTrel            , "2DpTrel[nGoodMuons]/F");
   m_tree_Mtt->Branch("muRelIso"           , &m_mtt_MuRelIso           , "muRelIso[nGoodMuons]/F");
 
   m_tree_Mtt->Branch("nGoodElectrons"     , &m_mtt_NGoodElectrons     , "nGoodElectrons/I");
   m_tree_Mtt->Branch("electronPt"         , &m_mtt_ElectronPt         , "electronPt[nGoodElectrons]/F");
   m_tree_Mtt->Branch("electronEta"        , &m_mtt_ElectronEta        , "electronEta[nGoodElectrons]/F");
   m_tree_Mtt->Branch("elRelIso"           , &m_mtt_ElRelIso           , "elRelIso[nGoodElectrons]/F");
-  m_tree_Mtt->Branch("hyperTight1MC"      , &m_mtt_HyperTight1MC      , "hyperTight1MC[nGoodElectrons]/I");
-
 
   m_tree_Mtt->Branch("1stjetpt"           , &m_mtt_1stjetpt           , "1stjetpt/F");
   m_tree_Mtt->Branch("2ndjetpt"           , &m_mtt_2ndjetpt           , "2ndjetpt/F");
@@ -211,9 +206,11 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("beta_tt_AfterChi2"      , &m_beta_tt_AfterChi2     , "eta_tt_AfterChi2/F");
     m_tree_Mtt->Branch("mtt_AfterChi2"          , &m_mtt_AfterChi2         , "mtt_AfterChi2/F");
     m_tree_Mtt->Branch("mttResolution_AfterChi2"          , &m_mtt_resolution_AfterChi2         , "mttResolution_AfterChi2/F");
-    
+
     // Index of selected particles inside respective collection for mtt computation
-    m_tree_Mtt->Branch("selectedLeptonIndex_AfterChi2"        , &m_selectedLeptonIndex_AfterChi2       , "selectedLeptonIndex_AfterChi2/I");
+    m_tree_Mtt->Branch("selectedLeptonIndex_in_loose_collection"        , &m_selectedLeptonIndex_in_loose_collection       , "selectedLeptonIndex_in_loose_collection/I");
+    m_tree_Mtt->Branch("selectedLeptonIndex_in_array"        , &m_selectedLeptonIndex_in_array       , "selectedLeptonIndex_in_array/I");
+
     m_tree_Mtt->Branch("selectedLeptonicBIndex_AfterChi2"     , &m_selectedLeptonicBIndex_AfterChi2    , "selectedLeptonicBIndex_AfterChi2/I");
     m_tree_Mtt->Branch("selectedHadronicBIndex_AfterChi2"     , &m_selectedHadronicBIndex_AfterChi2    , "selectedHadronicBIndex_AfterChi2/I");
     m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterChi2"  , &m_selectedHadronicFirstJetIndex_AfterChi2  , "selectedHadronicFirstJetIndex_AfterChi2/I");
@@ -249,7 +246,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("mttResolution_AfterMVA"          , &m_mtt_resolution_AfterMVA         , "mttResolution_AfterMVA/F");
 
     // Index of selected particles inside respective collection for mtt computation
-    m_tree_Mtt->Branch("selectedLeptonIndex_AfterMVA"        , &m_selectedLeptonIndex_AfterMVA       , "selectedLeptonIndex_AfterMVA/I");
     m_tree_Mtt->Branch("selectedLeptonicBIndex_AfterMVA"     , &m_selectedLeptonicBIndex_AfterMVA    , "selectedLeptonicBIndex_AfterMVA/I");
     m_tree_Mtt->Branch("selectedHadronicBIndex_AfterMVA"     , &m_selectedHadronicBIndex_AfterMVA    , "selectedHadronicBIndex_AfterMVA/I");
     m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterMVA"  , &m_selectedHadronicFirstJetIndex_AfterMVA  , "selectedHadronicFirstJetIndex_AfterMVA/I");
@@ -281,7 +277,10 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("pass_vertex_cut", &m_pass_vertex_cut, "pass_vertex_cut/I");
   m_tree_Mtt->Branch("pass_met_cut", &m_pass_met_cut, "pass_met_cut/I");
   m_tree_Mtt->Branch("pass_lepton_cut", &m_pass_lepton_cut, "pass_lepton_cut/I");
+  m_tree_Mtt->Branch("lepton_cut_flag", &m_lepton_sel_flag, "lepton_cut_flag/i");
   m_tree_Mtt->Branch("pass_jet_cut", &m_pass_jet_cut, "pass_jet_cut/I");
+  m_tree_Mtt->Branch("do_mtt_reco", &m_do_mtt_reco, "do_mtt_reco/O");
+
 
   m_MAIN_doSemiMu = cmsswSettings.getParameter<bool>("do_semimu");
 
@@ -396,6 +395,9 @@ mtt_analysis::~mtt_analysis()
   delete m_hadTopP4_AfterChi2;
 }
 
+const int NO_MTT_RECO = -1;
+const int FAILURE = 0;
+const int SUCCESS = 1;
 
 //
 // First you start with the different physics objects selections
@@ -407,55 +409,59 @@ int mtt_analysis::VertexSel()
   int n_vtx = m_vertex->getSize();
 
   if (!n_vtx)
-    return 2;
+    return FAILURE;
 
   for (int i = 0; i < n_vtx; ++i)
   {
     if (m_vertex->getVtxIsFake(i)) continue;
     if (m_vertex->getVtxNdof(i) < 4) continue;
 
-    return 1;
+    return SUCCESS;
   }
 
-  return 2;
+  return FAILURE;
 }
-
 
 // MET
 int mtt_analysis::METSel()
 {
   m_mtt_MET = m_jetMet->getMETLorentzVector(0)->Pt();
   if (m_mtt_MET > m_MET_Pt_Min) {
-    return 1;
+    return SUCCESS;
   }
 
-  return 3;
+  return FAILURE;
 }
 
+const uint32_t NO_LEPTON = 0;
+const uint32_t PASS_MUON_VETO = 1;
+const uint32_t PASS_ELECTRON_VETO = 2;
+const uint32_t PASS_LEPTON_VETO = PASS_MUON_VETO | PASS_ELECTRON_VETO;
+
+const uint32_t HAS_ONE_ISOLATED_LEPTON = 8;
+const uint32_t HAS_NO_ISOLATED_LEPTON = 16;
+const uint32_t HAS_MANY_ISOLATED_LEPTON = 32;
 
 int mtt_analysis::MuonSel()
 {
-  int goodmuidx = -1;
+  bool pass_cut = false;
 
-  int n_mu = m_muon->getSize();
+  m_lepton_sel_flag = NO_LEPTON;
 
-  if (!n_mu)
-    return 4;
+  int selected_muon_index = -1;
+  int n_loose_muons = m_muon_loose->getSize();
+  int n_isolated_muons = 0;
+  int isolated_muon_index_in_loose_collection = -1;
+  int isolated_muon_index_in_array = -1;
 
-  for (int i = 0; i < n_mu; i++)
-  {
-
-    // Selection:
-    // - exactly 1 isolated muon
-    // - loose muon veto
-    // - loose electron veto
-
+  std::vector<int> looseCollectionIndexes;
+  for (int i = 0; i < n_loose_muons; i++) {
 
     // Selection from https://twiki.cern.ch/twiki/bin/view/CMS/TWikiTopRefEventSel#Muons
-    if (! m_muon->getMuisGlobal(i))
+    if (! m_muon_loose->getMuisGlobal(i))
       continue;
 
-    TLorentzVector *muP = m_muon->getMuLorentzVector(i);
+    TLorentzVector *muP = m_muon_loose->getMuLorentzVector(i);
 
     if (fabs(muP->Pt()) <= 26)
       continue;
@@ -463,113 +469,138 @@ int mtt_analysis::MuonSel()
     if (fabs(muP->Eta()) >= 2.1)
       continue;
 
-    if (m_muon->getMunormChi2(i) >= 10.)
+    if (m_muon_loose->getMunormChi2(i) >= 10.)
       continue;
 
-    if (m_muon->getTrackerLayersWithMeasurements(i) <= 5)
+    if (m_muon_loose->getTrackerLayersWithMeasurements(i) <= 5)
       continue;
 
-    if (m_muon->getGlobalTrackNumberOfValidMuonHits(i) <= 0)
+    if (m_muon_loose->getGlobalTrackNumberOfValidMuonHits(i) <= 0)
       continue;
 
-    if (m_muon->getNumberOfMatchedStations(i) <= 1)
+    if (m_muon_loose->getNumberOfMatchedStations(i) <= 1)
       continue;
 
-    if (m_muon->getMudB(i) >= 0.2)
+    if (m_muon_loose->getMudB(i) >= 0.2)
       continue;
 
-    if (m_muon->getdZ(i) >= 0.5)
+    if (m_muon_loose->getdZ(i) >= 0.5)
       continue;
 
-    if (m_muon->getMunValPixelHits(i) <= 0)
+    if (m_muon_loose->getMunValPixelHits(i) <= 0)
       continue;
-
-    /* Isolation cut is done in P2PAT. No need to check that */
 
     m_mtt_MuonPt[m_mtt_NGoodMuons]   = muP->Pt();
     m_mtt_MuonEta[m_mtt_NGoodMuons]  = muP->Eta();
-    m_mtt_MuRelIso[m_mtt_NGoodMuons] = m_muon->getDeltaBetaCorrectedRelativeIsolation(i);
+    m_mtt_MuRelIso[m_mtt_NGoodMuons] = m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i);
+    looseCollectionIndexes.push_back(i);
 
-    ++m_mtt_NGoodMuons;
-    goodmuidx = i;
+    if (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.12) {
+      n_isolated_muons++;
+      isolated_muon_index_in_loose_collection = i;
+      isolated_muon_index_in_array = m_mtt_NGoodMuons;
+    }
+
+    m_mtt_NGoodMuons++;
   }
 
   // No muons
   if (m_mtt_NGoodMuons == 0)
-    return 4;
+    return NO_MTT_RECO;
 
-  /*
-  if (m_mtt_NGoodMuons == 1 && m_mtt_NLooseGoodMuons > 1)
-    return 6;
-  */
+  if (n_isolated_muons == 1) {
+    // One isolated lepton = standard selection
+    // Check if there are other isolated leptons in the event
 
-  // We want only 1 isolated muon
-  if (m_mtt_NGoodMuons > 1)
-    return 5;
+    m_lepton_sel_flag |= HAS_ONE_ISOLATED_LEPTON;
 
-  TLorentzVector* selected_p4 = m_muon->getMuLorentzVector(goodmuidx);
+    // Muon veto
+    m_lepton_sel_flag |= PASS_MUON_VETO;
+    int size = m_muon_loose->getSize();
+    for (int i = 0; i < size; i++) {
 
-  // Muon veto
-  int size = m_muon_loose->getSize();
-  for (int i = 0; i < size; i++) {
+      if (i == isolated_muon_index_in_loose_collection)
+        continue;
 
-    // Exclude the isolated muon
-    TLorentzVector* p4 = m_muon_loose->getMuLorentzVector(i);
-    if (*selected_p4 == *p4) {
-      continue;
+      TLorentzVector* p4 = m_muon_loose->getMuLorentzVector(i);
+
+      if ((m_muon_loose->getMuisGlobal(i) || m_muon_loose->getMuisTracker(i)) &&
+          (p4->Pt() > 10) &&
+          (p4->Eta() < 2.5) &&
+          (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.20)) {
+
+        m_lepton_sel_flag = m_lepton_sel_flag & ~PASS_MUON_VETO;
+        break;
+      }
     }
 
-    if ((m_muon_loose->getMuisGlobal(i) || m_muon_loose->getMuisTracker(i)) &&
-        (p4->Pt() > 10) &&
-        (p4->Eta() < 2.5) &&
-        (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.20)) {
+    //electron veto for semimu channel
+    m_lepton_sel_flag |= PASS_ELECTRON_VETO;
 
-      m_mtt_NLooseGoodMuons++;
+    int n_ele = m_electron_loose->getSize();
+    for (int i = 0; i < n_ele; ++i) {
+      TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
+
+      if ((eP->Pt() > 20) &&
+          (eP->Eta() < 2.5) &&
+          (m_electron_loose->passVetoId(i)) &&
+          (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.15)) {
+
+        m_lepton_sel_flag = m_lepton_sel_flag & ~PASS_ELECTRON_VETO;
+        break;
+      }
     }
+
+    selected_muon_index = isolated_muon_index_in_loose_collection;
+    m_selectedLeptonIndex_in_array = isolated_muon_index_in_array;
+
+    pass_cut = (m_lepton_sel_flag & PASS_LEPTON_VETO) == PASS_LEPTON_VETO;
+
+  } else if (n_isolated_muons > 1) {
+    // More than one isolated lepton
+    // Drop the event
+
+    return NO_MTT_RECO;
+
+  } else {
+    // No isolated muon
+    // Skip lepton veto, and use the first lepton
+
+    m_lepton_sel_flag |= HAS_NO_ISOLATED_LEPTON;
+    selected_muon_index = looseCollectionIndexes[0];
+    m_selectedLeptonIndex_in_array = 0;
   }
-  m_mtt_NLooseGoodMuons++; // Our isolated muon is loose too
 
-  if (m_mtt_NLooseGoodMuons > 1)
-    return 6;
-
-  //electron veto for semimu channel
-  int n_ele = m_electron_loose->getSize();
-
-  for (int i = 0; i < n_ele; ++i) {
-    TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
-
-    if ((eP->Pt() > 20) &&
-        (eP->Eta() < 2.5) &&
-        (m_electron_loose->passVetoId(i)) &&
-        (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.15))
-      return 7;
-  }
-
-  m_refLept = m_muon->getMuLorentzVector(goodmuidx);
-  m_selectedLeptonIndex_AfterChi2 = goodmuidx;
+  m_refLept = m_muon_loose->getMuLorentzVector(selected_muon_index);
+  m_selectedLeptonIndex_in_loose_collection = selected_muon_index;
 
   if (m_isMC) {
     // Get scale factor
-    ScaleFactor sf = m_muon->getScaleFactor(ScaleFactorService::TIGHT, goodmuidx);
+    ScaleFactor sf = m_muon_loose->getScaleFactor(ScaleFactorService::TIGHT, ScaleFactorService::TIGHT, selected_muon_index);
     m_lepton_weight *= sf.getValue();
     m_lepton_weight_error_low += sf.getErrorLow() * sf.getErrorLow();
     m_lepton_weight_error_high += sf.getErrorHigh() * sf.getErrorHigh();
   }
 
-  return 1;
+  return pass_cut ? SUCCESS : FAILURE;
 }
 
 int mtt_analysis::ElectronSel()
 {
-  int goodelidx = -1;
+  bool pass_cut = false;
 
-  int n_ele = m_electron->getSize();
+  m_lepton_sel_flag = NO_LEPTON;
 
-  if (!n_ele) return 4;
+  int selected_electron_index = -1;
+  int n_loose_electrons = m_electron_loose->getSize();
+  int n_isolated_electrons = 0;
+  int isolated_electron_index_in_loose_collection = -1;
+  int isolated_electron_index_in_array = -1;
 
-  for (int i = 0; i < n_ele; i++)
-  {
-    TLorentzVector *eP = m_electron->getEleLorentzVector(i);
+  std::vector<int> looseCollectionIndexes;
+  for (int i = 0; i < n_loose_electrons; i++) {
+
+    TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
 
     if (fabs(eP->Pt()) <= 30)
       continue;
@@ -577,71 +608,106 @@ int mtt_analysis::ElectronSel()
     if (fabs(eP->Eta()) >= 2.5)
       continue;
 
-    if (fabs(m_electron->getSuperClusterEta(i)) >= 1.4442 && fabs(m_electron->getSuperClusterEta(i)) < 1.5660)
+    if (fabs(m_electron_loose->getSuperClusterEta(i)) >= 1.4442 && fabs(m_electron_loose->getSuperClusterEta(i)) < 1.5660)
       continue;
 
-    if (! m_electron->passTightId(i))
+    if (! m_electron_loose->passTightId(i))
       continue;
 
     m_mtt_ElectronPt[m_mtt_NGoodElectrons] = eP->Pt();
     m_mtt_ElectronEta[m_mtt_NGoodElectrons] = eP->Eta();
-    m_mtt_ElRelIso[m_mtt_NGoodElectrons]   = m_electron->getRhoCorrectedRelativeIsolation(i);
+    m_mtt_ElRelIso[m_mtt_NGoodElectrons]   = m_electron_loose->getRhoCorrectedRelativeIsolation(i);
+    looseCollectionIndexes.push_back(i);
+
+    if (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.10) {
+      n_isolated_electrons++;
+      isolated_electron_index_in_loose_collection = i;
+      isolated_electron_index_in_array = m_mtt_NGoodElectrons;
+    }
 
     m_mtt_NGoodElectrons++;
-
-    goodelidx = i;
   }
 
   // No electrons? bye bye
   if (m_mtt_NGoodElectrons == 0)
-    return 4;
+    return NO_MTT_RECO;
 
-  // Only one good electron per event
-  if (m_mtt_NGoodElectrons > 1)
-    return 5;
+  if (n_isolated_electrons == 1) {
+    // One isolated lepton = standard selection
+    // Check if there are other isolated leptons in the event
 
-  TLorentzVector* selected_p4 = m_electron->getEleLorentzVector(goodelidx);
+    m_lepton_sel_flag |= HAS_ONE_ISOLATED_LEPTON;
 
-  // Electron veto
-  int size = m_electron_loose->getSize();
-  for (int i = 0; i < size; i++) {
-    TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
+    // Muon veto
+    m_lepton_sel_flag |= PASS_MUON_VETO;
+    int size = m_muon_loose->getSize();
+    for (int i = 0; i < size; i++) {
 
-    if (*selected_p4 == *eP)
-      continue;
+      TLorentzVector* p4 = m_muon_loose->getMuLorentzVector(i);
 
-    if ((eP->Pt() > 20) &&
-        (eP->Eta() < 2.5) &&
-        (m_electron_loose->passVetoId(i)) &&
-        (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.15))
-      return 7;
-  }
+      if ((m_muon_loose->getMuisGlobal(i) || m_muon_loose->getMuisTracker(i)) &&
+          (p4->Pt() > 10) &&
+          (p4->Eta() < 2.5) &&
+          (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.20)) {
 
-  // Muon veto
-  size = m_muon_loose->getSize();
-  for (int i = 0; i < size; i++) {
-    TLorentzVector* p4 = m_muon_loose->getMuLorentzVector(i);
-
-    if ((m_muon_loose->getMuisGlobal(i) || m_muon_loose->getMuisTracker(i)) &&
-        (p4->Pt() > 10) &&
-        (p4->Eta() < 2.5) &&
-        (m_muon_loose->getDeltaBetaCorrectedRelativeIsolation(i) < 0.20)) {
-      return 7;
+        m_lepton_sel_flag = m_lepton_sel_flag & ~PASS_MUON_VETO;
+        break;
+      }
     }
+
+    //electron veto for semimu channel
+    m_lepton_sel_flag |= PASS_ELECTRON_VETO;
+
+    int n_ele = m_electron_loose->getSize();
+    for (int i = 0; i < n_ele; ++i) {
+
+      if (i == isolated_electron_index_in_loose_collection)
+        continue;
+
+      TLorentzVector *eP = m_electron_loose->getEleLorentzVector(i);
+
+      if ((eP->Pt() > 20) &&
+          (eP->Eta() < 2.5) &&
+          (m_electron_loose->passVetoId(i)) &&
+          (m_electron_loose->getRhoCorrectedRelativeIsolation(i) < 0.15)) {
+
+        m_lepton_sel_flag = m_lepton_sel_flag & ~PASS_ELECTRON_VETO;
+        break;
+      }
+    }
+
+    selected_electron_index = isolated_electron_index_in_loose_collection;
+    m_selectedLeptonIndex_in_array = isolated_electron_index_in_array;
+
+    pass_cut = (m_lepton_sel_flag & PASS_LEPTON_VETO) == PASS_LEPTON_VETO;
+
+  } else if (n_isolated_electrons > 1) {
+    // More than one isolated lepton
+    // Drop the event
+
+    return NO_MTT_RECO;
+
+  } else {
+    // No isolated electron
+    // Skip lepton veto, and use the first lepton
+
+    m_lepton_sel_flag |= HAS_NO_ISOLATED_LEPTON;
+    selected_electron_index = looseCollectionIndexes[0];
+    m_selectedLeptonIndex_in_array = 0;
   }
 
-  m_refLept = m_electron->getEleLorentzVector(goodelidx);
-  m_selectedLeptonIndex_AfterChi2 = goodelidx;
+  m_refLept = m_electron_loose->getEleLorentzVector(selected_electron_index);
+  m_selectedLeptonIndex_in_loose_collection = selected_electron_index;
 
   if (m_isMC) {
     // Get scale factor
-    ScaleFactor sf = m_electron->getScaleFactor(ScaleFactorService::TIGHT, goodelidx);
+    ScaleFactor sf = m_electron_loose->getScaleFactor(ScaleFactorService::TIGHT, ScaleFactorService::TIGHT, selected_electron_index);
     m_lepton_weight *= sf.getValue();
     m_lepton_weight_error_low += sf.getErrorLow() * sf.getErrorLow();
     m_lepton_weight_error_high += sf.getErrorHigh() * sf.getErrorHigh();
   }
 
-  return 1;
+  return pass_cut ? SUCCESS : FAILURE;
 }
 
 
@@ -653,7 +719,7 @@ int mtt_analysis::JetSel()
   int n_jet = m_jetMet->getSize();
 
   if (! n_jet)
-    return 8;
+    return NO_MTT_RECO;
 
   std::vector<ScaleFactor> jetSF;
   std::vector<int> jetFlavor;
@@ -704,7 +770,7 @@ int mtt_analysis::JetSel()
 
   // We need at least 4 good jets
   if (m_mtt_NJets < 4)
-    return 8;
+    return NO_MTT_RECO;
 
   auto getEfficiencyWithError = [&] (int mcFlavor, float pt, float eta) -> std::tuple<double, double, double> {
     mcFlavor = abs(mcFlavor);
@@ -879,17 +945,13 @@ int mtt_analysis::JetSel()
     }
   }
 
-  return 1;
+  return SUCCESS;
 }
 
-#define CHECK_RES_AND_RETURN(res, var) \
-  if (res != 1) { \
-    var = 0; \
-    m_mtt_isSel = res; \
-    fillTree(); \
-    return; \
-  } else { \
-    var = 1; \
+#define PROCESS_RESULT(res, var) \
+  var = res; \
+  if (res == NO_MTT_RECO) { \
+    m_do_mtt_reco = false; \
   }
 
 #define   MTT_TRIGGER_NOT_FOUND   1000
@@ -927,26 +989,29 @@ void mtt_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& extracto
 
   m_nPU = m_event->nPU();
 
+  m_do_mtt_reco = true;
+
   int res = VertexSel();
-  CHECK_RES_AND_RETURN(res, m_pass_vertex_cut);
+  PROCESS_RESULT(res, m_pass_vertex_cut);
 
   res = METSel();
-  CHECK_RES_AND_RETURN(res, m_pass_met_cut);
+  PROCESS_RESULT(res, m_pass_met_cut);
 
   if (m_MAIN_doSemiMu) {
     res  = MuonSel();
   } else {
     res = ElectronSel();
   }
-  CHECK_RES_AND_RETURN(res, m_pass_lepton_cut);
+  PROCESS_RESULT(res, m_pass_lepton_cut);
 
   res = JetSel();
-  CHECK_RES_AND_RETURN(res, m_pass_jet_cut);
+  PROCESS_RESULT(res, m_pass_jet_cut);
 
-  m_mtt_isSel = 1;
+  m_mtt_isSel = m_pass_vertex_cut == SUCCESS && m_pass_met_cut == SUCCESS && m_pass_lepton_cut == SUCCESS && m_pass_jet_cut == SUCCESS;
 
-  // We selected a candidate (and m_refLept)
-  loopOverCombinations();
+  if (m_do_mtt_reco) {
+    loopOverCombinations();
+  }
 
   fillTree();
 }
@@ -1718,31 +1783,29 @@ void mtt_analysis::reset()
   m_MC_Top1_p4->Clear("C");
   m_MC_Top2_p4->Clear("C");
 
-  m_selectedLeptonIndex_AfterChi2               = -1;
+  m_selectedLeptonIndex_in_loose_collection     = -1;
+  m_selectedLeptonIndex_in_array                = -1;
   m_selectedLeptonicBIndex_AfterChi2            = -1;
   m_selectedHadronicBIndex_AfterChi2            = -1;
   m_selectedHadronicFirstJetIndex_AfterChi2     = -1;
   m_selectedHadronicSecondJetIndex_AfterChi2    = -1;
 
-  m_selectedLeptonIndex_AfterMVA               = -1;
   m_selectedLeptonicBIndex_AfterMVA            = -1;
   m_selectedHadronicBIndex_AfterMVA            = -1;
   m_selectedHadronicFirstJetIndex_AfterMVA     = -1;
   m_selectedHadronicSecondJetIndex_AfterMVA    = -1;
 
   m_mtt_NGoodMuons = 0;
-  m_mtt_NLooseGoodMuons = 0;
   m_mtt_NGoodElectrons = 0;
 
   for (int tmp = 0; tmp < 20; ++tmp)
   {
     m_mtt_MuonPt[tmp] = 0.;
-    m_mtt_2DDrMin[tmp] = -1.;
-    m_mtt_2DpTrel[tmp] = -1.;
+    m_mtt_MuonEta[tmp] = 1000.;
     m_mtt_MuRelIso[tmp] = -1.;
 
     m_mtt_ElectronPt[tmp] = 0.;
-    m_mtt_HyperTight1MC[tmp] = -1;
+    m_mtt_ElectronEta[tmp] = 1000.;
     m_mtt_ElRelIso[tmp] = -1.;
   }
 

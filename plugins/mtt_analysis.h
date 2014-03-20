@@ -274,7 +274,9 @@ namespace mtt {
       TClonesArray* m_hadTopP4_AfterChi2;
 
       // Indexes of selected particles for mtt computation
-      int m_selectedLeptonIndex_AfterChi2;
+      int m_selectedLeptonIndex_in_loose_collection; // Index of the selected lepton inside the Extractor "loose muon" collection
+      int m_selectedLeptonIndex_in_array; // Index of the selected lepton inside the m_mtt_Muon* arrays
+
       int m_selectedLeptonicBIndex_AfterChi2;
       int m_selectedHadronicBIndex_AfterChi2;
       int m_selectedHadronicFirstJetIndex_AfterChi2;
@@ -310,7 +312,6 @@ namespace mtt {
       TClonesArray* m_hadTopP4_AfterMVA;
 
       // Indexes of selected particles for mtt computation, after MVA selection
-      int m_selectedLeptonIndex_AfterMVA;
       int m_selectedLeptonicBIndex_AfterMVA;
       int m_selectedHadronicBIndex_AfterMVA;
       int m_selectedHadronicFirstJetIndex_AfterMVA;
@@ -328,14 +329,11 @@ namespace mtt {
       float m_mtt_MuonPt[20];
       float m_mtt_MuonEta[20];
       float m_mtt_MuRelIso[20];
-      float m_mtt_2DDrMin[20];
-      float m_mtt_2DpTrel[20];
 
       int m_mtt_NGoodElectrons;
       float m_mtt_ElectronPt[20];
       float m_mtt_ElectronEta[20];
       float m_mtt_ElRelIso[20];
-      int m_mtt_HyperTight1MC[20];
 
       float m_mtt_1stjetpt;
       float m_mtt_2ndjetpt;
@@ -422,7 +420,9 @@ namespace mtt {
       int m_pass_vertex_cut;
       int m_pass_met_cut;
       int m_pass_lepton_cut;
+      unsigned int m_lepton_sel_flag;
       int m_pass_jet_cut;
+      bool m_do_mtt_reco;
 
       // b-tagging efficiencies
       TH2* m_gen_bjets; // Number of b-jets at generator level for an event
