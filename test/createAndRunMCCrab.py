@@ -30,6 +30,8 @@ datasets = [
 
     # TT + jets
     ["/TT_CT10_TuneZ2star_8TeV-powheg-tauola/chassera-TT_CT10_powheg_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_powheg"],
+    ["/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/chassera-TTJets_MassiveBinDECAY_START53_V7C_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_madgraph"],
+    ["/TT_8TeV-mcatnlo/chassera-TT_8TeV-mcatnlo_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_mcatnlo"],
     
     # Z + jets
     ["/DY1JetsToLL_M-50_TuneZ2Star_8TeV-madgraph/chassera-DY1JetsToLL_M-50_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "DY1JetsToLL_M-50"],
