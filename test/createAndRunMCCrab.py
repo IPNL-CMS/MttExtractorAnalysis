@@ -112,6 +112,11 @@ datasets = [
     ["/RSGluonToTT_M-1200_Tune4C_8TeV-pythia8/apequegn-RSGluon1200_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-1200"],
     ["/RSGluonToTT_M-1500_Tune4C_8TeV-pythia8/apequegn-RSGluon1500_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-1500"],
     ["/RSGluonToTT_M-2000_Tune4C_8TeV-pythia8/apequegn-RSGluon2000_START53_V7A_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "RSGluonToTT_M-2000"],
+
+    # Dibosons
+    ["/WW_TuneZ2star_8TeV_pythia6_tauola/chassera-WWincl_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "WW"],
+    ["/WZ_TuneZ2star_8TeV_pythia6_tauola/chassera-WZincl_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "WZ"],
+    ["/ZZ_TuneZ2star_8TeV_pythia6_tauola/chassera-ZZincl_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER ", "ZZ"]
     ]
 
 # Get email address
