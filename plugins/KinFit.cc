@@ -62,6 +62,18 @@ KinFit::KinFit(const std::string& ParamsFile, const edm::ParameterSet& cmsswSett
   m_usePtSystInChi2 = cmsswSettings.getParameter<edm::ParameterSet>("chi2_sorting").getParameter<bool>("use_pt_syst");
   m_useHtFracInChi2 = cmsswSettings.getParameter<edm::ParameterSet>("chi2_sorting").getParameter<bool>("use_ht_frac");
 
+  std::cout << std::endl << "Chi^2 sorting algorithm: Using" << std::endl;
+  std::cout << "\t- Hadronic top mass: " << chi2_hadronic_top_mass << " +/- " << chi2_sigma_hadronic_top_mass << std::endl;
+  std::cout << "\t- Leptonic top mass (semi-mu): " << chi2_leptonic_top_mass_semimu << " +/- " << chi2_sigma_leptonic_top_mass_semimu << std::endl;
+  std::cout << "\t- Leptonic top mass (semi-e): " << chi2_leptonic_top_mass_semie << " +/- " << chi2_sigma_leptonic_top_mass_semie << std::endl;
+  std::cout << "\t- Hadronic W mass: " << chi2_hadronic_w_mass << " +/- " << chi2_sigma_hadronic_w_mass << std::endl;
+
+  if (m_usePtSystInChi2)
+    std::cout << "\t- pT tt system: " << chi2_pt_ttbar_system << " +/- " << chi2_sigma_pt_ttbar_system << std::endl;
+
+  if (m_useHtFracInChi2)
+    std::cout << "\t- HT fraction: " << chi2_ht_frac << " +/- " << chi2_sigma_ht_frac << std::endl;
+
   chi2_sigma_hadronic_top_mass_square = chi2_sigma_hadronic_top_mass * chi2_sigma_hadronic_top_mass;
   chi2_sigma_leptonic_top_mass_semimu_square = chi2_sigma_leptonic_top_mass_semimu * chi2_sigma_leptonic_top_mass_semimu;
   chi2_sigma_leptonic_top_mass_semie_square = chi2_sigma_leptonic_top_mass_semie * chi2_sigma_leptonic_top_mass_semie;
