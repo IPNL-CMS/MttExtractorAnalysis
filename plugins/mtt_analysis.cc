@@ -165,7 +165,8 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   if (m_useMVA) {
     m_tree_Mtt->Branch("numComb_MVA"        , &m_mtt_NumComb_MVA            , "numComb_MVA/I");
     m_tree_Mtt->Branch("solMVA"             , &m_mtt_SolMVA                 , "solMVA[numComb_MVA]/F");
-    m_tree_Mtt->Branch("bestSolMVA"         , &m_mtt_BestSolMVA            , "bestSolMVA/F");
+    m_tree_Mtt->Branch("bestSolMVA"         , &m_mtt_BestSolMVA             , "bestSolMVA/F");
+    m_tree_Mtt->Branch("isSelMVA"           , &m_mtt_isSelMVA               , "isSelMVA/I");
   }
 
   m_tree_Mtt->Branch("eventIsAssociable"  , &m_mtt_eventIsAssociable     , "eventIsAssociable/O");
@@ -319,6 +320,11 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   if (m_useMVA) {
     const edm::ParameterSet& mvaSettings = cmsswSettings.getParameter<edm::ParameterSet>("mva");
     m_MVAWeightFilename = edm::FileInPath(mvaSettings.getParameter<std::string>("weights")).fullPath();
+    m_MVAMethodName = mvaSettings.getParameter<std::string>("name");
+    m_MVACut = mvaSettings.getParameter<bool>("cut");
+    if (m_MVACut) {
+      m_MVACutValue = mvaSettings.getParameter<double>("cut_value");
+    }
 
     m_MVAReader.reset(new TMVA::Reader("V"));
 
@@ -340,7 +346,15 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_MVAReader->AddVariable("delta_R_lightjets", &m_mva_delta_R_lightjets);
     m_MVAReader->AddVariable("delta_R_W", &m_mva_delta_R_W);
 
-    m_MVAReader->BookMVA("BDT", m_MVAWeightFilename.c_str());
+    // Chi^2 like MVA
+    //{
+      //m_MVAReader->AddVariable("leptonic_Top_M", &m_mva_leptonic_Top_M);
+      //m_MVAReader->AddVariable("hadronic_W_M", &m_mva_hadronic_W_M);
+      //m_MVAReader->AddVariable("hadronic_Top_M", &m_mva_hadronic_Top_M);
+      //m_MVAReader->AddVariable("ht_fraction", &m_mva_ht_fraction);
+    //}
+
+    m_MVAReader->BookMVA(m_MVAMethodName, m_MVAWeightFilename.c_str());
   }
 
   std::string fname = "kfparams_semilept.dat";
@@ -1153,7 +1167,9 @@ void mtt_analysis::loopOverCombinations()
             m_mva_delta_R_W =            leptonic_W.DeltaR(hadronic_W);
             m_mva_delta_R_lightjets =    measuredHadronicFirstJet.DeltaR(measuredHadronicSecondJet);
 
-            mvaValue = m_MVAReader->EvaluateMVA("BDT");
+            m_mva_ht_fraction = (measuredLeptonicB.Pt() + measuredHadronicB.Pt() + measuredHadronicFirstJet.Pt() + measuredHadronicSecondJet.Pt()) / (AllJetsPt);
+
+            mvaValue = m_MVAReader->EvaluateMVA(m_MVAMethodName);
 
             if (mvaValue > maxMVAValue) {
               maxMVAValue = mvaValue;
@@ -1248,6 +1264,13 @@ void mtt_analysis::loopOverCombinations()
   }
 
   if (m_useMVA && m_mtt_NumComb_MVA > 0) {
+
+    if (m_MVACut) {
+      m_mtt_isSelMVA = (maxMVAValue < m_MVACut) ? 0 : 1; 
+    } else {
+      m_mtt_isSelMVA = 1;
+    }
+
     m_selectedHadronicBIndex_AfterMVA = bestj1_MVA;
     m_selectedLeptonicBIndex_AfterMVA = bestj2_MVA;
     m_selectedHadronicFirstJetIndex_AfterMVA = bestj3_MVA;
@@ -1373,7 +1396,6 @@ void mtt_analysis::MCidentification()
 
       continue;
     }
-
 
     int motherIndex = patIndexToExtractorIndex(m_MC->getMom1Index(i));
     int grandMotherIndex = -1;
@@ -1731,6 +1753,7 @@ void mtt_analysis::reset()
   m_pass_jet_cut = -1;
 
   m_mtt_isSel = 0;
+  m_mtt_isSelMVA = 0;
   m_mtt_eventIsAssociable = false;
   m_mtt_recoJetsAssociatedWithChi2 = false;
   m_mtt_recoJetsAssociatedWellPlacedWithChi2 = false;

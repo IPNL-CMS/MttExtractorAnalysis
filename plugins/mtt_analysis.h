@@ -110,6 +110,9 @@ namespace mtt {
       // MVA
       bool m_useMVA;
       std::string m_MVAWeightFilename;
+      std::string m_MVAMethodName;
+      bool m_MVACut;
+      double m_MVACutValue;
       std::shared_ptr<TMVA::Reader> m_MVAReader;
 
       bool m_useChi2;
@@ -131,6 +134,8 @@ namespace mtt {
       float m_mva_delta_R_tops;
       float m_mva_delta_R_lightjets;
       float m_mva_delta_R_W;
+
+      float m_mva_ht_fraction;
 
       TTree*  m_tree_Mtt;
       KinFit* m_KinFit;
@@ -237,6 +242,7 @@ namespace mtt {
       //Reco stuff
 
       int m_mtt_isSel;
+      int m_mtt_isSelMVA;
       bool m_mtt_eventIsAssociable; // If true, each parton from the event has a reco object associated.
       bool m_mtt_recoJetsAssociatedWithChi2;
       bool m_mtt_recoJetsAssociatedWellPlacedWithChi2;
