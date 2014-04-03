@@ -252,12 +252,12 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterMVA"  , &m_selectedHadronicFirstJetIndex_AfterMVA  , "selectedHadronicFirstJetIndex_AfterMVA/I");
     m_tree_Mtt->Branch("selectedHadronicSecondJetIndex_AfterMVA" , &m_selectedHadronicSecondJetIndex_AfterMVA , "selectedHadronicSecondJetIndex_AfterMVA/I");
 
-    m_tree_Mtt->Branch("selectedLeptonP4_AfterChi2"      , &m_selectedLeptonP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterChi2"    , &m_selectedNeutrinoP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterChi2"   , &m_selectedLeptonicBP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedHadronicBP4_AfterChi2"   , &m_selectedHadronicBP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedFirstJetP4_AfterChi2"    , &m_selectedFirstJetP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedSecondJetP4_AfterChi2"   , &m_selectedSecondJetP4_AfterChi2, 32000, -1);
+    m_tree_Mtt->Branch("selectedLeptonP4_AfterMVA"      , &m_selectedLeptonP4_AfterMVA, 32000, -1);
+    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterMVA"    , &m_selectedNeutrinoP4_AfterMVA, 32000, -1);
+    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterMVA"   , &m_selectedLeptonicBP4_AfterMVA, 32000, -1);
+    m_tree_Mtt->Branch("selectedHadronicBP4_AfterMVA"   , &m_selectedHadronicBP4_AfterMVA, 32000, -1);
+    m_tree_Mtt->Branch("selectedFirstJetP4_AfterMVA"    , &m_selectedFirstJetP4_AfterMVA, 32000, -1);
+    m_tree_Mtt->Branch("selectedSecondJetP4_AfterMVA"   , &m_selectedSecondJetP4_AfterMVA, 32000, -1);
   }
 
   m_tree_Mtt->Branch("trigger_passed", &m_trigger_passed, "trigger_passed/O");
