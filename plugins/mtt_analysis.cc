@@ -901,8 +901,8 @@ int mtt_analysis::JetSel()
           error_tagged_squared_low += ((error_sf_i_low * error_sf_i_low) / (sf_i * sf_i));
         } else {
           eff_untagged *= ((1. - sf_i * eff_i)) / (1. - eff_i);
-          error_untagged_squared_up += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_up, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_up, 2);
-          error_untagged_squared_low += std::pow(((1 - eff_i) / (1 - eff_i * sf_i)) * error_sf_i_low, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_low, 2);
+          error_untagged_squared_up += std::pow(((-eff_i) / (1 - eff_i * sf_i)) * error_sf_i_up, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_up, 2);
+          error_untagged_squared_low += std::pow(((-eff_i) / (1 - eff_i * sf_i)) * error_sf_i_low, 2) + std::pow(((1 - sf_i) / ((1 - eff_i) * (1 - sf_i * eff_i))) * error_eff_i_low, 2);
         }
       }
 
