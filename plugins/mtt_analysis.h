@@ -270,6 +270,8 @@ namespace mtt {
       float m_mHadTop_AfterChi2;
       float m_mHadW_AfterChi2;
       float m_mLepW_AfterChi2;
+      
+      int   m_neutrino_no_real_solution_AfterChi2;
 
       float m_lepTopPt_AfterChi2;
       float m_lepTopEta_AfterChi2;
@@ -308,6 +310,8 @@ namespace mtt {
       float m_mHadTop_AfterMVA;
       float m_mHadW_AfterMVA;
       float m_mLepW_AfterMVA;
+
+      int   m_neutrino_no_real_solution_AfterMVA;
 
       float m_lepTopPt_AfterMVA;
       float m_lepTopEta_AfterMVA;
@@ -419,8 +423,6 @@ namespace mtt {
       float m_btag_weight;
       float m_btag_weight_error_low;
       float m_btag_weight_error_high;
-
-      bool m_is_neutrino_pz_corrected;
 
       // Cut ; -1 event drop before arriving to this cut ; 0 cut failed, 1 cut passed
       int m_pass_vertex_cut;

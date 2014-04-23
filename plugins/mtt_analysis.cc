@@ -208,6 +208,8 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("mtt_AfterChi2"          , &m_mtt_AfterChi2         , "mtt_AfterChi2/F");
     m_tree_Mtt->Branch("mttResolution_AfterChi2"          , &m_mtt_resolution_AfterChi2         , "mttResolution_AfterChi2/F");
 
+    m_tree_Mtt->Branch("neutrino_no_real_solution_AfterChi2", &m_neutrino_no_real_solution_AfterChi2, "neutrino_no_real_solution_AfterChi2/I");
+
     // Index of selected particles inside respective collection for mtt computation
     m_tree_Mtt->Branch("selectedLeptonIndex_in_loose_collection"        , &m_selectedLeptonIndex_in_loose_collection       , "selectedLeptonIndex_in_loose_collection/I");
     m_tree_Mtt->Branch("selectedLeptonIndex_in_array"        , &m_selectedLeptonIndex_in_array       , "selectedLeptonIndex_in_array/I");
@@ -246,6 +248,8 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
     m_tree_Mtt->Branch("mtt_AfterMVA"          , &m_mtt_AfterMVA         , "mtt_AfterMVA/F");
     m_tree_Mtt->Branch("mttResolution_AfterMVA"          , &m_mtt_resolution_AfterMVA         , "mttResolution_AfterMVA/F");
 
+    m_tree_Mtt->Branch("neutrino_no_real_solution_AfterMVA", &m_neutrino_no_real_solution_AfterMVA, "neutrino_no_real_solution_AfterMVA/I");
+
     // Index of selected particles inside respective collection for mtt computation
     m_tree_Mtt->Branch("selectedLeptonicBIndex_AfterMVA"     , &m_selectedLeptonicBIndex_AfterMVA    , "selectedLeptonicBIndex_AfterMVA/I");
     m_tree_Mtt->Branch("selectedHadronicBIndex_AfterMVA"     , &m_selectedHadronicBIndex_AfterMVA    , "selectedHadronicBIndex_AfterMVA/I");
@@ -270,9 +274,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("btag_weight", &m_btag_weight, "btag_weight/F");
   m_tree_Mtt->Branch("btag_weight_error_low", &m_btag_weight_error_low, "btag_weight_error_low/F");
   m_tree_Mtt->Branch("btag_weight_error_high", &m_btag_weight_error_high, "btag_weight_error_high/F");
-
-  // Neutrino Pz calculation study
-  m_tree_Mtt->Branch("is_neutrino_pz_corrected", &m_is_neutrino_pz_corrected, "is_neutrino_pz_corrected/O");
 
   // cuts
   m_tree_Mtt->Branch("pass_vertex_cut", &m_pass_vertex_cut, "pass_vertex_cut/I");
@@ -1210,6 +1211,7 @@ void mtt_analysis::loopOverCombinations()
     m_selectedHadronicSecondJetIndex_AfterChi2 = bestj4_chi2;
 
     // Put selected object inside KinFit. This will correct MET and everything we need
+    bool no_real_sol = false;
     m_KinFit->ReadObjects(*m_jetMet->getP4(bestj3_chi2),
         *m_jetMet->getP4(bestj4_chi2),
         *m_jetMet->getP4(bestj1_chi2),
@@ -1217,8 +1219,10 @@ void mtt_analysis::loopOverCombinations()
         *m_jetMet->getMETLorentzVector(0),
         *m_jetMet->getP4(bestj2_chi2),
         m_MAIN_doSemiMu,
-        &m_is_neutrino_pz_corrected
+        &no_real_sol
         );
+
+    m_neutrino_no_real_solution_AfterChi2 = (no_real_sol) ? 1 : 0;
 
     const TLorentzVector& measuredLepton = m_KinFit->GetMeasuredLepton();
     const TLorentzVector& measuredNeutrino = m_KinFit->GetMeasuredNeutrino();
@@ -1277,6 +1281,7 @@ void mtt_analysis::loopOverCombinations()
     m_selectedHadronicSecondJetIndex_AfterMVA = bestj4_MVA;
 
     // Put selected object inside KinFit. This will correct MET and everything we need
+    bool no_real_sol = false;
     m_KinFit->ReadObjects(*m_jetMet->getP4(bestj3_MVA),
         *m_jetMet->getP4(bestj4_MVA),
         *m_jetMet->getP4(bestj1_MVA),
@@ -1284,8 +1289,10 @@ void mtt_analysis::loopOverCombinations()
         *m_jetMet->getMETLorentzVector(0),
         *m_jetMet->getP4(bestj2_MVA),
         m_MAIN_doSemiMu,
-        &m_is_neutrino_pz_corrected
+        &no_real_sol
         );
+
+    m_neutrino_no_real_solution_AfterMVA = (no_real_sol) ? 1 : 0;
 
     const TLorentzVector& measuredLepton = m_KinFit->GetMeasuredLepton();
     const TLorentzVector& measuredNeutrino = m_KinFit->GetMeasuredNeutrino();
@@ -1752,6 +1759,9 @@ void mtt_analysis::reset()
   m_pass_lepton_cut = -1;
   m_pass_jet_cut = -1;
 
+  m_neutrino_no_real_solution_AfterMVA = -1;
+  m_neutrino_no_real_solution_AfterChi2 = -1;
+
   m_mtt_isSel = 0;
   m_mtt_isSelMVA = 0;
   m_mtt_eventIsAssociable = false;
@@ -1908,8 +1918,6 @@ void mtt_analysis::reset()
   m_btag_weight = 1.;
   m_btag_weight_error_low = 0.;
   m_btag_weight_error_high = 0.;
-
-  m_is_neutrino_pz_corrected = false;
 }
 
 bool mtt_analysis::isBJet(unsigned int index) {
