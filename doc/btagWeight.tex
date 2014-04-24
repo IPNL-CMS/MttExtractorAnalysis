@@ -1,0 +1,25 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage{amsmath}
+
+\title{B-tag weight for $m_{t\bar{t}}$ analysis}
+\author{S. Brochet \and A.-L. Pequegnot \and S. Perries \and V. Sordini}
+
+\begin{document}
+
+\maketitle
+
+\section{B-tag weight}
+The b-tag weight is:
+
+\[ w = \sum_{i}^{N_{jets}^{tagged}} SF_{i} \sum_{j\neq i}^{N_{jets}^{untagged}} \frac{1-\varepsilon _{j}SF_{j} }{1-SF_{j}} \]
+
+\section{B-tag weight error}
+This leads to the following formula for $\Delta w^{2}$:
+
+\[ \Delta w^{2} = \sum_{i}^{N_{jets}^{tagged}} \left[ \left| \frac{w}{SF_{i}}\right|^{2} \Delta ^{2} SF_{i} \right] + \sum_{j\neq i}^{N_{jets}^{untagged}} \left[ \left| \frac{-\varepsilon _{j}w}{1-\varepsilon _{j}SF_{j}}\right|^{2}\Delta ^{2}SF_{j} +  \left|\frac{w(1-SF_{j})}{(1-\varepsilon _{j}SF_{j})(1-\varepsilon _{j})} \right|^{2}\Delta ^{2}\varepsilon _{j} \right] \]
+
+\end{document}
