@@ -895,6 +895,8 @@ int mtt_analysis::JetSel()
         float error_eff_i_low = std::get<2>(eff);
         float error_sf_i_low = jetSF[i].getErrorLow();
 
+        // Compute b-tag weight error
+        // See calculation here: https://github.com/IPNL-CMS/MttExtractorAnalysis/raw/master/doc/btagWeight.pdf
         if (jetIsBTagged[i]) {
           eff_tagged *= sf_i;
           error_tagged_squared_up += ((error_sf_i_up * error_sf_i_up) / (sf_i * sf_i));
