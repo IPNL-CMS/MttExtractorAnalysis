@@ -31,7 +31,6 @@
 #include <FWCore/ParameterSet/interface/FileInPath.h>
 
 #include "Extractors/MttExtractorAnalysis/plugins/SortingAlgorithmFactory.h"
-#include "Extractors/MttExtractorAnalysis/plugins/KinFit.h"
 #include "Extractors/MttExtractorAnalysis/plugins/BTaggingEfficiencyProvider.h"
 
 using namespace std;

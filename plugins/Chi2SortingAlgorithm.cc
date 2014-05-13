@@ -137,8 +137,8 @@ void Chi2SortingAlgorithm::work() {
 
   /*
    * Indices:
-   * Jet 1: First b-jet (hadronic)
-   * Jet 2: Second b-jet (leptonic)
+   * Jet 1: First b-jet (leptonic)
+   * Jet 2: Second b-jet (hadronic)
    * Jet 3: First light jet
    * Jet 4: Second light jet
    */

@@ -181,6 +181,18 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                     use_ht_frac = cms.bool(True)
                     )
                 ),
+            cms.PSet(
+                name = cms.string("mva"),
+                enable = cms.bool(True),
+                configuration = cms.PSet(
+                    weights = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
+                    cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semie_BDT.weights.xml"),
+                    name = cms.string("BDT"),
+                    cut = cms.bool(False),
+                    cut_value = cms.double(-0.0288),
+                    use_btag_in_combinatorics = cms.bool(False),
+                    )
+                ),    
             ),
 
         use_mva = cms.bool(True),
