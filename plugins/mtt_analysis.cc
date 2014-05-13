@@ -30,6 +30,7 @@
 
 #include <FWCore/ParameterSet/interface/FileInPath.h>
 
+#include "Extractors/MttExtractorAnalysis/plugins/SortingAlgorithmFactory.h"
 #include "Extractors/MttExtractorAnalysis/plugins/KinFit.h"
 #include "Extractors/MttExtractorAnalysis/plugins/BTaggingEfficiencyProvider.h"
 
@@ -38,22 +39,10 @@ using namespace std;
 namespace mtt {
 
 mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
-  Plugin(cmsswSettings),
-  maxNrIter_                        (cmsswSettings.getParameter<unsigned>     ("maxNrIter"           )),
-  maxDeltaS_                        (cmsswSettings.getParameter<double>       ("maxDeltaS"           )),
-  maxF_                             (cmsswSettings.getParameter<double>       ("maxF"                )),
-  jetParam_                         (cmsswSettings.getParameter<unsigned>     ("jetParametrisation"  )),
-  lepParam_                         (cmsswSettings.getParameter<unsigned>     ("lepParametrisation"  )),
-  metParam_                         (cmsswSettings.getParameter<unsigned>     ("metParametrisation"  )),
-  constraints_                      (cmsswSettings.getParameter<std::vector<unsigned> >("constraints")),
-  mW_                               (cmsswSettings.getParameter<double>       ("mW"                  )),
-  mTop_                             (cmsswSettings.getParameter<double>       ("mTop"                )),
-  jetEnergyResolutionScaleFactors_  (cmsswSettings.getParameter<std::vector<double> >("jetEnergyResolutionScaleFactors")),
-  jetEnergyResolutionEtaBinning_    (cmsswSettings.getParameter<std::vector<double> >("jetEnergyResolutionEtaBinning"))
+  Plugin(cmsswSettings)
 {
 
-  m_useChi2 = cmsswSettings.getParameter<bool>("use_chi2");
-  m_useMVA = cmsswSettings.getParameter<bool>("use_mva");
+  m_MAIN_doSemiMu = cmsswSettings.getParameter<bool>("do_semimu");
 
   m_MC_lepton_p4 = new TClonesArray("TLorentzVector");
   m_MC_neutrino_p4 = new TClonesArray("TLorentzVector");
@@ -67,26 +56,18 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_MC_Top1_p4 = new TClonesArray("TLorentzVector");
   m_MC_Top2_p4 = new TClonesArray("TLorentzVector");
 
-  if (m_useChi2) {
-    m_selectedLeptonP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_selectedNeutrinoP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_selectedLeptonicBP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_selectedHadronicBP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_selectedFirstJetP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_selectedSecondJetP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_hadTopP4_AfterChi2 = new TClonesArray("TLorentzVector");
-    m_lepTopP4_AfterChi2 = new TClonesArray("TLorentzVector");
-  }
+  m_selectedLeptonP4 = new TClonesArray("TLorentzVector");
 
-  if (m_useMVA) {
-    m_selectedLeptonP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_selectedNeutrinoP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_selectedLeptonicBP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_selectedHadronicBP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_selectedFirstJetP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_selectedSecondJetP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_hadTopP4_AfterMVA = new TClonesArray("TLorentzVector");
-    m_lepTopP4_AfterMVA = new TClonesArray("TLorentzVector");
+  edm::VParameterSet algos = cmsswSettings.getParameterSetVector("sorting_algortihms");
+  for (const edm::ParameterSet& algo: algos) {
+    bool enable = algo.getParameter<bool>("enable");
+    if (! enable)
+      continue;
+
+    std::string name = algo.getParameter<std::string>("name");
+    const edm::ParameterSet cfg = algo.getParameterSet("configuration");
+
+    m_sorting_algortihms.push_back(SortingAlgorithmFactory::create(name, cfg, m_MAIN_doSemiMu));
   }
 
   reset();
@@ -155,114 +136,8 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("MET"                , &m_mtt_MET                   , "MET/F");
 
   m_tree_Mtt->Branch("isSel"              , &m_mtt_isSel                 , "isSel/I");
-  //m_tree_Mtt->Branch("oneMatchedCombi"    , &m_mtt_OneMatchedCombi       , "oneMatchedCombi/I");
-  if (m_useChi2) {
-    m_tree_Mtt->Branch("numComb_chi2"       , &m_mtt_NumComb_chi2           , "numComb_chi2/I");
-    m_tree_Mtt->Branch("solChi2"            , &m_mtt_SolChi2                , "solChi2[numComb_chi2]/F");
-    m_tree_Mtt->Branch("bestSolChi2"        , &m_mtt_BestSolChi2           , "bestSolChi2/F");
-  }
-
-  if (m_useMVA) {
-    m_tree_Mtt->Branch("numComb_MVA"        , &m_mtt_NumComb_MVA            , "numComb_MVA/I");
-    m_tree_Mtt->Branch("solMVA"             , &m_mtt_SolMVA                 , "solMVA[numComb_MVA]/F");
-    m_tree_Mtt->Branch("bestSolMVA"         , &m_mtt_BestSolMVA             , "bestSolMVA/F");
-    m_tree_Mtt->Branch("isSelMVA"           , &m_mtt_isSelMVA               , "isSelMVA/I");
-  }
 
   m_tree_Mtt->Branch("eventIsAssociable"  , &m_mtt_eventIsAssociable     , "eventIsAssociable/O");
-
-  if (m_useChi2) {
-    // If true, it means that we have selected the correct four reco jets (ie, reco jets coming from tt decay)
-    m_tree_Mtt->Branch("recoJetsAssociatedWithChi2" , &m_mtt_recoJetsAssociatedWithChi2    , "recoJetsAssociatedWithChi2/O");
-    // If true, it means that we have selected the correct four reco jets (ie, reco jets coming from tt decay)
-    // and each jets is correctly positionned.
-    m_tree_Mtt->Branch("recoJetsAssociatedWellPlacedWithChi2", &m_mtt_recoJetsAssociatedWellPlacedWithChi2, "recoJetsAssociatedWellPlacedWithChi2/O");
-  }
-
-  if (m_useMVA) {
-    // If true, it means that we have selected the correct four reco jets (ie, reco jets coming from tt decay)
-    m_tree_Mtt->Branch("recoJetsAssociatedWithMVA" , &m_mtt_recoJetsAssociatedWithMVA    , "recoJetsAssociatedWithMVA/O");
-    // If true, it means that we have selected the correct four reco jets (ie, reco jets coming from tt decay)
-    // and each jets is correctly positionned.
-    m_tree_Mtt->Branch("recoJetsAssociatedWellPlacedWithMVA", &m_mtt_recoJetsAssociatedWellPlacedWithMVA, "recoJetsAssociatedWellPlacedWithMVA/O");
-  }
-
-  if (m_useChi2) {
-    // Selected object with Chi2
-    m_tree_Mtt->Branch("mLepW_AfterChi2"        , &m_mLepW_AfterChi2       , "mLepW_AfterChi2/F");
-    m_tree_Mtt->Branch("mHadW_AfterChi2"        , &m_mHadW_AfterChi2       , "mHadW_AfterChi2/F");
-
-    m_tree_Mtt->Branch("mLepTop_AfterChi2"      , &m_mLepTop_AfterChi2     , "mLepTop_AfterChi2/F");
-    m_tree_Mtt->Branch("lepTopPt_AfterChi2"     , &m_lepTopPt_AfterChi2    , "lepTopPt_AfterChi2/F");
-    m_tree_Mtt->Branch("lepTopEta_AfterChi2"    , &m_lepTopEta_AfterChi2   , "lepTopEta_AfterChi2/F");
-    m_tree_Mtt->Branch("lepTopP4_AfterChi2"    , &m_lepTopP4_AfterChi2, 32000, -1);
-
-    m_tree_Mtt->Branch("mHadTop_AfterChi2"      , &m_mHadTop_AfterChi2     , "mHadTop_AfterChi2/F");
-    m_tree_Mtt->Branch("hadTopPt_AfterChi2"     , &m_hadTopPt_AfterChi2    , "hadTopPt_AfterChi2/F");
-    m_tree_Mtt->Branch("hadTopEta_AfterChi2"    , &m_hadTopEta_AfterChi2   , "hadTopEta_AfterChi2/F");
-    m_tree_Mtt->Branch("hadTopP4_AfterChi2"    , &m_hadTopP4_AfterChi2, 32000, -1);
-
-    m_tree_Mtt->Branch("pt_tt_AfterChi2"        , &m_pt_tt_AfterChi2       , "pt_tt_AfterChi2/F");
-    m_tree_Mtt->Branch("eta_tt_AfterChi2"       , &m_eta_tt_AfterChi2      , "eta_tt_AfterChi2/F");
-    m_tree_Mtt->Branch("beta_tt_AfterChi2"      , &m_beta_tt_AfterChi2     , "eta_tt_AfterChi2/F");
-    m_tree_Mtt->Branch("mtt_AfterChi2"          , &m_mtt_AfterChi2         , "mtt_AfterChi2/F");
-    m_tree_Mtt->Branch("mttResolution_AfterChi2"          , &m_mtt_resolution_AfterChi2         , "mttResolution_AfterChi2/F");
-
-    m_tree_Mtt->Branch("neutrino_no_real_solution_AfterChi2", &m_neutrino_no_real_solution_AfterChi2, "neutrino_no_real_solution_AfterChi2/I");
-
-    // Index of selected particles inside respective collection for mtt computation
-    m_tree_Mtt->Branch("selectedLeptonIndex_in_loose_collection"        , &m_selectedLeptonIndex_in_loose_collection       , "selectedLeptonIndex_in_loose_collection/I");
-    m_tree_Mtt->Branch("selectedLeptonIndex_in_array"        , &m_selectedLeptonIndex_in_array       , "selectedLeptonIndex_in_array/I");
-
-    m_tree_Mtt->Branch("selectedLeptonicBIndex_AfterChi2"     , &m_selectedLeptonicBIndex_AfterChi2    , "selectedLeptonicBIndex_AfterChi2/I");
-    m_tree_Mtt->Branch("selectedHadronicBIndex_AfterChi2"     , &m_selectedHadronicBIndex_AfterChi2    , "selectedHadronicBIndex_AfterChi2/I");
-    m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterChi2"  , &m_selectedHadronicFirstJetIndex_AfterChi2  , "selectedHadronicFirstJetIndex_AfterChi2/I");
-    m_tree_Mtt->Branch("selectedHadronicSecondJetIndex_AfterChi2" , &m_selectedHadronicSecondJetIndex_AfterChi2 , "selectedHadronicSecondJetIndex_AfterChi2/I");
-
-    m_tree_Mtt->Branch("selectedLeptonP4_AfterChi2"      , &m_selectedLeptonP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterChi2"    , &m_selectedNeutrinoP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterChi2"   , &m_selectedLeptonicBP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedHadronicBP4_AfterChi2"   , &m_selectedHadronicBP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedFirstJetP4_AfterChi2"    , &m_selectedFirstJetP4_AfterChi2, 32000, -1);
-    m_tree_Mtt->Branch("selectedSecondJetP4_AfterChi2"   , &m_selectedSecondJetP4_AfterChi2, 32000, -1);
-  }
-
-  if (m_useMVA) {
-    // Selected object with MVA
-    m_tree_Mtt->Branch("mLepW_AfterMVA"        , &m_mLepW_AfterMVA       , "mLepW_AfterMVA/F");
-    m_tree_Mtt->Branch("mHadW_AfterMVA"        , &m_mHadW_AfterMVA       , "mHadW_AfterMVA/F");
-
-    m_tree_Mtt->Branch("mLepTop_AfterMVA"      , &m_mLepTop_AfterMVA     , "mLepTop_AfterMVA/F");
-    m_tree_Mtt->Branch("lepTopPt_AfterMVA"     , &m_lepTopPt_AfterMVA    , "lepTopPt_AfterMVA/F");
-    m_tree_Mtt->Branch("lepTopEta_AfterMVA"    , &m_lepTopEta_AfterMVA   , "lepTopEta_AfterMVA/F");
-    m_tree_Mtt->Branch("lepTopP4_AfterMVA"    , &m_lepTopP4_AfterMVA, 32000, -1);
-
-    m_tree_Mtt->Branch("mHadTop_AfterMVA"      , &m_mHadTop_AfterMVA     , "mHadTop_AfterMVA/F");
-    m_tree_Mtt->Branch("hadTopPt_AfterMVA"     , &m_hadTopPt_AfterMVA    , "hadTopPt_AfterMVA/F");
-    m_tree_Mtt->Branch("hadTopEta_AfterMVA"    , &m_hadTopEta_AfterMVA   , "hadTopEta_AfterMVA/F");
-    m_tree_Mtt->Branch("hadTopP4_AfterMVA"    , &m_hadTopP4_AfterMVA, 32000, -1);
-
-    m_tree_Mtt->Branch("pt_tt_AfterMVA"        , &m_pt_tt_AfterMVA       , "pt_tt_AfterMVA/F");
-    m_tree_Mtt->Branch("eta_tt_AfterMVA"       , &m_eta_tt_AfterMVA      , "eta_tt_AfterMVA/F");
-    m_tree_Mtt->Branch("beta_tt_AfterMVA"      , &m_beta_tt_AfterMVA     , "eta_tt_AfterMVA/F");
-    m_tree_Mtt->Branch("mtt_AfterMVA"          , &m_mtt_AfterMVA         , "mtt_AfterMVA/F");
-    m_tree_Mtt->Branch("mttResolution_AfterMVA"          , &m_mtt_resolution_AfterMVA         , "mttResolution_AfterMVA/F");
-
-    m_tree_Mtt->Branch("neutrino_no_real_solution_AfterMVA", &m_neutrino_no_real_solution_AfterMVA, "neutrino_no_real_solution_AfterMVA/I");
-
-    // Index of selected particles inside respective collection for mtt computation
-    m_tree_Mtt->Branch("selectedLeptonicBIndex_AfterMVA"     , &m_selectedLeptonicBIndex_AfterMVA    , "selectedLeptonicBIndex_AfterMVA/I");
-    m_tree_Mtt->Branch("selectedHadronicBIndex_AfterMVA"     , &m_selectedHadronicBIndex_AfterMVA    , "selectedHadronicBIndex_AfterMVA/I");
-    m_tree_Mtt->Branch("selectedHadronicFirstJetIndex_AfterMVA"  , &m_selectedHadronicFirstJetIndex_AfterMVA  , "selectedHadronicFirstJetIndex_AfterMVA/I");
-    m_tree_Mtt->Branch("selectedHadronicSecondJetIndex_AfterMVA" , &m_selectedHadronicSecondJetIndex_AfterMVA , "selectedHadronicSecondJetIndex_AfterMVA/I");
-
-    m_tree_Mtt->Branch("selectedLeptonP4_AfterMVA"      , &m_selectedLeptonP4_AfterMVA, 32000, -1);
-    m_tree_Mtt->Branch("selectedNeutrinoP4_AfterMVA"    , &m_selectedNeutrinoP4_AfterMVA, 32000, -1);
-    m_tree_Mtt->Branch("selectedLeptonicBP4_AfterMVA"   , &m_selectedLeptonicBP4_AfterMVA, 32000, -1);
-    m_tree_Mtt->Branch("selectedHadronicBP4_AfterMVA"   , &m_selectedHadronicBP4_AfterMVA, 32000, -1);
-    m_tree_Mtt->Branch("selectedFirstJetP4_AfterMVA"    , &m_selectedFirstJetP4_AfterMVA, 32000, -1);
-    m_tree_Mtt->Branch("selectedSecondJetP4_AfterMVA"   , &m_selectedSecondJetP4_AfterMVA, 32000, -1);
-  }
 
   m_tree_Mtt->Branch("trigger_passed", &m_trigger_passed, "trigger_passed/O");
 
@@ -283,8 +158,13 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("pass_jet_cut", &m_pass_jet_cut, "pass_jet_cut/I");
   m_tree_Mtt->Branch("do_mtt_reco", &m_do_mtt_reco, "do_mtt_reco/O");
 
+  m_tree_Mtt->Branch("selectedLeptonIndex_in_loose_collection", &m_selectedLeptonIndex_in_loose_collection, "selectedLeptonIndex_in_loose_collection/I");
+  m_tree_Mtt->Branch("selectedLeptonIndex_in_array", &m_selectedLeptonIndex_in_array, "selectedLeptonIndex_in_array/I");
+  m_tree_Mtt->Branch("selectedLeptonP4", &m_selectedLeptonP4, 32000, -1);
 
-  m_MAIN_doSemiMu = cmsswSettings.getParameter<bool>("do_semimu");
+  // Create branches associated to sorting algos
+  for (auto& algo: m_sorting_algortihms)
+    algo->addBranches(*m_tree_Mtt);
 
   // METSel()
   m_MET_Pt_Min = cmsswSettings.getParameter<edm::ParameterSet>("met").getParameter<double>("pt_min");
@@ -315,52 +195,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_JET_btag_CSVT = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<double>("btag_CSVT");
   m_JET_btag_TCHPT = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<double>("btag_TCHPT");
   m_b_tagging_efficiency = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<double>("b_tagging_efficiency");
-
-  m_MAIN_doUseBTag = cmsswSettings.getParameter<edm::ParameterSet>("chi2_sorting").getParameter<bool>("use_btagging");
-
-  if (m_useMVA) {
-    const edm::ParameterSet& mvaSettings = cmsswSettings.getParameter<edm::ParameterSet>("mva");
-    m_MVAWeightFilename = edm::FileInPath(mvaSettings.getParameter<std::string>("weights")).fullPath();
-    m_MVAMethodName = mvaSettings.getParameter<std::string>("name");
-    m_MVACut = mvaSettings.getParameter<bool>("cut");
-    if (m_MVACut) {
-      m_MVACutValue = mvaSettings.getParameter<double>("cut_value");
-    }
-
-    m_MVAReader.reset(new TMVA::Reader("V"));
-
-    m_MVAReader->AddVariable("lightJet1p2_Pt", &m_mva_lightJet1p2_Pt);
-    m_MVAReader->AddVariable("leptonic_B_Pt", &m_mva_leptonic_B_Pt);
-    m_MVAReader->AddVariable("leptonic_W_Pt", &m_mva_leptonic_W_Pt);
-    m_MVAReader->AddVariable("leptonic_Top_Pt", &m_mva_leptonic_Top_Pt);
-    m_MVAReader->AddVariable("leptonic_Top_M", &m_mva_leptonic_Top_M);
-    m_MVAReader->AddVariable("hadronic_B_Pt", &m_mva_hadronic_B_Pt);
-    m_MVAReader->AddVariable("hadronic_W_Pt", &m_mva_hadronic_W_Pt);
-    m_MVAReader->AddVariable("hadronic_W_M", &m_mva_hadronic_W_M);
-    m_MVAReader->AddVariable("hadronic_Top_Pt", &m_mva_hadronic_Top_Pt);
-    m_MVAReader->AddVariable("hadronic_Top_M", &m_mva_hadronic_Top_M);
-
-    m_MVAReader->AddVariable("delta_phi_tops", &m_mva_delta_phi_tops);
-    m_MVAReader->AddVariable("delta_phi_lightjets", &m_mva_delta_phi_lightjets);
-    m_MVAReader->AddVariable("delta_phi_W", &m_mva_delta_phi_W);
-    m_MVAReader->AddVariable("delta_R_tops", &m_mva_delta_R_tops);
-    m_MVAReader->AddVariable("delta_R_lightjets", &m_mva_delta_R_lightjets);
-    m_MVAReader->AddVariable("delta_R_W", &m_mva_delta_R_W);
-
-    // Chi^2 like MVA
-    //{
-      //m_MVAReader->AddVariable("leptonic_Top_M", &m_mva_leptonic_Top_M);
-      //m_MVAReader->AddVariable("hadronic_W_M", &m_mva_hadronic_W_M);
-      //m_MVAReader->AddVariable("hadronic_Top_M", &m_mva_hadronic_Top_M);
-      //m_MVAReader->AddVariable("ht_fraction", &m_mva_ht_fraction);
-    //}
-
-    m_MVAReader->BookMVA(m_MVAMethodName, m_MVAWeightFilename.c_str());
-  }
-
-  std::string fname = "kfparams_semilept.dat";
-  m_KinFit = new KinFit(fname, cmsswSettings);
-
 
   float ptBinning[] = {20, 30, 40, 50, 60, 70, 80, 100, 120, 160, 210, 260, 320, 400, 500, 600, 800};
   float etaBinning[] = {0., 0.8, 1.5, 2.4};
@@ -400,14 +234,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_selected_light_jets_sf = new TH1F("selected_light_jets_sf", "Scale factor for selected light jets", 50, 0.5, 1.5);
 
   m_b_tagging_efficiency_provider = std::make_shared<BTaggingEfficiencyProvider>(cmsswSettings);
-}
-
-mtt_analysis::~mtt_analysis()
-{
-  delete m_KinFit;
-
-  delete m_lepTopP4_AfterChi2;
-  delete m_hadTopP4_AfterChi2;
 }
 
 const int NO_MTT_RECO = -1;
@@ -1033,312 +859,36 @@ void mtt_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& extracto
   fillTree();
 }
 
-
-
 void mtt_analysis::loopOverCombinations()
 {
-  //jets indices
-  int c_j1 = -1;
-  int c_j2 = -1;
-  int c_j3 = -1;
-  int c_j4 = -1;
+  new ((*m_selectedLeptonP4)[0]) TLorentzVector(*m_refLept);
 
-  //
-  int bestj1_chi2 = -1;
-  int bestj2_chi2 = -1;
-  int bestj3_chi2 = -1;
-  int bestj4_chi2 = -1;
+  std::vector<Jet> jets;
+  for (size_t i = 0; i < m_selJetsIds.size(); i++) {
+    Jet jet;
 
-  int bestj1_MVA = -1;
-  int bestj2_MVA = -1;
-  int bestj3_MVA = -1;
-  int bestj4_MVA = -1;
+    int index = m_selJetsIds[i];
+    TLorentzVector *jetP = m_jetMet->getP4(index);
 
-  int n_btaggedjets = 0;
+    // LorentzVector is used in (Pt, Eta, Phi, E) coordinates
+    jet.p.SetCoordinates(jetP->Pt(), jetP->Eta(), jetP->Phi(), jetP->E());
+    jet.index = index;
+    jet.isBTagged = isBJet(index);
 
-  // chi2 variables
-  double minfitchi2 = std::numeric_limits<double>::infinity();
-  double fitchi2    = std::numeric_limits<double>::infinity();
-
-  // MVA variables
-  double maxMVAValue = std::numeric_limits<double>::lowest();
-
-  m_mtt_NumComb_chi2 = 0;
-  m_mtt_NumComb_MVA = 0;
-
-  int n_jets = m_selJetsIds.size();
-
-  //If requested get the number of b-tagged jets in the selected jets sample
-  if (m_MAIN_doUseBTag)
-    n_btaggedjets = m_mtt_NBtaggedJets_CSVM;
-
-  //std::cout << "Nulber of b tagged jets: " << btaggedjets.size() << std::endl;
-
-  /**
-   * Indices:
-   * Jet 1: First b-jet (hadronic)
-   * Jet 2: Second b-jet (leptonic)
-   * Jet 3: First light jet
-   * Jet 4: Second light jet
-   */
-
-  //calculate all the possible jets combinations for chi2 calculation.
-  //the idea is: b-tag fake rate is low, so b-tagged jets are only associated to bjets (indices bjet1idx and bjet2idx below)
-  //on the other hand the b-tag efficiency is low, so non-b-tagged jets can be associated to bjets
-  //bottom line: only non b-tagged jets can be associated to the light jets (indices jet3idx and jet4idx below)
-  //in the chi2 calculation for this reason in the selected jets we need at least 2 non b-tagged jets
-
-  int numberoflightjets = n_jets - n_btaggedjets;
-
-  if (numberoflightjets < 2)
-    return; // if we dont have at least 2 non b-tagged jets, chi2 is -1
-
-  for (int bj1 = 0; bj1 < n_jets; ++bj1)
-  {
-    for (int bj2 = 0; bj2 < n_jets; ++bj2)
-    {
-      if (bj2 == bj1)
-        continue; //dont pick the one you already used
-
-      for (int j3 = 0; j3 < n_jets; ++j3)
-      {
-        // dont pick the two jets you used, or btagged jets
-        if (j3 == bj1 || j3 == bj2 || (m_MAIN_doUseBTag && isBJet(m_selJetsIds[j3])))
-          continue;
-
-        for (int j4 = j3 + 1; j4 < n_jets; ++j4)
-        {
-          //dont pick the two jets you used, or btagged jets
-          if (j4 == bj1 || j4 == bj2 || (m_MAIN_doUseBTag && isBJet(m_selJetsIds[j4])))
-            continue;
-
-          // Get the real jet indices
-
-          c_j1 = m_selJetsIds[bj1];
-          c_j2 = m_selJetsIds[bj2];
-          c_j3 = m_selJetsIds[j3];
-          c_j4 = m_selJetsIds[j4];
-
-          // This call corrects MET pz
-          bool res = m_KinFit->ReadObjects(*m_jetMet->getP4(c_j3),
-              *m_jetMet->getP4(c_j4),
-              *m_jetMet->getP4(c_j1),
-              *m_refLept,
-              *m_jetMet->getMETLorentzVector(0),
-              *m_jetMet->getP4(c_j2),
-              m_MAIN_doSemiMu
-              );
-
-          if (!res)
-            return; // We will never get anything with this event
-
-          float mvaValue = 0;
-          if (m_useMVA) {
-            const TLorentzVector& measuredLepton = m_KinFit->GetMeasuredLepton();
-            const TLorentzVector& measuredNeutrino = m_KinFit->GetMeasuredNeutrino();
-            const TLorentzVector& measuredLeptonicB = m_KinFit->GetMeasuredLeptonicBJet();
-            const TLorentzVector& measuredHadronicB = m_KinFit->GetMeasuredHadronicBJet();
-            const TLorentzVector& measuredHadronicFirstJet = m_KinFit->GetMeasuredFirstLightJet();
-            const TLorentzVector& measuredHadronicSecondJet = m_KinFit->GetMeasuredSecondLightJet();
-
-            TLorentzVector leptonic_W = measuredLepton + measuredNeutrino;
-            TLorentzVector hadronic_W = measuredHadronicFirstJet + measuredHadronicSecondJet;
-
-            TLorentzVector leptonic_Top = leptonic_W + measuredLeptonicB;
-            TLorentzVector hadronic_Top = hadronic_W + measuredHadronicB;
-
-            m_mva_lightJet1p2_Pt = measuredHadronicFirstJet.Pt() + measuredHadronicSecondJet.Pt();
-
-            m_mva_leptonic_B_Pt = measuredLeptonicB.Pt();
-            m_mva_hadronic_B_Pt = measuredHadronicB.Pt();
-
-            m_mva_leptonic_W_Pt = leptonic_W.Pt();
-            //m_mva_leptonic_W_M = leptonic_W.M();
-            m_mva_leptonic_Top_Pt = leptonic_Top.Pt();
-            m_mva_leptonic_Top_M = leptonic_Top.M();
-
-            m_mva_hadronic_W_Pt = hadronic_W.Pt();
-            m_mva_hadronic_W_M = hadronic_W.M();
-            m_mva_hadronic_Top_Pt = hadronic_Top.Pt();
-            m_mva_hadronic_Top_M = hadronic_Top.M();
-
-            m_mva_delta_phi_tops =         leptonic_Top.DeltaPhi(hadronic_Top);
-            m_mva_delta_phi_W =            leptonic_W.DeltaPhi(hadronic_W);
-            m_mva_delta_phi_lightjets =    measuredHadronicFirstJet.DeltaPhi(measuredHadronicSecondJet);
-
-            m_mva_delta_R_tops =         leptonic_Top.DeltaR(hadronic_Top);
-            m_mva_delta_R_W =            leptonic_W.DeltaR(hadronic_W);
-            m_mva_delta_R_lightjets =    measuredHadronicFirstJet.DeltaR(measuredHadronicSecondJet);
-
-            m_mva_ht_fraction = (measuredLeptonicB.Pt() + measuredHadronicB.Pt() + measuredHadronicFirstJet.Pt() + measuredHadronicSecondJet.Pt()) / (AllJetsPt);
-
-            mvaValue = m_MVAReader->EvaluateMVA(m_MVAMethodName);
-
-            if (mvaValue > maxMVAValue) {
-              maxMVAValue = mvaValue;
-
-              m_mtt_SolMVA[m_mtt_NumComb_MVA] = mvaValue;
-              m_mtt_NumComb_MVA++;
-
-              bestj1_MVA = c_j1;
-              bestj2_MVA = c_j2;
-              bestj3_MVA = c_j3;
-              bestj4_MVA = c_j4;
-            }
-          }
-
-          if (m_useChi2) {
-            fitchi2 = m_KinFit->GlobalSimpleChi2(AllJetsPt);
-            if (fitchi2 < minfitchi2) {
-              minfitchi2 = fitchi2;
-
-              m_mtt_SolChi2[m_mtt_NumComb_chi2] = fitchi2;
-              m_mtt_NumComb_chi2++;
-
-              bestj1_chi2 = c_j1;
-              bestj2_chi2 = c_j2;
-              bestj3_chi2 = c_j3;
-              bestj4_chi2 = c_j4;
-            }
-          }
-        } // j4 close
-      } // j3 close
-    } // j2 close
-  } // we out of the loop over jet pairings
-
-  if (m_useChi2 && m_mtt_NumComb_chi2 > 0) {
-    m_selectedHadronicBIndex_AfterChi2 = bestj1_chi2;
-    m_selectedLeptonicBIndex_AfterChi2 = bestj2_chi2;
-    m_selectedHadronicFirstJetIndex_AfterChi2 = bestj3_chi2;
-    m_selectedHadronicSecondJetIndex_AfterChi2 = bestj4_chi2;
-
-    // Put selected object inside KinFit. This will correct MET and everything we need
-    bool no_real_sol = false;
-    m_KinFit->ReadObjects(*m_jetMet->getP4(bestj3_chi2),
-        *m_jetMet->getP4(bestj4_chi2),
-        *m_jetMet->getP4(bestj1_chi2),
-        *m_refLept,
-        *m_jetMet->getMETLorentzVector(0),
-        *m_jetMet->getP4(bestj2_chi2),
-        m_MAIN_doSemiMu,
-        &no_real_sol
-        );
-
-    m_neutrino_no_real_solution_AfterChi2 = (no_real_sol) ? 1 : 0;
-
-    const TLorentzVector& measuredLepton = m_KinFit->GetMeasuredLepton();
-    const TLorentzVector& measuredNeutrino = m_KinFit->GetMeasuredNeutrino();
-    const TLorentzVector& measuredLeptonicB = m_KinFit->GetMeasuredLeptonicBJet();
-    const TLorentzVector& measuredHadronicB = m_KinFit->GetMeasuredHadronicBJet();
-    const TLorentzVector& measuredHadronicFirstJet = m_KinFit->GetMeasuredFirstLightJet();
-    const TLorentzVector& measuredHadronicSecondJet = m_KinFit->GetMeasuredSecondLightJet();
-
-    // Copy P4 for Tree
-    new ((*m_selectedLeptonP4_AfterChi2)[0]) TLorentzVector(measuredLepton);
-    new ((*m_selectedNeutrinoP4_AfterChi2)[0]) TLorentzVector(measuredNeutrino);
-    new ((*m_selectedLeptonicBP4_AfterChi2)[0]) TLorentzVector(measuredLeptonicB);
-    new ((*m_selectedHadronicBP4_AfterChi2)[0]) TLorentzVector(measuredHadronicB);
-    new ((*m_selectedFirstJetP4_AfterChi2)[0]) TLorentzVector(measuredHadronicFirstJet);
-    new ((*m_selectedSecondJetP4_AfterChi2)[0]) TLorentzVector(measuredHadronicSecondJet);
-
-    /**
-     * Compute Mtt before doing KinFit
-     */
-    m_mLepW_AfterChi2   = (measuredNeutrino + measuredLepton).M();
-    m_mHadW_AfterChi2   = (measuredHadronicFirstJet + measuredHadronicSecondJet).M();
-
-    TLorentzVector lepTopP4_AfterChi2 = (measuredLepton + measuredNeutrino + measuredLeptonicB);
-    new ((*m_lepTopP4_AfterChi2)[0]) TLorentzVector(lepTopP4_AfterChi2);
-    m_mLepTop_AfterChi2 = lepTopP4_AfterChi2.M();
-    m_lepTopPt_AfterChi2 = lepTopP4_AfterChi2.Pt();
-    m_lepTopEta_AfterChi2 = lepTopP4_AfterChi2.Eta();
-
-    TLorentzVector hadTopP4_AfterChi2 = (measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB);
-    new ((*m_hadTopP4_AfterChi2)[0]) TLorentzVector((measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB));
-    m_mHadTop_AfterChi2 = hadTopP4_AfterChi2.M();
-    m_hadTopPt_AfterChi2 = hadTopP4_AfterChi2.Pt();
-    m_hadTopEta_AfterChi2 = hadTopP4_AfterChi2.Eta();
-
-    TLorentzVector res = (lepTopP4_AfterChi2 + hadTopP4_AfterChi2);
-    m_mtt_AfterChi2     = res.M();
-    m_mtt_resolution_AfterChi2 = m_mtt_AfterChi2 - m_MC_mtt;
-    m_pt_tt_AfterChi2   = res.Pt();
-    m_eta_tt_AfterChi2   = res.Eta();
-    m_beta_tt_AfterChi2  = fabs(res.Pz() / res.E());
-
-    m_mtt_BestSolChi2 = minfitchi2;
+    jets.push_back(jet);
   }
 
-  if (m_useMVA && m_mtt_NumComb_MVA > 0) {
+  LorentzVector lepton(m_refLept->Pt(), m_refLept->Eta(), m_refLept->Phi(), m_refLept->E());
 
-    if (m_MVACut) {
-      m_mtt_isSelMVA = (maxMVAValue < m_MVACut) ? 0 : 1; 
-    } else {
-      m_mtt_isSelMVA = 1;
-    }
+  TLorentzVector* metP = m_jetMet->getMETLorentzVector(0);
+  LorentzVector met(metP->Pt(), metP->Eta(), metP->Phi(), metP->E());
 
-    m_selectedHadronicBIndex_AfterMVA = bestj1_MVA;
-    m_selectedLeptonicBIndex_AfterMVA = bestj2_MVA;
-    m_selectedHadronicFirstJetIndex_AfterMVA = bestj3_MVA;
-    m_selectedHadronicSecondJetIndex_AfterMVA = bestj4_MVA;
-
-    // Put selected object inside KinFit. This will correct MET and everything we need
-    bool no_real_sol = false;
-    m_KinFit->ReadObjects(*m_jetMet->getP4(bestj3_MVA),
-        *m_jetMet->getP4(bestj4_MVA),
-        *m_jetMet->getP4(bestj1_MVA),
-        *m_refLept,
-        *m_jetMet->getMETLorentzVector(0),
-        *m_jetMet->getP4(bestj2_MVA),
-        m_MAIN_doSemiMu,
-        &no_real_sol
-        );
-
-    m_neutrino_no_real_solution_AfterMVA = (no_real_sol) ? 1 : 0;
-
-    const TLorentzVector& measuredLepton = m_KinFit->GetMeasuredLepton();
-    const TLorentzVector& measuredNeutrino = m_KinFit->GetMeasuredNeutrino();
-    const TLorentzVector& measuredLeptonicB = m_KinFit->GetMeasuredLeptonicBJet();
-    const TLorentzVector& measuredHadronicB = m_KinFit->GetMeasuredHadronicBJet();
-    const TLorentzVector& measuredHadronicFirstJet = m_KinFit->GetMeasuredFirstLightJet();
-    const TLorentzVector& measuredHadronicSecondJet = m_KinFit->GetMeasuredSecondLightJet();
-
-    // Copy P4 for Tree
-    new ((*m_selectedLeptonP4_AfterMVA)[0]) TLorentzVector(measuredLepton);
-    new ((*m_selectedNeutrinoP4_AfterMVA)[0]) TLorentzVector(measuredNeutrino);
-    new ((*m_selectedLeptonicBP4_AfterMVA)[0]) TLorentzVector(measuredLeptonicB);
-    new ((*m_selectedHadronicBP4_AfterMVA)[0]) TLorentzVector(measuredHadronicB);
-    new ((*m_selectedFirstJetP4_AfterMVA)[0]) TLorentzVector(measuredHadronicFirstJet);
-    new ((*m_selectedSecondJetP4_AfterMVA)[0]) TLorentzVector(measuredHadronicSecondJet);
-
-    /**
-     * Compute Mtt before doing KinFit
-     */
-    m_mLepW_AfterMVA   = (measuredNeutrino + measuredLepton).M();
-    m_mHadW_AfterMVA   = (measuredHadronicFirstJet + measuredHadronicSecondJet).M();
-
-    TLorentzVector lepTopP4_AfterMVA = (measuredLepton + measuredNeutrino + measuredLeptonicB);
-    new ((*m_lepTopP4_AfterMVA)[0]) TLorentzVector(lepTopP4_AfterMVA);
-    m_mLepTop_AfterMVA = lepTopP4_AfterMVA.M();
-    m_lepTopPt_AfterMVA = lepTopP4_AfterMVA.Pt();
-    m_lepTopEta_AfterMVA = lepTopP4_AfterMVA.Eta();
-
-    TLorentzVector hadTopP4_AfterMVA = (measuredHadronicFirstJet + measuredHadronicSecondJet + measuredHadronicB);
-    new ((*m_hadTopP4_AfterMVA)[0]) TLorentzVector((hadTopP4_AfterMVA));
-    m_mHadTop_AfterMVA = hadTopP4_AfterMVA.M();
-    m_hadTopPt_AfterMVA = hadTopP4_AfterMVA.Pt();
-    m_hadTopEta_AfterMVA = hadTopP4_AfterMVA.Eta();
-
-    TLorentzVector res = (lepTopP4_AfterMVA + hadTopP4_AfterMVA);
-    m_mtt_AfterMVA     = res.M();
-    m_mtt_resolution_AfterMVA = m_mtt_AfterMVA - m_MC_mtt;
-    m_pt_tt_AfterMVA   = res.Pt();
-    m_eta_tt_AfterMVA   = res.Eta();
-    m_beta_tt_AfterMVA  = fabs(res.Pz() / res.E());
-
-    m_mtt_BestSolMVA = maxMVAValue;
+  for (auto& algo: m_sorting_algortihms) {
+    algo->setObjects(jets, lepton, met);
+    algo->work();
   }
 
+  //FIXME
   if (m_isMC)
     checkIfSolutionIsCorrect();
 }
@@ -1718,27 +1268,27 @@ void mtt_analysis::checkIfSolutionIsCorrect() {
 
   // Check if the four select jets come from tt decay.
   // Position is not important, as long as we have the four
-  if (m_useChi2) {
-    m_mtt_recoJetsAssociatedWithChi2 = (
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedLeptonicBIndex_AfterChi2)) &&
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicBIndex_AfterChi2)) &&
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicFirstJetIndex_AfterChi2)) &&
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicSecondJetIndex_AfterChi2))
-        );
+  //if (m_useChi2) {
+    //m_mtt_recoJetsAssociatedWithChi2 = (
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedLeptonicBIndex_AfterChi2)) &&
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicBIndex_AfterChi2)) &&
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicFirstJetIndex_AfterChi2)) &&
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicSecondJetIndex_AfterChi2))
+        //);
 
-    m_mtt_recoJetsAssociatedWellPlacedWithChi2 = isSolutionMatched(m_selectedLeptonicBIndex_AfterChi2, m_selectedHadronicBIndex_AfterChi2, m_selectedHadronicFirstJetIndex_AfterChi2, m_selectedHadronicSecondJetIndex_AfterChi2);
-  }
+    //m_mtt_recoJetsAssociatedWellPlacedWithChi2 = isSolutionMatched(m_selectedLeptonicBIndex_AfterChi2, m_selectedHadronicBIndex_AfterChi2, m_selectedHadronicFirstJetIndex_AfterChi2, m_selectedHadronicSecondJetIndex_AfterChi2);
+  //}
 
-  if (m_useMVA) {
-    m_mtt_recoJetsAssociatedWithMVA = (
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedLeptonicBIndex_AfterMVA)) &&
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicBIndex_AfterMVA)) &&
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicFirstJetIndex_AfterMVA)) &&
-        jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicSecondJetIndex_AfterMVA))
-        );
+  //if (m_useMVA) {
+    //m_mtt_recoJetsAssociatedWithMVA = (
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedLeptonicBIndex_AfterMVA)) &&
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicBIndex_AfterMVA)) &&
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicFirstJetIndex_AfterMVA)) &&
+        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicSecondJetIndex_AfterMVA))
+        //);
 
-    m_mtt_recoJetsAssociatedWellPlacedWithMVA = isSolutionMatched(m_selectedLeptonicBIndex_AfterMVA, m_selectedHadronicBIndex_AfterMVA, m_selectedHadronicFirstJetIndex_AfterMVA, m_selectedHadronicSecondJetIndex_AfterMVA);
-  }
+    //m_mtt_recoJetsAssociatedWellPlacedWithMVA = isSolutionMatched(m_selectedLeptonicBIndex_AfterMVA, m_selectedHadronicBIndex_AfterMVA, m_selectedHadronicFirstJetIndex_AfterMVA, m_selectedHadronicSecondJetIndex_AfterMVA);
+  //}
 }
 
 void mtt_analysis::fillTree()
@@ -1761,50 +1311,8 @@ void mtt_analysis::reset()
   m_pass_lepton_cut = -1;
   m_pass_jet_cut = -1;
 
-  m_neutrino_no_real_solution_AfterMVA = -1;
-  m_neutrino_no_real_solution_AfterChi2 = -1;
-
   m_mtt_isSel = 0;
-  m_mtt_isSelMVA = 0;
   m_mtt_eventIsAssociable = false;
-  m_mtt_recoJetsAssociatedWithChi2 = false;
-  m_mtt_recoJetsAssociatedWellPlacedWithChi2 = false;
-  m_mtt_recoJetsAssociatedWithMVA = false;
-  m_mtt_recoJetsAssociatedWellPlacedWithMVA = false;
-
-  m_mtt_OneMatchedCombi = 0;
-  m_mtt_BestSolChi2 = -1.;
-  m_mtt_BestSolMVA = -1.;
-  m_mtt_NumComb_chi2 = 0;
-  m_mtt_NumComb_MVA = 0;
-
-  m_mtt_AfterChi2            = -1.;
-  m_mtt_resolution_AfterChi2 = -1.;
-  m_pt_tt_AfterChi2          = -1.;
-  m_eta_tt_AfterChi2         = -1.;
-  m_beta_tt_AfterChi2        = -1.;
-  m_mLepTop_AfterChi2        = -1.;
-  m_mHadTop_AfterChi2        = -1.;
-  m_mHadW_AfterChi2          = -1.;
-
-  m_lepTopPt_AfterChi2  = -1;
-  m_lepTopEta_AfterChi2 = -1;
-  m_hadTopPt_AfterChi2  = -1;
-  m_hadTopEta_AfterChi2 = -1;
-
-  m_mtt_AfterMVA     = -1.;
-  m_mtt_resolution_AfterMVA = -1.;
-  m_pt_tt_AfterMVA   = -1.;
-  m_eta_tt_AfterMVA  = -1.;
-  m_beta_tt_AfterMVA = -1.;
-  m_mLepTop_AfterMVA = -1.;
-  m_mHadTop_AfterMVA = -1.;
-  m_mHadW_AfterMVA   = -1.;
-
-  m_lepTopPt_AfterMVA  = -1;
-  m_lepTopEta_AfterMVA = -1;
-  m_hadTopPt_AfterMVA  = -1;
-  m_hadTopEta_AfterMVA = -1;
 
   m_MC_lepton_p4->Clear("C");
   m_MC_neutrino_p4->Clear("C");
@@ -1820,15 +1328,6 @@ void mtt_analysis::reset()
 
   m_selectedLeptonIndex_in_loose_collection     = -1;
   m_selectedLeptonIndex_in_array                = -1;
-  m_selectedLeptonicBIndex_AfterChi2            = -1;
-  m_selectedHadronicBIndex_AfterChi2            = -1;
-  m_selectedHadronicFirstJetIndex_AfterChi2     = -1;
-  m_selectedHadronicSecondJetIndex_AfterChi2    = -1;
-
-  m_selectedLeptonicBIndex_AfterMVA            = -1;
-  m_selectedHadronicBIndex_AfterMVA            = -1;
-  m_selectedHadronicFirstJetIndex_AfterMVA     = -1;
-  m_selectedHadronicSecondJetIndex_AfterMVA    = -1;
 
   m_mtt_NGoodMuons = 0;
   m_mtt_NGoodElectrons = 0;
@@ -1849,11 +1348,7 @@ void mtt_analysis::reset()
   m_mtt_NBtaggedJets_CSVL = 0;
   m_mtt_NBtaggedJets_CSVM = 0;
   m_mtt_NBtaggedJets_CSVT = 0;
-  //m_mtt_NBtaggedJets_TCHPL = 0;
-  //m_mtt_NBtaggedJets_TCHPM = 0;
   m_mtt_NBtaggedJets_TCHPT = 0;
-  //m_mtt_NBtaggedJets_SSVHEM = 0;
-  //m_mtt_NBtaggedJets_SSVHPT = 0;
 
   m_mtt_1stjetpt = 0.;
   m_mtt_2ndjetpt = 0.;
@@ -1891,27 +1386,7 @@ void mtt_analysis::reset()
   m_MC_hadronicTopMass = -1;
   m_MC_leptonicTopMass = -1;
 
-  if (m_useChi2) {
-    m_selectedLeptonP4_AfterChi2->Clear("C");
-    m_selectedNeutrinoP4_AfterChi2->Clear("C");
-    m_selectedLeptonicBP4_AfterChi2->Clear("C");
-    m_selectedHadronicBP4_AfterChi2->Clear("C");
-    m_selectedFirstJetP4_AfterChi2->Clear("C");
-    m_selectedSecondJetP4_AfterChi2->Clear("C");
-    m_lepTopP4_AfterChi2->Clear("C");
-    m_hadTopP4_AfterChi2->Clear("C");
-  }
-
-  if (m_useMVA) {
-    m_selectedLeptonP4_AfterMVA->Clear("C");
-    m_selectedNeutrinoP4_AfterMVA->Clear("C");
-    m_selectedLeptonicBP4_AfterMVA->Clear("C");
-    m_selectedHadronicBP4_AfterMVA->Clear("C");
-    m_selectedFirstJetP4_AfterMVA->Clear("C");
-    m_selectedSecondJetP4_AfterMVA->Clear("C");
-    m_lepTopP4_AfterMVA->Clear("C");
-    m_hadTopP4_AfterMVA->Clear("C");
-  }
+  m_selectedLeptonP4->Clear("C");
 
   m_lepton_weight = 1.;
   m_lepton_weight_error_low = 0.;
@@ -1920,6 +1395,9 @@ void mtt_analysis::reset()
   m_btag_weight = 1.;
   m_btag_weight_error_low = 0.;
   m_btag_weight_error_high = 0.;
+
+  for (auto& algo: m_sorting_algortihms)
+    algo->reset();
 }
 
 bool mtt_analysis::isBJet(unsigned int index) {

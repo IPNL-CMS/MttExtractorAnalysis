@@ -152,40 +152,36 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
           b_tagging_efficiency = cms.double(0.6915)
           ),
 
-        chi2_sorting = cms.PSet(
-          w_mass = cms.double(80.399),
-          w_mass_error = cms.double(10),
-          top_mass = cms.double(172),
-          top_mass_error = cms.double(10),
-          b_mass = cms.double(4.67),
+        sorting_algortihms = cms.VPSet(
+            cms.PSet(
+                name = cms.string("chi2"),
+                enable = cms.bool(True),
+                configuration = cms.PSet(
+                    w_mass = cms.double(80.399),
+                    top_mass = cms.double(172),
+                    b_mass = cms.double(4.67),
 
-          use_btagging = cms.bool(False),
+                    use_btag_in_combinatorics = cms.bool(False),
 
-          hadronic_top_mass = cms.double(174.688),
-          leptonic_top_mass_semimu = cms.double(171.784),
-          leptonic_top_mass_semie = cms.double(171.751),
-          hadronic_w_mass = cms.double(83.9742),
-          pt_ttbar_system = cms.double(22),
-          ht_frac = cms.double(0.99),
+                    hadronic_top_mass = cms.double(174.688),
+                    leptonic_top_mass_semimu = cms.double(171.784),
+                    leptonic_top_mass_semie = cms.double(171.751),
+                    hadronic_w_mass = cms.double(83.9742),
+                    pt_ttbar_system = cms.double(22),
+                    ht_frac = cms.double(0.99),
 
-          sigma_hadronic_top_mass = cms.double(17.1949),
-          sigma_leptonic_top_mass_semimu = cms.double(15.0096),
-          sigma_leptonic_top_mass_semie = cms.double(15.031),
-          sigma_hadronic_w_mass = cms.double(10.1752),
-          sigma_pt_ttbar_system = cms.double(95.6927),
-          sigma_ht_frac = cms.double(0.153778),
+                    sigma_hadronic_top_mass = cms.double(17.1949),
+                    sigma_leptonic_top_mass_semimu = cms.double(15.0096),
+                    sigma_leptonic_top_mass_semie = cms.double(15.031),
+                    sigma_hadronic_w_mass = cms.double(10.1752),
+                    sigma_pt_ttbar_system = cms.double(95.6927),
+                    sigma_ht_frac = cms.double(0.153778),
 
-          use_pt_syst = cms.bool(False),
-          use_ht_frac = cms.bool(True)
-          ),
-
-        mva = cms.PSet(
-          weights = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
-                    cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semie_BDT.weights.xml"),
-          name = cms.string("BDT"),
-          cut = cms.bool(False),
-          cut_value = cms.double(-0.0288)
-          ),
+                    use_pt_syst = cms.bool(False),
+                    use_ht_frac = cms.bool(True)
+                    )
+                ),
+            ),
 
         use_mva = cms.bool(True),
         use_chi2 = cms.bool(True),

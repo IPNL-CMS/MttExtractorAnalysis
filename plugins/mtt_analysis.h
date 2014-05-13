@@ -47,6 +47,8 @@ namespace TMVA {
   class Reader;
 }
 
+class SortingAlgorithm;
+
 namespace mtt {
 
   class mtt_analysis: public patextractor::Plugin {
@@ -103,39 +105,9 @@ namespace mtt {
       float getBTagProbabilityMC();
       float getBTagProbabilityData();
 
-      bool   m_MAIN_doUseBTag;
-      //bool   m_MAIN_doKF;
       bool   m_MAIN_doSemiMu;
 
-      // MVA
-      bool m_useMVA;
-      std::string m_MVAWeightFilename;
-      std::string m_MVAMethodName;
-      bool m_MVACut;
-      double m_MVACutValue;
-      std::shared_ptr<TMVA::Reader> m_MVAReader;
-
       bool m_useChi2;
-
-      float m_mva_lightJet1p2_Pt;
-      float m_mva_leptonic_B_Pt;
-      float m_mva_leptonic_W_Pt;
-      float m_mva_leptonic_Top_Pt;
-      float m_mva_leptonic_Top_M;
-      float m_mva_hadronic_B_Pt;
-      float m_mva_hadronic_W_Pt;
-      float m_mva_hadronic_W_M;
-      float m_mva_hadronic_Top_Pt;
-      float m_mva_hadronic_Top_M;
-
-      float m_mva_delta_phi_tops;
-      float m_mva_delta_phi_lightjets;
-      float m_mva_delta_phi_W;
-      float m_mva_delta_R_tops;
-      float m_mva_delta_R_lightjets;
-      float m_mva_delta_R_W;
-
-      float m_mva_ht_fraction;
 
       TTree*  m_tree_Mtt;
       KinFit* m_KinFit;
@@ -145,7 +117,6 @@ namespace mtt {
 
       std::shared_ptr<VertexExtractor> m_vertex;
 
-      //std::shared_ptr<METExtractor>   m_MET;
       float m_MET_Pt_Min;
 
       std::shared_ptr<MuonExtractor> m_muon;
@@ -171,14 +142,7 @@ namespace mtt {
       std::shared_ptr<JetMETExtractor> m_jetMet;
       float m_JET_Pt_min;
       float m_JET_Eta_max;
-      //float m_jet_btag_tchel_min;
-      //float m_jet_btag_tchem_min;
-      //float m_jet_btag_tchet_min;
-      //float m_JET_btag_TCHPL_min;
-      //float m_JET_btag_TCHPM_min;
       float m_JET_btag_TCHPT;
-      //float m_JET_btag_SSVHEM_min;
-      //float m_JET_btag_SSVHPT_min;
       float m_JET_btag_CSVL;
       float m_JET_btag_CSVM;
       float m_JET_btag_CSVT;
@@ -242,97 +206,14 @@ namespace mtt {
       //Reco stuff
 
       int m_mtt_isSel;
-      int m_mtt_isSelMVA;
       bool m_mtt_eventIsAssociable; // If true, each parton from the event has a reco object associated.
       bool m_mtt_recoJetsAssociatedWithChi2;
       bool m_mtt_recoJetsAssociatedWellPlacedWithChi2;
-      int m_mtt_OneMatchedCombi;
-
-      int m_mtt_NumComb_chi2;
-      int m_mtt_NumComb_MVA;
-      float m_mtt_SolChi2[1000];
-      float m_mtt_SolMVA[1000];
-      float m_mtt_BestSolChi2;
-      float m_mtt_BestSolMVA;
-      //float m_mtt_KFChi2;
-
-      /*float m_mtt_AfterChi2andKF;
-        float m_mLepTop_AfterChi2andKF;
-        float m_mHadTop_AfterChi2andKF;*/
-
-      // Values after Chi2 selection
-      float m_mtt_AfterChi2;
-      float m_mtt_resolution_AfterChi2;
-      float m_eta_tt_AfterChi2;
-      float m_pt_tt_AfterChi2;
-      float m_beta_tt_AfterChi2;
-      float m_mLepTop_AfterChi2;
-      float m_mHadTop_AfterChi2;
-      float m_mHadW_AfterChi2;
-      float m_mLepW_AfterChi2;
-      
-      int   m_neutrino_no_real_solution_AfterChi2;
-
-      float m_lepTopPt_AfterChi2;
-      float m_lepTopEta_AfterChi2;
-      TClonesArray* m_lepTopP4_AfterChi2;
-
-      float m_hadTopPt_AfterChi2;
-      float m_hadTopEta_AfterChi2;
-      TClonesArray* m_hadTopP4_AfterChi2;
 
       // Indexes of selected particles for mtt computation
       int m_selectedLeptonIndex_in_loose_collection; // Index of the selected lepton inside the Extractor "loose muon" collection
       int m_selectedLeptonIndex_in_array; // Index of the selected lepton inside the m_mtt_Muon* arrays
-
-      int m_selectedLeptonicBIndex_AfterChi2;
-      int m_selectedHadronicBIndex_AfterChi2;
-      int m_selectedHadronicFirstJetIndex_AfterChi2;
-      int m_selectedHadronicSecondJetIndex_AfterChi2;
-
-      TClonesArray* m_selectedLeptonP4_AfterChi2;
-      TClonesArray* m_selectedNeutrinoP4_AfterChi2;
-      TClonesArray* m_selectedLeptonicBP4_AfterChi2;
-      TClonesArray* m_selectedHadronicBP4_AfterChi2;
-      TClonesArray* m_selectedFirstJetP4_AfterChi2;
-      TClonesArray* m_selectedSecondJetP4_AfterChi2;
-
-      // MVA values
-      bool m_mtt_recoJetsAssociatedWithMVA;
-      bool m_mtt_recoJetsAssociatedWellPlacedWithMVA;
-
-      float m_mtt_AfterMVA;
-      float m_mtt_resolution_AfterMVA;
-      float m_eta_tt_AfterMVA;
-      float m_pt_tt_AfterMVA;
-      float m_beta_tt_AfterMVA;
-      float m_mLepTop_AfterMVA;
-      float m_mHadTop_AfterMVA;
-      float m_mHadW_AfterMVA;
-      float m_mLepW_AfterMVA;
-
-      int   m_neutrino_no_real_solution_AfterMVA;
-
-      float m_lepTopPt_AfterMVA;
-      float m_lepTopEta_AfterMVA;
-      TClonesArray* m_lepTopP4_AfterMVA;
-
-      float m_hadTopPt_AfterMVA;
-      float m_hadTopEta_AfterMVA;
-      TClonesArray* m_hadTopP4_AfterMVA;
-
-      // Indexes of selected particles for mtt computation, after MVA selection
-      int m_selectedLeptonicBIndex_AfterMVA;
-      int m_selectedHadronicBIndex_AfterMVA;
-      int m_selectedHadronicFirstJetIndex_AfterMVA;
-      int m_selectedHadronicSecondJetIndex_AfterMVA;
-
-      TClonesArray* m_selectedLeptonP4_AfterMVA;
-      TClonesArray* m_selectedNeutrinoP4_AfterMVA;
-      TClonesArray* m_selectedLeptonicBP4_AfterMVA;
-      TClonesArray* m_selectedHadronicBP4_AfterMVA;
-      TClonesArray* m_selectedFirstJetP4_AfterMVA;
-      TClonesArray* m_selectedSecondJetP4_AfterMVA;
+      TClonesArray* m_selectedLeptonP4;
 
       int m_mtt_NGoodMuons;
       int m_mtt_NLooseGoodMuons;
@@ -353,14 +234,7 @@ namespace mtt {
 
       int m_mtt_NJets;
       int m_mtt_NGoodJets;
-      //int m_mtt_NBtaggedJets_TCHEL;
-      //int m_mtt_NBtaggedJets_TCHEM;
-      //int m_mtt_NBtaggedJets_TCHET;
-      //int m_mtt_NBtaggedJets_TCHPL;
-      //int m_mtt_NBtaggedJets_TCHPM;
       int m_mtt_NBtaggedJets_TCHPT;
-      //int m_mtt_NBtaggedJets_SSVHEM;
-      //int m_mtt_NBtaggedJets_SSVHPT;
       int m_mtt_NBtaggedJets_CSVL;
       int m_mtt_NBtaggedJets_CSVM;
       int m_mtt_NBtaggedJets_CSVT;
@@ -391,30 +265,6 @@ namespace mtt {
       int nGoodMuons_veto;
       //variables for jet selection
       int  nGoodJets;
-
-
-      // Kin Fit
-      /// maximal number of iterations to be performed for the fit
-      unsigned int maxNrIter_;
-      /// maximal chi2 equivalent
-      double maxDeltaS_;
-      /// maximal deviation for contstraints
-      double maxF_;
-      unsigned int jetParam_;
-      unsigned int lepParam_;
-      unsigned int metParam_;
-      /// constrains
-      std::vector<unsigned> constraints_;
-      double mW_;
-      double mTop_;
-      /// scale factors for jet energy resolution
-      std::vector<double> jetEnergyResolutionScaleFactors_;
-      std::vector<double> jetEnergyResolutionEtaBinning_;
-      /// config-file-based object resolutions
-      std::vector<edm::ParameterSet> udscResolutions_;
-      std::vector<edm::ParameterSet> bResolutions_;
-      std::vector<edm::ParameterSet> lepResolutions_;
-      std::vector<edm::ParameterSet> metResolutions_;
 
       float m_lepton_weight;
       float m_lepton_weight_error_low;
@@ -454,6 +304,8 @@ namespace mtt {
       TH1* m_2b_sf;
 
       std::shared_ptr<BTaggingEfficiencyProvider> m_b_tagging_efficiency_provider;
+
+      std::vector<std::shared_ptr<SortingAlgorithm>> m_sorting_algortihms;
   };
 
 }
