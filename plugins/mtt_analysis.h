@@ -140,6 +140,7 @@ namespace mtt {
       float m_ELE_Iso_max_loose;
 
       std::shared_ptr<JetMETExtractor> m_jetMet;
+      uint32_t m_JET_N_sel_max;
       float m_JET_Pt_min;
       float m_JET_Eta_max;
       float m_JET_btag_TCHPT;

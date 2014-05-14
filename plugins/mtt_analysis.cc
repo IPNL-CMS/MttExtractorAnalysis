@@ -187,6 +187,7 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_ELE_Iso_max = cmsswSettings.getParameter<edm::ParameterSet>("electrons_tight").getParameter<double>("isolation_max");
 
   // JetSel()
+  m_JET_N_sel_max = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<uint32_t>("n_sel_max");
   m_JET_Pt_min  = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<double>("pt_min");
   m_JET_Eta_max = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<double>("eta_max");
   m_JET_btag_CSVL = cmsswSettings.getParameter<edm::ParameterSet>("jets").getParameter<double>("btag_CSVL");
@@ -585,7 +586,7 @@ int mtt_analysis::JetSel()
 
     AllJetsPt += jetP->Pt();
 
-    if (m_mtt_NJets < 9) // Count the number of btagged jets in the selected jets
+    if (m_mtt_NJets <= (int) m_JET_N_sel_max) // Count the number of btagged jets in the selected jets
     {
       m_selJetsIds.push_back(i);
       if ((m_jetMet->getJetBTagProb_CSV(i)) > m_JET_btag_CSVL)
