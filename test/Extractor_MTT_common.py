@@ -253,9 +253,6 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                 )
             ),
 
-        use_mva = cms.bool(True),
-        use_chi2 = cms.bool(True),
-
         b_tagging_efficiency = cms.PSet(
                 filename = cms.string("Extractors/MttExtractorAnalysis/data/TT_powheg_btagging_efficiency.root"),
                 #filename = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_MassiveBinDECAY_btagging_efficiency_semimu.root") if isSemiMu else

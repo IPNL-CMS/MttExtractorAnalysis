@@ -107,8 +107,6 @@ namespace mtt {
 
       bool   m_MAIN_doSemiMu;
 
-      bool m_useChi2;
-
       TTree*  m_tree_Mtt;
       KinFit* m_KinFit;
 
