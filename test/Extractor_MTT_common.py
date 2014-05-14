@@ -186,7 +186,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                 ),
             cms.PSet(
                 name = cms.string("mva"),
-                enable = cms.bool(True),
+                enable = cms.bool(False),
                 configuration = cms.PSet(
                     weights = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
                     cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semie_BDT.weights.xml"),
@@ -198,7 +198,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                 ),    
             cms.PSet(
                 name = cms.string("kinfit"),
-                enable = cms.bool(True),
+                enable = cms.bool(False),
                 configuration = cms.PSet(
                     # ------------------------------------------------
                     # settings for the KinFitter
@@ -247,6 +247,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                     bResolutions    = bjetResolutionPF.functions,
                     lepResolutions  = muonResolution.functions,
                     metResolutions  = metResolutionPF.functions,
+
                     use_btag_in_combinatorics = cms.bool(False),
                     )
                 )
