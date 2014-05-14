@@ -119,10 +119,6 @@ std::vector<TtSemiLepKinFitter::Constraint> KinFitSortingAlgorithm::constraints(
   return result; 
 }
 
-TtSemiLepKinFitter& KinFitSortingAlgorithm::getFitter() {
-  return *m_fitter;
-}
-
 void KinFitSortingAlgorithm::work() {
   size_t n_jets = m_jets.size();
   int n_btaggedjets = 0;
@@ -140,7 +136,7 @@ void KinFitSortingAlgorithm::work() {
   if (numberoflightjets < 2)
     return; // if we dont have at least 2 non b-tagged jets, chi2 is -1
 
-  TtSemiLepKinFitter& fitter = getFitter();
+  TtSemiLepKinFitter& fitter = *m_fitter;
   fitter.setVerbosity(0);
 
   double minChiSquare = std::numeric_limits<double>::infinity();

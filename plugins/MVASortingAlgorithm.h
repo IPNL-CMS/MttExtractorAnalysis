@@ -14,23 +14,29 @@ class MVASortingAlgorithm: public SortingAlgorithm {
     virtual void work();
     virtual void reset();
     virtual void addBranches(TTree& tree);
+
     virtual int getSelectedLeptonicBIndex() {
-        return m_selectedLeptonicBIndex_AfterMVA;
+      return m_selectedLeptonicBIndex_AfterMVA;
     };
+
     virtual int getSelectedHadronicBIndex() {
-        return m_selectedHadronicBIndex_AfterMVA;
+      return m_selectedHadronicBIndex_AfterMVA;
     };
+
     virtual int getSelectedHadronicFirstJetIndex() {
-        return m_selectedHadronicFirstJetIndex_AfterMVA;
+      return m_selectedHadronicFirstJetIndex_AfterMVA;
     };
+
     virtual int getSelectedHadronicSecondJetIndex() {
-        return m_selectedHadronicSecondJetIndex_AfterMVA;
+      return m_selectedHadronicSecondJetIndex_AfterMVA;
     };
+
     virtual void setRecoJetsAssociated(const bool& recoJetsAssociated) {
-        m_mtt_recoJetsAssociatedWithMVA = recoJetsAssociated;
+      m_mtt_recoJetsAssociatedWithMVA = recoJetsAssociated;
     };
+
     virtual void setRecoJetsAssociatedWellPlaced(const bool& recoJetsAssociatedWellPlaced) {
-        m_mtt_recoJetsAssociatedWellPlacedWithMVA = recoJetsAssociatedWellPlaced;
+      m_mtt_recoJetsAssociatedWellPlacedWithMVA = recoJetsAssociatedWellPlaced;
     };
 
   private:

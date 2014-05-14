@@ -10,23 +10,29 @@ class Chi2SortingAlgorithm: public SortingAlgorithm {
     virtual void work();
     virtual void reset();
     virtual void addBranches(TTree& tree);
+
     virtual int getSelectedLeptonicBIndex() {
-        return m_selectedLeptonicBIndex_AfterChi2;
+      return m_selectedLeptonicBIndex_AfterChi2;
     };
+
     virtual int getSelectedHadronicBIndex() {
-        return m_selectedHadronicBIndex_AfterChi2;
+      return m_selectedHadronicBIndex_AfterChi2;
     };
+
     virtual int getSelectedHadronicFirstJetIndex() {
-        return m_selectedHadronicFirstJetIndex_AfterChi2;
+      return m_selectedHadronicFirstJetIndex_AfterChi2;
     };
+
     virtual int getSelectedHadronicSecondJetIndex() {
-        return m_selectedHadronicSecondJetIndex_AfterChi2;
+      return m_selectedHadronicSecondJetIndex_AfterChi2;
     };
+
     virtual void setRecoJetsAssociated(const bool& recoJetsAssociated) {
-        m_mtt_recoJetsAssociatedWithChi2 = recoJetsAssociated;
+      m_mtt_recoJetsAssociatedWithChi2 = recoJetsAssociated;
     };
+
     virtual void setRecoJetsAssociatedWellPlaced(const bool& recoJetsAssociatedWellPlaced) {
-        m_mtt_recoJetsAssociatedWellPlacedWithChi2 = recoJetsAssociatedWellPlaced;
+      m_mtt_recoJetsAssociatedWellPlacedWithChi2 = recoJetsAssociatedWellPlaced;
     };
 
   private:

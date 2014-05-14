@@ -9,32 +9,32 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
     KinFitSortingAlgorithm(const edm::ParameterSet& cfg, bool isSemiMu);
     ~KinFitSortingAlgorithm();
 
-    TtSemiLepKinFitter::Param param(unsigned val) const;
-    TtSemiLepKinFitter::Constraint constraint(unsigned val) const;
-    std::vector<TtSemiLepKinFitter::Constraint> constraints(std::vector<unsigned>& val) const;
-
-    TtSemiLepKinFitter& getFitter();
-
     virtual void work();
     virtual void reset();
     virtual void addBranches(TTree& tree);
+
     virtual int getSelectedLeptonicBIndex() {
-        return m_selectedLeptonicBIndex_AfterKF;
+      return m_selectedLeptonicBIndex_AfterKF;
     };
+
     virtual int getSelectedHadronicBIndex() {
-        return m_selectedHadronicBIndex_AfterKF;
+      return m_selectedHadronicBIndex_AfterKF;
     };
+
     virtual int getSelectedHadronicFirstJetIndex() {
-        return m_selectedHadronicFirstJetIndex_AfterKF;
+      return m_selectedHadronicFirstJetIndex_AfterKF;
     };
+
     virtual int getSelectedHadronicSecondJetIndex() {
-        return m_selectedHadronicSecondJetIndex_AfterKF;
+      return m_selectedHadronicSecondJetIndex_AfterKF;
     };
+
     virtual void setRecoJetsAssociated(const bool& recoJetsAssociated) {
-        m_mtt_recoJetsAssociatedWithKF = recoJetsAssociated;
+      m_mtt_recoJetsAssociatedWithKF = recoJetsAssociated;
     };
+
     virtual void setRecoJetsAssociatedWellPlaced(const bool& recoJetsAssociatedWellPlaced) {
-        m_mtt_recoJetsAssociatedWellPlacedWithKF = recoJetsAssociatedWellPlaced;
+      m_mtt_recoJetsAssociatedWellPlacedWithKF = recoJetsAssociatedWellPlaced;
     };
 
   private:
@@ -42,6 +42,10 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
     template<class T> static inline TLorentzVector toTLorentzVector(const T& v) {
       return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
+
+    TtSemiLepKinFitter::Param param(unsigned val) const;
+    TtSemiLepKinFitter::Constraint constraint(unsigned val) const;
+    std::vector<TtSemiLepKinFitter::Constraint> constraints(std::vector<unsigned>& val) const;
 
     /// maximal number of iterations to be performed for the fit
     unsigned int m_maxNrIter;
