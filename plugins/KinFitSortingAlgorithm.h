@@ -18,6 +18,24 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
     virtual void work();
     virtual void reset();
     virtual void addBranches(TTree& tree);
+    virtual int getSelectedLeptonicBIndex() {
+        return m_selectedLeptonicBIndex_AfterKF;
+    };
+    virtual int getSelectedHadronicBIndex() {
+        return m_selectedHadronicBIndex_AfterKF;
+    };
+    virtual int getSelectedHadronicFirstJetIndex() {
+        return m_selectedHadronicFirstJetIndex_AfterKF;
+    };
+    virtual int getSelectedHadronicSecondJetIndex() {
+        return m_selectedHadronicSecondJetIndex_AfterKF;
+    };
+    virtual void setRecoJetsAssociated(const bool& recoJetsAssociated) {
+        m_mtt_recoJetsAssociatedWithKF = recoJetsAssociated;
+    };
+    virtual void setRecoJetsAssociatedWellPlaced(const bool& recoJetsAssociatedWellPlaced) {
+        m_mtt_recoJetsAssociatedWellPlacedWithKF = recoJetsAssociatedWellPlaced;
+    };
 
   private:
 

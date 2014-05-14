@@ -30,6 +30,20 @@ struct Lepton {
 class SortingAlgorithm {
   public:
     void setObjects(const std::vector<Jet>& jets, const Lepton& lepton, const LorentzVector& met);
+    virtual int getSelectedLeptonicBIndex() {
+        return -1;
+    };
+    virtual int getSelectedHadronicBIndex() {
+        return -1;
+    };
+    virtual int getSelectedHadronicFirstJetIndex() {
+        return -1;
+    };
+    virtual int getSelectedHadronicSecondJetIndex() {
+        return -1;
+    };
+    virtual void setRecoJetsAssociated(const bool& recoJetsAssociated) {};
+    virtual void setRecoJetsAssociatedWellPlaced(const bool& recoJetsAssociatedWellPlaced) {};
     virtual void work() = 0;
     virtual void reset() {};
     virtual void addBranches(TTree& tree) = 0;

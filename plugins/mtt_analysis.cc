@@ -1269,31 +1269,28 @@ bool mtt_analysis::isSolutionMatched(uint32_t leptonicBIndex, uint32_t hadronicB
       );
 }
 
-void mtt_analysis::checkIfSolutionIsCorrect() {
+void mtt_analysis::checkIfSolutionIsCorrect() 
+{
+  bool recoJetsAssociated = false;
+  bool recoJetsAssociatedWellPlaced = false;
+  for (auto& algo: m_sorting_algortihms) {
+    // First, check if the four select jets come from tt decay.
+    // Position is not important, as long as we have the four
+    recoJetsAssociated = (
+        jetComesFromTTDecay(m_jetMet->getJetMCIndex(algo->getSelectedLeptonicBIndex())) &&
+        jetComesFromTTDecay(m_jetMet->getJetMCIndex(algo->getSelectedHadronicBIndex())) &&
+        jetComesFromTTDecay(m_jetMet->getJetMCIndex(algo->getSelectedHadronicFirstJetIndex())) &&
+        jetComesFromTTDecay(m_jetMet->getJetMCIndex(algo->getSelectedHadronicSecondJetIndex()))
+        );
 
-  // Check if the four select jets come from tt decay.
-  // Position is not important, as long as we have the four
-  //if (m_useChi2) {
-    //m_mtt_recoJetsAssociatedWithChi2 = (
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedLeptonicBIndex_AfterChi2)) &&
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicBIndex_AfterChi2)) &&
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicFirstJetIndex_AfterChi2)) &&
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicSecondJetIndex_AfterChi2))
-        //);
+    // Then, check if the four select jets come from tt decay.
+    // AND that they are well placed
+    recoJetsAssociatedWellPlaced = isSolutionMatched(algo->getSelectedLeptonicBIndex(), algo->getSelectedHadronicBIndex(), algo->getSelectedHadronicFirstJetIndex(), algo->getSelectedHadronicSecondJetIndex());
 
-    //m_mtt_recoJetsAssociatedWellPlacedWithChi2 = isSolutionMatched(m_selectedLeptonicBIndex_AfterChi2, m_selectedHadronicBIndex_AfterChi2, m_selectedHadronicFirstJetIndex_AfterChi2, m_selectedHadronicSecondJetIndex_AfterChi2);
-  //}
+    algo->setRecoJetsAssociated(recoJetsAssociated);
+    algo->setRecoJetsAssociatedWellPlaced(recoJetsAssociatedWellPlaced);
 
-  //if (m_useMVA) {
-    //m_mtt_recoJetsAssociatedWithMVA = (
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedLeptonicBIndex_AfterMVA)) &&
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicBIndex_AfterMVA)) &&
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicFirstJetIndex_AfterMVA)) &&
-        //jetComesFromTTDecay(m_jetMet->getJetMCIndex(m_selectedHadronicSecondJetIndex_AfterMVA))
-        //);
-
-    //m_mtt_recoJetsAssociatedWellPlacedWithMVA = isSolutionMatched(m_selectedLeptonicBIndex_AfterMVA, m_selectedHadronicBIndex_AfterMVA, m_selectedHadronicFirstJetIndex_AfterMVA, m_selectedHadronicSecondJetIndex_AfterMVA);
-  //}
+  }
 }
 
 void mtt_analysis::fillTree()
