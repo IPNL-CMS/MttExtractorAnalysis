@@ -206,10 +206,10 @@ void Chi2SortingAlgorithm::work() {
     /**
      * Compute Mtt before doing KinFit
      */
-    m_mLepW_AfterChi2   = (m_neutrino + m_lepton).M();
+    m_mLepW_AfterChi2   = (m_neutrino + m_lepton.p).M();
     m_mHadW_AfterChi2   = (hadronicLightJet1.p + hadronicLightJet2.p).M();
 
-    LorentzVector lepTopP4_AfterChi2 = (m_lepton + m_neutrino + leptonicBJet.p);
+    LorentzVector lepTopP4_AfterChi2 = (m_lepton.p + m_neutrino + leptonicBJet.p);
     *m_lepTopP4_AfterChi2 = lepTopP4_AfterChi2;
     m_mLepTop_AfterChi2 = lepTopP4_AfterChi2.M();
     m_lepTopPt_AfterChi2 = lepTopP4_AfterChi2.Pt();
@@ -235,9 +235,9 @@ void Chi2SortingAlgorithm::work() {
 double Chi2SortingAlgorithm::chi2(const LorentzVector& leptonicBJet, const LorentzVector& hadronicBJet, const LorentzVector& hadronicLightJet1, const LorentzVector& hadronicLightJet2, double allJetsPt) {
   float MW          = sqrt(std::max(0., (hadronicLightJet1 + hadronicLightJet2).M2()));
   float MtopH       = sqrt(std::max(0., (hadronicLightJet1 + hadronicLightJet2 + hadronicBJet).M2()));
-  float MtopL       = sqrt(std::max(0., (m_neutrino + m_lepton + leptonicBJet).M2()));
+  float MtopL       = sqrt(std::max(0., (m_neutrino + m_lepton.p + leptonicBJet).M2()));
   float SolPtSystem = (hadronicLightJet1.Pt() + hadronicLightJet2.Pt() + leptonicBJet.Pt() + hadronicBJet.Pt()) / allJetsPt;
-  float TTbarSystemPt = ((hadronicLightJet1 + hadronicLightJet2 + leptonicBJet + hadronicBJet + m_neutrino + m_lepton).Pt());
+  float TTbarSystemPt = ((hadronicLightJet1 + hadronicLightJet2 + leptonicBJet + hadronicBJet + m_neutrino + m_lepton.p).Pt());
 
   float chi2 = ((MtopH - chi2_hadronic_top_mass) * (MtopH - chi2_hadronic_top_mass) / (chi2_sigma_hadronic_top_mass_square)) + 
     ((MW - chi2_hadronic_w_mass) * (MW - chi2_hadronic_w_mass) / (chi2_sigma_hadronic_w_mass_square));

@@ -18,9 +18,18 @@ struct Jet {
   }
 };
 
+struct Lepton {
+  LorentzVector p;
+  int charge;
+
+  Lepton() {
+    charge = 0;
+  }
+};
+
 class SortingAlgorithm {
   public:
-    void setObjects(const std::vector<Jet>& jets, const LorentzVector& lepton, const LorentzVector& met);
+    void setObjects(const std::vector<Jet>& jets, const Lepton& lepton, const LorentzVector& met);
     virtual void work() = 0;
     virtual void reset() {};
     virtual void addBranches(TTree& tree) = 0;
@@ -29,7 +38,7 @@ class SortingAlgorithm {
     bool computeNeutrinoPz(const LorentzVector& leptonicBjet, bool* no_real_sol = nullptr);
 
     std::vector<Jet> m_jets;
-    LorentzVector m_lepton;
+    Lepton m_lepton;
     LorentzVector m_met;
     ROOT::Math::PxPyPzMVector m_neutrino;
 };

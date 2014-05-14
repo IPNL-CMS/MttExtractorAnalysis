@@ -118,7 +118,7 @@ void MVASortingAlgorithm::work() {
           Jet currentHadronicLightJet1 = m_jets[j3];
           Jet currentHadronicLightJet2 = m_jets[j4];
 
-          LorentzVector leptonic_W = m_lepton + m_neutrino;
+          LorentzVector leptonic_W = m_lepton.p + m_neutrino;
           LorentzVector hadronic_W = currentHadronicLightJet1.p + currentHadronicLightJet2.p;
 
           LorentzVector leptonic_Top = leptonic_W + currentLeptonicBJet.p;
@@ -196,10 +196,10 @@ void MVASortingAlgorithm::work() {
     /**
      * Compute Mtt before doing KinFit
      */
-    m_mLepW_AfterMVA = (m_neutrino + m_lepton).M();
+    m_mLepW_AfterMVA = (m_neutrino + m_lepton.p).M();
     m_mHadW_AfterMVA = (hadronicLightJet1.p + hadronicLightJet2.p).M();
 
-    LorentzVector lepTopP4_AfterMVA = (m_lepton + m_neutrino + leptonicBJet.p);
+    LorentzVector lepTopP4_AfterMVA = (m_lepton.p + m_neutrino + leptonicBJet.p);
     m_mLepTop_AfterMVA = lepTopP4_AfterMVA.M();
     m_lepTopPt_AfterMVA = lepTopP4_AfterMVA.pt();
     m_lepTopEta_AfterMVA = lepTopP4_AfterMVA.Eta();

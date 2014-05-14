@@ -412,6 +412,7 @@ int mtt_analysis::MuonSel()
   }
 
   m_refLept = m_muon_loose->getMuLorentzVector(selected_muon_index);
+  m_refLeptCharge = m_muon_loose->getMuCharge(selected_muon_index);
   m_selectedLeptonIndex_in_loose_collection = selected_muon_index;
 
   if (m_isMC) {
@@ -537,6 +538,7 @@ int mtt_analysis::ElectronSel()
   }
 
   m_refLept = m_electron_loose->getEleLorentzVector(selected_electron_index);
+  m_refLeptCharge = m_electron_loose->getEleCharge(selected_electron_index);
   m_selectedLeptonIndex_in_loose_collection = selected_electron_index;
 
   if (m_isMC) {
@@ -807,6 +809,7 @@ void mtt_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& extracto
   reset();
 
   m_refLept  = nullptr;
+  m_refLeptCharge = 0;
 
   m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
 
@@ -877,7 +880,9 @@ void mtt_analysis::loopOverCombinations()
     jets.push_back(jet);
   }
 
-  LorentzVector lepton(m_refLept->Pt(), m_refLept->Eta(), m_refLept->Phi(), m_refLept->E());
+  Lepton lepton;
+  lepton.p = LorentzVector(m_refLept->Pt(), m_refLept->Eta(), m_refLept->Phi(), m_refLept->E());
+  lepton.charge = m_refLeptCharge;
 
   TLorentzVector* metP = m_jetMet->getMETLorentzVector(0);
   LorentzVector met(metP->Pt(), metP->Eta(), metP->Phi(), metP->E());

@@ -148,6 +148,7 @@ namespace mtt {
       float m_JET_btag_CSVT;
 
       TLorentzVector* m_refLept;
+      int m_refLeptCharge;
 
       // Triggers
       bool m_trigger_passed;

@@ -9,6 +9,8 @@
 
 import FWCore.ParameterSet.Config as cms
 
+from Extractors.MttExtractorAnalysis.stringResolutions_etEtaPhi_Fall11_cff import *
+
 def readFile(file):
   return cms.untracked.string(open(file).read())
 
@@ -155,7 +157,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
         sorting_algortihms = cms.VPSet(
             cms.PSet(
                 name = cms.string("chi2"),
-                enable = cms.bool(True),
+                enable = cms.bool(False),
                 configuration = cms.PSet(
                     w_mass = cms.double(80.399),
                     top_mass = cms.double(172),
@@ -183,7 +185,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                 ),
             cms.PSet(
                 name = cms.string("mva"),
-                enable = cms.bool(True),
+                enable = cms.bool(False),
                 configuration = cms.PSet(
                     weights = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
                     cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semie_BDT.weights.xml"),
@@ -193,6 +195,60 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                     use_btag_in_combinatorics = cms.bool(False),
                     )
                 ),    
+            cms.PSet(
+                name = cms.string("kinfit"),
+                enable = cms.bool(True),
+                configuration = cms.PSet(
+                    # ------------------------------------------------
+                    # settings for the KinFitter
+                    # ------------------------------------------------    
+                    maxNrIter = cms.uint32(500),
+                    maxDeltaS = cms.double(5e-05),
+                    maxF      = cms.double(0.0001),
+                    # ------------------------------------------------
+                    # select parametrisation
+                    # 0: EMom, 1: EtEtaPhi, 2: EtThetaPhi
+                    # ------------------------------------------------
+                    jetParametrisation = cms.uint32(1),
+                    lepParametrisation = cms.uint32(1),
+                    metParametrisation = cms.uint32(1),
+
+                    # ------------------------------------------------
+                    # set constraints
+                    # 1: Whad-mass, 2: Wlep-mass, 3: thad-mass,
+                    # 4: tlep-mass, 5: nu-mass, 6: equal t-masses
+                    # 7: sum-pt conservation
+                    # ------------------------------------------------
+                    #constraints = cms.vuint32(2, 6),
+                    constraints = cms.vuint32(1, 2, 3, 4),
+
+                    # ------------------------------------------------
+                    # set mass values used in the constraints
+                    # ------------------------------------------------    
+                    mW   = cms.double(80.4),
+                    mTop = cms.double(173.),
+
+                    # ------------------------------------------------
+                    # set correction factor(s) for the jet energy resolution:
+                    # - (optional) eta dependence assumed to be symmetric
+                    #   around eta=0, i.e. parametrized in |eta|
+                    # - any negative value as last bin edge is read as "inf"
+                    # - make sure that number of entries in vector with
+                    #   bin edges = number of scale factors + 1
+                    # ------------------------------------------------
+                    jetEnergyResolutionScaleFactors = cms.vdouble(1.0),
+                    jetEnergyResolutionEtaBinning = cms.vdouble(0.0,-1.0),
+
+                    # ------------------------------------------------
+                    # Experimental resolutions parametrization
+                    # ------------------------------------------------
+                    udscResolutions = udscResolutionPF.functions,
+                    bResolutions    = bjetResolutionPF.functions,
+                    lepResolutions  = muonResolution.functions,
+                    metResolutions  = metResolutionPF.functions,
+                    use_btag_in_combinatorics = cms.bool(False),
+                    )
+                )
             ),
 
         use_mva = cms.bool(True),
@@ -256,5 +312,8 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
 
   process.p = cms.Path(process.PATextraction)
   process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+  process.MessageLogger.categories.append('TtSemiLeptonicEvent') 
+  #process.MessageLogger.categories.append('KinFitter') 
+  process.MessageLogger.cerr.INFO = cms.untracked.PSet( limit = cms.untracked.int32(0) )
 
   return process

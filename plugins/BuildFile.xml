@@ -1,6 +1,7 @@
 <library file="*.cc" name="ExtractorsMttExtractorAnalysisPlugins">
   <use name="FWCore/Framework"/>
   <use name="FWCore/ParameterSet"/>
+  <use name="TopQuarkAnalysis/TopKinFitter"/>
   <use name="Extractors/PatExtractor" />
   <use name="CondFormats/JetMETObjects"/>
   <use name="JetMETCorrections/Objects" />

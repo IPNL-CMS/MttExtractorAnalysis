@@ -1,13 +1,13 @@
 #include "SortingAlgorithm.h"
 
-void SortingAlgorithm::setObjects(const std::vector<Jet>& jets, const LorentzVector& lepton, const LorentzVector& met) {
+void SortingAlgorithm::setObjects(const std::vector<Jet>& jets, const Lepton& lepton, const LorentzVector& met) {
   m_jets = jets;
   m_lepton = lepton;
   m_met = met;
 }
 
 bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_real_sol/* = nullptr*/) {
-  if (m_lepton.E() == 0)
+  if (m_lepton.p.E() == 0)
     return false;
 
   if (no_real_sol)
@@ -19,9 +19,9 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
   const double m_w = 8.04190000E+01; // Value used in Madgraph generation
   const double m_top = 172.5; // Value used in Madgraph generation
 
-  double x = (m_w * m_w - m_lepton.M() * m_lepton.M() + 2. * (m_neutrino.Px() * m_lepton.Px() + m_neutrino.Py() * m_lepton.Py())) / (2 * m_lepton.E());
-  double a = 1 - (m_lepton.Pz() * m_lepton.Pz()) / (m_lepton.E() * m_lepton.E());
-  double b = -2. * (m_lepton.Pz() / m_lepton.E()) * x;
+  double x = (m_w * m_w - m_lepton.p.M() * m_lepton.p.M() + 2. * (m_neutrino.Px() * m_lepton.p.Px() + m_neutrino.Py() * m_lepton.p.Py())) / (2 * m_lepton.p.E());
+  double a = 1 - (m_lepton.p.Pz() * m_lepton.p.Pz()) / (m_lepton.p.E() * m_lepton.p.E());
+  double b = -2. * (m_lepton.p.Pz() / m_lepton.p.E()) * x;
   double c = m_neutrino.Pt() * m_neutrino.Pt() - x * x;
 
   if (!a && !b)
@@ -38,13 +38,13 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
   if (delta < 0) {   // No solution, try to correct MET
     double rat = m_neutrino.Py() / m_neutrino.Px();
 
-    double u = 4. / (m_lepton.E() * m_lepton.E()) * ((m_lepton.Px() + rat * m_lepton.Py()) * (m_lepton.Px() + rat * m_lepton.Py()) / (1 + rat * rat)
-        - (m_lepton.E() * m_lepton.E()) + (m_lepton.Pz() * m_lepton.Pz()));
+    double u = 4. / (m_lepton.p.E() * m_lepton.p.E()) * ((m_lepton.p.Px() + rat * m_lepton.p.Py()) * (m_lepton.p.Px() + rat * m_lepton.p.Py()) / (1 + rat * rat)
+        - (m_lepton.p.E() * m_lepton.p.E()) + (m_lepton.p.Pz() * m_lepton.p.Pz()));
 
-    double v = 4. / (m_lepton.E() * m_lepton.E()) * (m_w * m_w - m_lepton.M() * m_lepton.M())
-      * (m_lepton.Px() + rat * m_lepton.Py()) / sqrt(1 + rat * rat);
+    double v = 4. / (m_lepton.p.E() * m_lepton.p.E()) * (m_w * m_w - m_lepton.p.M() * m_lepton.p.M())
+      * (m_lepton.p.Px() + rat * m_lepton.p.Py()) / sqrt(1 + rat * rat);
 
-    double w = (m_w * m_w - m_lepton.M() * m_lepton.M()) * (m_w * m_w - m_lepton.M() * m_lepton.M()) / (m_lepton.E() * m_lepton.E());
+    double w = (m_w * m_w - m_lepton.p.M() * m_lepton.p.M()) * (m_w * m_w - m_lepton.p.M() * m_lepton.p.M()) / (m_lepton.p.E() * m_lepton.p.E());
 
     double deltan = v * v - 4 * u * w;
 
@@ -85,9 +85,9 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
 
     // Recompute the new parameters
 
-    x = (m_w * m_w - m_lepton.M() * m_lepton.M() + 2.*(m_neutrino.Px() * m_lepton.Px() + m_neutrino.Py() * m_lepton.Py())) / (2 * m_lepton.E());
-    a = 1 - (m_lepton.Pz() * m_lepton.Pz()) / (m_lepton.E() * m_lepton.E());
-    b = -2.*(m_lepton.Pz() / m_lepton.E()) * x;
+    x = (m_w * m_w - m_lepton.p.M() * m_lepton.p.M() + 2.*(m_neutrino.Px() * m_lepton.p.Px() + m_neutrino.Py() * m_lepton.p.Py())) / (2 * m_lepton.p.E());
+    a = 1 - (m_lepton.p.Pz() * m_lepton.p.Pz()) / (m_lepton.p.E() * m_lepton.p.E());
+    b = -2.*(m_lepton.p.Pz() / m_lepton.p.E()) * x;
     c = m_neutrino.Px() * m_neutrino.Px() + m_neutrino.Py() * m_neutrino.Py() - x * x;
 
     delta = b * b - 4 * a * c;
@@ -103,8 +103,8 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
 
   // We can go back to the normal path: 
 
-  LorentzVector TopCand1 = m_lepton + bJet;
-  LorentzVector TopCand2 = m_lepton + bJet;
+  LorentzVector TopCand1 = m_lepton.p + bJet;
+  LorentzVector TopCand2 = m_lepton.p + bJet;
 
   m_neutrino.SetPz((-b - (sqrt(delta))) / (2 * a));
   TopCand1 += m_neutrino;
