@@ -145,7 +145,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
           ),
 
         jets = cms.PSet(
-          n_sel_max = cms.uint32(8)
+          n_sel_max = cms.uint32(8),
           pt_min = cms.double(30),
           eta_max = cms.double(2.4),
           btag_CSVL = cms.double(0.244),
@@ -158,7 +158,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
         sorting_algortihms = cms.VPSet(
             cms.PSet(
                 name = cms.string("chi2"),
-                enable = cms.bool(False),
+                enable = cms.bool(True),
                 configuration = cms.PSet(
                     w_mass = cms.double(80.399),
                     top_mass = cms.double(172),
@@ -186,7 +186,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                 ),
             cms.PSet(
                 name = cms.string("mva"),
-                enable = cms.bool(False),
+                enable = cms.bool(True),
                 configuration = cms.PSet(
                     weights = cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semimu_BDT.weights.xml") if isSemiMu else
                     cms.string("Extractors/MttExtractorAnalysis/data/TTJets_semie_BDT.weights.xml"),
