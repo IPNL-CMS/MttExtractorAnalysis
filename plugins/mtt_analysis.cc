@@ -30,7 +30,6 @@
 
 #include <FWCore/ParameterSet/interface/FileInPath.h>
 
-#include "Extractors/MttExtractorAnalysis/plugins/SortingAlgorithmFactory.h"
 #include "Extractors/MttExtractorAnalysis/plugins/BTaggingEfficiencyProvider.h"
 
 using namespace std;
@@ -890,6 +889,7 @@ void mtt_analysis::loopOverCombinations()
 
   for (auto& algo: m_sorting_algortihms) {
     algo->setObjects(jets, lepton, met);
+    algo->setMttGen(m_MC_mtt);
     algo->work();
   }
 

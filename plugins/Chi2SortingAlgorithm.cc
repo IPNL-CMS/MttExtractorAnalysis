@@ -2,7 +2,10 @@
 
 #include <TTree.h>
 
-Chi2SortingAlgorithm::Chi2SortingAlgorithm(const edm::ParameterSet& cfg, bool isSemiMu) {
+Chi2SortingAlgorithm::Chi2SortingAlgorithm(const edm::ParameterSet& cfg, bool isSemiMu) :
+  m_mtt_gen_vs_mtt_reco_linearity("mtt_gen_vs_mtt_reco_linearity_AfterChi2", nBins_for_gaussian_profile, bins_for_gaussian_profile),
+  m_mtt_gen_vs_mtt_reco_resolution("mtt_gen_vs_mtt_reco_resolution_AfterChi2", nBins_for_gaussian_profile, bins_for_gaussian_profile, 100, -1.2, 1.2)
+{
   m_isSemiMu = isSemiMu;
   m_useBTagInCombinatorics = cfg.getParameter<bool>("use_btag_in_combinatorics");
 
@@ -229,6 +232,9 @@ void Chi2SortingAlgorithm::work() {
 
     m_mtt_BestSolChi2 = minChi2;
   }
+
+  m_mtt_gen_vs_mtt_reco_linearity.fill(m_mtt_gen, m_mtt_AfterChi2);
+  m_mtt_gen_vs_mtt_reco_resolution.fill(m_mtt_gen, (m_mtt_AfterChi2 - m_mtt_gen) / m_mtt_gen);
 
 }
 

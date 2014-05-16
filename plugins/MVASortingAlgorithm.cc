@@ -4,7 +4,10 @@
 
 #include <TTree.h>
 
-MVASortingAlgorithm::MVASortingAlgorithm(const edm::ParameterSet& cfg) {
+MVASortingAlgorithm::MVASortingAlgorithm(const edm::ParameterSet& cfg) :
+  m_mtt_gen_vs_mtt_reco_linearity("mtt_gen_vs_mtt_reco_linearity_AfterMVA", nBins_for_gaussian_profile, bins_for_gaussian_profile),
+  m_mtt_gen_vs_mtt_reco_resolution("mtt_gen_vs_mtt_reco_resolution_AfterMVA", nBins_for_gaussian_profile, bins_for_gaussian_profile, 100, -1.2, 1.2)
+{
   m_useBTagInCombinatorics = cfg.getParameter<bool>("use_btag_in_combinatorics");
 
   m_MVAWeightFilename = edm::FileInPath(cfg.getParameter<std::string>("weights")).fullPath();
@@ -217,6 +220,9 @@ void MVASortingAlgorithm::work() {
 
     m_mtt_BestSolMVA = maxMVAValue;
   }
+
+  m_mtt_gen_vs_mtt_reco_linearity.fill(m_mtt_gen, m_mtt_AfterMVA);
+  m_mtt_gen_vs_mtt_reco_resolution.fill(m_mtt_gen, (m_mtt_AfterMVA - m_mtt_gen) / m_mtt_gen);
 }
 
 void MVASortingAlgorithm::reset() {

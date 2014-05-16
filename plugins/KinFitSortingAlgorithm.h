@@ -3,6 +3,7 @@
 #include "SortingAlgorithm.h"
 #include <FWCore/ParameterSet/interface/ParameterSet.h>
 #include "TopQuarkAnalysis/TopKinFitter/interface/TtSemiLepKinFitter.h"
+#include "Extractors/MttExtractorAnalysis/plugins/GaussianProfile.h"
 
 class KinFitSortingAlgorithm: public SortingAlgorithm {
   public:
@@ -12,6 +13,10 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
     virtual void work();
     virtual void reset();
     virtual void addBranches(TTree& tree);
+    virtual void end() {
+      m_mtt_gen_vs_mtt_reco_linearity.write(); 
+      m_mtt_gen_vs_mtt_reco_resolution.write(); 
+    };
 
     virtual int getSelectedLeptonicBIndex() {
       return m_selectedLeptonicBIndex_AfterKF;
@@ -42,6 +47,9 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
     template<class T> static inline TLorentzVector toTLorentzVector(const T& v) {
       return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
+
+    GaussianProfile m_mtt_gen_vs_mtt_reco_linearity;
+    GaussianProfile m_mtt_gen_vs_mtt_reco_resolution;
 
     TtSemiLepKinFitter::Param param(unsigned val) const;
     TtSemiLepKinFitter::Constraint constraint(unsigned val) const;

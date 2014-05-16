@@ -2,6 +2,7 @@
 
 #include "SortingAlgorithm.h"
 #include <FWCore/ParameterSet/interface/ParameterSet.h>
+#include "Extractors/MttExtractorAnalysis/plugins/GaussianProfile.h"
 
 namespace TMVA {
   class Reader;
@@ -14,6 +15,10 @@ class MVASortingAlgorithm: public SortingAlgorithm {
     virtual void work();
     virtual void reset();
     virtual void addBranches(TTree& tree);
+    virtual void end() {
+      m_mtt_gen_vs_mtt_reco_linearity.write(); 
+      m_mtt_gen_vs_mtt_reco_resolution.write(); 
+    };
 
     virtual int getSelectedLeptonicBIndex() {
       return m_selectedLeptonicBIndex_AfterMVA;
@@ -40,6 +45,9 @@ class MVASortingAlgorithm: public SortingAlgorithm {
     };
 
   private:
+    GaussianProfile m_mtt_gen_vs_mtt_reco_linearity;
+    GaussianProfile m_mtt_gen_vs_mtt_reco_resolution;
+
     bool m_useBTagInCombinatorics;
 
     std::string m_MVAWeightFilename;

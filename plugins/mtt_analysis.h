@@ -19,6 +19,7 @@
 #include <boost/regex.hpp>
 
 #include <Extractors/PatExtractor/interface/ExtractorPlugin.h>
+#include "Extractors/MttExtractorAnalysis/plugins/SortingAlgorithmFactory.h"
 
 #include <TTree.h>
 #include <TLorentzVector.h>
@@ -46,8 +47,6 @@ namespace edm {
 namespace TMVA {
   class Reader;
 }
-
-class SortingAlgorithm;
 
 namespace mtt {
 
@@ -80,6 +79,10 @@ namespace mtt {
 
         m_2b_sf_flavor->Write();
         m_2b_sf->Write();
+
+        for (auto& algo: m_sorting_algortihms) {
+          algo->end();
+        }
       }
 
     private:

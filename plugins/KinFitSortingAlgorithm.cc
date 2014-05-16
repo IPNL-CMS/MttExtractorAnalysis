@@ -15,7 +15,9 @@ KinFitSortingAlgorithm::KinFitSortingAlgorithm(const edm::ParameterSet& cfg, boo
     m_mTop                    (cfg.getParameter<double>       ("mTop"                )),
     m_jetEnergyResolutionScaleFactors(cfg.getParameter<std::vector<double> >("jetEnergyResolutionScaleFactors")),
     m_jetEnergyResolutionEtaBinning(cfg.getParameter<std::vector<double> >("jetEnergyResolutionEtaBinning")),
-    m_udscResolutions(0), m_bResolutions(0), m_lepResolutions(0), m_metResolutions(0)
+    m_udscResolutions(0), m_bResolutions(0), m_lepResolutions(0), m_metResolutions(0),
+    m_mtt_gen_vs_mtt_reco_linearity("mtt_gen_vs_mtt_reco_linearity_AfterKF", nBins_for_gaussian_profile, bins_for_gaussian_profile),
+    m_mtt_gen_vs_mtt_reco_resolution("mtt_gen_vs_mtt_reco_resolution_AfterKF", nBins_for_gaussian_profile, bins_for_gaussian_profile, 100, -1.2, 1.2)
 {
   m_isSemiMu = isSemiMu;
 
@@ -262,6 +264,9 @@ void KinFitSortingAlgorithm::work() {
 
     m_mtt_BestSolKF = minChiSquare;
   }
+
+  m_mtt_gen_vs_mtt_reco_linearity.fill(m_mtt_gen, m_mtt_AfterKF);
+  m_mtt_gen_vs_mtt_reco_resolution.fill(m_mtt_gen, (m_mtt_AfterKF - m_mtt_gen) / m_mtt_gen);
 }
 
 void KinFitSortingAlgorithm::reset() {
