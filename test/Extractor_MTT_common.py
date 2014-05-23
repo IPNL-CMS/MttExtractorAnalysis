@@ -9,8 +9,6 @@
 
 import FWCore.ParameterSet.Config as cms
 
-from Extractors.MttExtractorAnalysis.stringResolutions_etEtaPhi_Fall11_cff import *
-
 def readFile(file):
   return cms.untracked.string(open(file).read())
 
@@ -239,14 +237,6 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                     # ------------------------------------------------
                     jetEnergyResolutionScaleFactors = cms.vdouble(1.0),
                     jetEnergyResolutionEtaBinning = cms.vdouble(0.0,-1.0),
-
-                    # ------------------------------------------------
-                    # Experimental resolutions parametrization
-                    # ------------------------------------------------
-                    udscResolutions = udscResolutionPF.functions,
-                    bResolutions    = bjetResolutionPF.functions,
-                    lepResolutions  = muonResolution.functions,
-                    metResolutions  = metResolutionPF.functions,
 
                     use_btag_in_combinatorics = cms.bool(False),
                     )
