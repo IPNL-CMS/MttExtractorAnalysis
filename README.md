@@ -20,8 +20,19 @@ src> git cms-addpkg TopQuarkAnalysis/TopObjectResolutions
 ```bash
 src> cd Extractors
 Extractors> git clone https://github.com/IPNL-CMS/MttExtractorAnalysis.git
-Extractors> git checkout cmssw_5_3_18
+Extractors> cd MttExtractorAnalysis
+MttExtractorAnalysis> git checkout cmssw_5_3_18
+MttExtractorAnalysis> cd ..
 Extractors> cd ..
-src> scram b -j8
 ```
 
+### Apply patches
+```bash
+src> git am Extractors/MttExtractorAnalysis/patches/0001-Fix-resolution-creator.patch
+src> git am Extractors/MttExtractorAnalysis/patches/0001-Update-top-objects-resolution-using-8-TeV-POWHEG-TT-.patch
+```
+
+### Build
+```bash
+src> scram b -j8
+```
