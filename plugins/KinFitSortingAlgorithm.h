@@ -48,9 +48,6 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
       return TLorentzVector(v.Px(), v.Py(), v.Pz(), v.E());
     }
 
-    GaussianProfile m_mtt_gen_vs_mtt_reco_linearity;
-    GaussianProfile m_mtt_gen_vs_mtt_reco_resolution;
-
     TtSemiLepKinFitter::Param param(unsigned val) const;
     TtSemiLepKinFitter::Constraint constraint(unsigned val) const;
     std::vector<TtSemiLepKinFitter::Constraint> constraints(std::vector<unsigned>& val) const;
@@ -76,6 +73,9 @@ class KinFitSortingAlgorithm: public SortingAlgorithm {
     std::vector<edm::ParameterSet> m_bResolutions;
     std::vector<edm::ParameterSet> m_lepResolutions;
     std::vector<edm::ParameterSet> m_metResolutions;
+
+    GaussianProfile m_mtt_gen_vs_mtt_reco_linearity;
+    GaussianProfile m_mtt_gen_vs_mtt_reco_resolution;
 
     std::shared_ptr<TtSemiLepKinFitter> m_fitter;
 
