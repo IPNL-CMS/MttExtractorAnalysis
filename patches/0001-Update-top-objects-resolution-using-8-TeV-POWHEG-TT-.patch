@@ -1,17 +1,17 @@
-From 554487265e8fae836c6e31dfb14c913a648a92ca Mon Sep 17 00:00:00 2001
+From f3a2cc3d26be2ecbe5a20468e9363c9c5594ac4e Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?S=C3=A9bastien=20Brochet?= <s.brochet@ipnl.in2p3.fr>
 Date: Fri, 23 May 2014 15:06:35 +0200
 Subject: [PATCH] Update top objects resolution using 8 TeV POWHEG TT MC
 
 ---
  .../TopObjectResolutions/interface/Electron.h      | 192 +++++-----
- .../TopObjectResolutions/interface/Jet.h           | 417 +++++++++++----------
+ .../TopObjectResolutions/interface/Jet.h           | 418 +++++++++++----------
  .../TopObjectResolutions/interface/MET.h           |  50 +--
  .../TopObjectResolutions/interface/Muon.h          | 192 +++++-----
- 4 files changed, 444 insertions(+), 407 deletions(-)
+ 4 files changed, 445 insertions(+), 407 deletions(-)
 
 diff --git a/TopQuarkAnalysis/TopObjectResolutions/interface/Electron.h b/TopQuarkAnalysis/TopObjectResolutions/interface/Electron.h
-index d26fa2e..ef29244 100644
+index d26fa2e..c4d2fa0 100644
 --- a/TopQuarkAnalysis/TopObjectResolutions/interface/Electron.h
 +++ b/TopQuarkAnalysis/TopObjectResolutions/interface/Electron.h
 @@ -4,19 +4,19 @@
@@ -196,16 +196,16 @@ index d26fa2e..ef29244 100644
 -	else if(fabs(eta)<1.9) res = 0.000321587+0.00155721*exp(-(0.0337709*pt));
 -	else if(fabs(eta)<2.5) res = 0.000819101+0.00205336*exp(-(0.0992806*pt));
 +  double x = pt;
-+  if(fabs(eta)<0.17) res = 0.000216712+(0.00123984*exp(-(0.10732*x)));
-+  else if(fabs(eta)<0.35) res = 0.000235754+(0.0015665*exp(-(0.132849*x)));
-+  else if(fabs(eta)<0.5) res = 0.00022635+(0.000832085*exp(-(0.0942651*x)));
-+  else if(fabs(eta)<0.7) res = 0.00023035+(0.00123031*exp(-(0.109134*x)));
-+  else if(fabs(eta)<0.9) res = 0.000231646+(0.000637984*exp(-(0.06776*x)));
-+  else if(fabs(eta)<1.15) res = 0.000236762+(0.000468619*exp(-(0.0441783*x)));
-+  else if(fabs(eta)<1.3) res = 0.000273202+(0.000502506*exp(-(0.0350297*x)));
-+  else if(fabs(eta)<1.6) res = 0.000306672+(0.000537243*exp(-(0.0275623*x)));
-+  else if(fabs(eta)<1.9) res = 0.000388989+(0.000611646*exp(-(0.0274963*x)));
-+  else if(fabs(eta)<2.5) res = 0.000427448+(0.000914092*exp(-(0.028918*x)));
++  if(fabs(eta)<0.17) res = 0.000143854+(0.000398902*exp(-(0.0400644*x)));
++  else if(fabs(eta)<0.35) res = 0.000148833+(0.00036801*exp(-(0.0366143*x)));
++  else if(fabs(eta)<0.5) res = 0.000158831+(0.000411797*exp(-(0.0430381*x)));
++  else if(fabs(eta)<0.7) res = 0.000163409+(0.000414585*exp(-(0.0401658*x)));
++  else if(fabs(eta)<0.9) res = 0.000177134+(0.000357264*exp(-(0.0319147*x)));
++  else if(fabs(eta)<1.15) res = 0.00019975+(0.000366286*exp(-(0.0273673*x)));
++  else if(fabs(eta)<1.3) res = 0.000265061+(0.000439402*exp(-(0.032858*x)));
++  else if(fabs(eta)<1.6) res = 0.00027821+(0.000485688*exp(-(0.0248829*x)));
++  else if(fabs(eta)<1.9) res = 0.000387235+(0.000528967*exp(-(0.0284901*x)));
++  else if(fabs(eta)<2.5) res = 0.000433765+(0.000912961*exp(-(0.032419*x)));
    return res;
  }
  
@@ -264,7 +264,7 @@ index d26fa2e..ef29244 100644
  }
  
 diff --git a/TopQuarkAnalysis/TopObjectResolutions/interface/Jet.h b/TopQuarkAnalysis/TopObjectResolutions/interface/Jet.h
-index 002dca7..0672eb2 100644
+index 002dca7..c930c45 100644
 --- a/TopQuarkAnalysis/TopObjectResolutions/interface/Jet.h
 +++ b/TopQuarkAnalysis/TopObjectResolutions/interface/Jet.h
 @@ -4,21 +4,21 @@
@@ -302,7 +302,7 @@ index 002dca7..0672eb2 100644
    };
  }
  
-@@ -39,231 +39,246 @@ inline double res::HelperJet::a(double pt, double eta,  Flavor flav)
+@@ -39,231 +39,247 @@ inline double res::HelperJet::a(double pt, double eta,  Flavor flav)
  {
    double res = 0.29*sqrt(pt);
    if(flav==kB){ 
@@ -384,28 +384,28 @@ index 002dca7..0672eb2 100644
 -	}
 -	return res;
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 1.40221+(12.0158*exp(-(0.138349*x)));
-+    else if(fabs(eta)<0.35) res = 1.38854+(6.73829*exp(-(0.11877*x)));
-+    else if(fabs(eta)<0.5) res = 1.43621+(26.3061*exp(-(0.177802*x)));
-+    else if(fabs(eta)<0.7) res = 1.45636+(1.40743e+18*exp(-(1.72016*x)));
-+    else if(fabs(eta)<0.9) res = 1.48852+(22.8918*exp(-(0.169956*x)));
-+    else if(fabs(eta)<1.15) res = 1.57909+(10.8624*exp(-(0.155405*x)));
-+    else if(fabs(eta)<1.4) res = 1.70239+(110.396*exp(-(11.1383*x)));
-+    else if(fabs(eta)<1.7) res = 1.66305+(98.8448*exp(-(3.9306*x)));
-+    else if(fabs(eta)<2.1) res = 1.79934+(1.68954*exp(-(15.5471*x)));
-+    else if(fabs(eta)<2.5) res = 2.59183+(2.30077*exp(-(6.41998*x)));
++    if(fabs(eta)<0.17) res = (1.68634+(-0.00711703*x))+(3.87998e-05*(x*x));
++    else if(fabs(eta)<0.35) res = (1.71078+(-0.00778533*x))+(4.1231e-05*(x*x));
++    else if(fabs(eta)<0.5) res = (1.66197+(-0.00610065*x))+(3.56903e-05*(x*x));
++    else if(fabs(eta)<0.7) res = (1.66666+(-0.00621128*x))+(3.86132e-05*(x*x));
++    else if(fabs(eta)<0.9) res = (1.75978+(-0.00737841*x))+(4.34129e-05*(x*x));
++    else if(fabs(eta)<1.15) res = (1.78347+(-0.00636042*x))+(4.10271e-05*(x*x));
++    else if(fabs(eta)<1.4) res = (1.79935+(-0.00608056*x))+(5.39295e-05*(x*x));
++    else if(fabs(eta)<1.7) res = (1.85672+(-0.00760289*x))+(5.74128e-05*(x*x));
++    else if(fabs(eta)<2.1) res = (1.76453+(-0.00246182*x))+(3.5687e-05*(x*x));
++    else if(fabs(eta)<2.5) res = (2.04271+(0.00994519*x))+(-6.16184e-06*(x*x));
 +  }else{
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 1.13361+(2.00196*exp(-(2.08064*x)));
-+    else if(fabs(eta)<0.35) res = 2.45567+(-1.46083*exp(-(0.00144197*x)));
-+    else if(fabs(eta)<0.5) res = 1.3656+(-0.470827*exp(-(0.0108258*x)));
-+    else if(fabs(eta)<0.7) res = 1.15729+(146326*exp(-(12.3508*x)));
-+    else if(fabs(eta)<0.9) res = 1.37903+(-0.499091*exp(-(0.0136749*x)));
-+    else if(fabs(eta)<1.15) res = 1.20725+(1.38758*exp(-(11.0681*x)));
-+    else if(fabs(eta)<1.4) res = 1.2623+(-778.272*exp(-(4.86267*x)));
-+    else if(fabs(eta)<1.7) res = 2.12974+(-1.12456*exp(-(0.00325241*x)));
-+    else if(fabs(eta)<2.1) res = 2.47707+(-1.50088*exp(-(0.00350362*x)));
-+    else if(fabs(eta)<2.5) res = 1.7294+(1.40838*exp(-(3.82901*x)));
++    if(fabs(eta)<0.17) res = 0.97434+(0.00216332*x);
++    else if(fabs(eta)<0.35) res = 1.00448+(0.00184302*x);
++    else if(fabs(eta)<0.5) res = 0.989448+(0.00202015*x);
++    else if(fabs(eta)<0.7) res = 0.997106+(0.00215462*x);
++    else if(fabs(eta)<0.9) res = 1.0178+(0.00214086*x);
++    else if(fabs(eta)<1.15) res = 1.03042+(0.00242128*x);
++    else if(fabs(eta)<1.4) res = 1.01884+(0.00350935*x);
++    else if(fabs(eta)<1.7) res = 1.03631+(0.00274497*x);
++    else if(fabs(eta)<2.1) res = 1.01884+(0.00392628*x);
++    else if(fabs(eta)<2.5) res = 1.47909+(0.00424039*x);
 +  }
 +  return res;
  }
@@ -450,16 +450,16 @@ index 002dca7..0672eb2 100644
 +    else if(fabs(eta)<2.5) res = (2.05298+(-0.00435062*x))+(3.65765e-05*(x*x));
 +  }else{
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 1.2404+(-8.84305e+11*exp(-(1.15811*x)));
-+    else if(fabs(eta)<0.35) res = 1.22278+(71715*exp(-(2.79128*x)));
-+    else if(fabs(eta)<0.5) res = 1.82985+(-0.871515*exp(-(0.00511375*x)));
-+    else if(fabs(eta)<0.7) res = 1.38+(-0.562736*exp(-(0.0192402*x)));
-+    else if(fabs(eta)<0.9) res = 1.50367+(-0.599957*exp(-(0.0117869*x)));
-+    else if(fabs(eta)<1.15) res = 1.23162+(456.576*exp(-(2.28551*x)));
-+    else if(fabs(eta)<1.4) res = 1.52824+(-0.594604*exp(-(0.0153028*x)));
-+    else if(fabs(eta)<1.7) res = 1.35569+(-6.48079e+11*exp(-(1.14579*x)));
-+    else if(fabs(eta)<2.1) res = 1.76626+(-0.809294*exp(-(0.0074542*x)));
-+    else if(fabs(eta)<2.5) res = 1.73786+(-0.80058*exp(-(0.0176028*x)));
++    if(fabs(eta)<0.17) res = 1.02496+(0.00270651*x);
++    else if(fabs(eta)<0.35) res = 1.04484+(0.00238701*x);
++    else if(fabs(eta)<0.5) res = 1.01267+(0.00283824*x);
++    else if(fabs(eta)<0.7) res = 1.04768+(0.00223012*x);
++    else if(fabs(eta)<0.9) res = 1.03818+(0.00258631*x);
++    else if(fabs(eta)<1.15) res = 1.04653+(0.00256663*x);
++    else if(fabs(eta)<1.4) res = 1.11624+(0.00258064*x);
++    else if(fabs(eta)<1.7) res = 1.12093+(0.00305622*x);
++    else if(fabs(eta)<2.1) res = 1.04035+(0.00327652*x);
++    else if(fabs(eta)<2.5) res = 1.17718+(0.00408585*x);
 +  }
 +  return res;
  }
@@ -548,28 +548,28 @@ index 002dca7..0672eb2 100644
 -	}
 -	return res;
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 0.0104842+(0.0882064*exp(-(0.032938*x)));
-+    else if(fabs(eta)<0.35) res = 0.00920322+(0.080507*exp(-(0.0302299*x)));
-+    else if(fabs(eta)<0.5) res = 0.0089787+(0.0690725*exp(-(0.0282613*x)));
-+    else if(fabs(eta)<0.7) res = 0.0091765+(0.0734335*exp(-(0.0319388*x)));
-+    else if(fabs(eta)<0.9) res = 0.00815405+(0.0657282*exp(-(0.0309524*x)));
-+    else if(fabs(eta)<1.15) res = 0.00793967+(0.0652332*exp(-(0.0345982*x)));
-+    else if(fabs(eta)<1.4) res = 0.00821557+(0.0601466*exp(-(0.0399748*x)));
-+    else if(fabs(eta)<1.7) res = 0.00687507+(0.0578253*exp(-(0.0460599*x)));
-+    else if(fabs(eta)<2.1) res = 0.00636746+(0.0446437*exp(-(0.0493981*x)));
-+    else if(fabs(eta)<2.5) res = 0.00685341+(0.0304872*exp(-(0.0630634*x)));
++    if(fabs(eta)<0.17) res = 0.00953318+(0.0647985*exp(-(0.027092*x)));
++    else if(fabs(eta)<0.35) res = 0.00944863+(0.0721154*exp(-(0.0296269*x)));
++    else if(fabs(eta)<0.5) res = 0.00921174+(0.0659004*exp(-(0.028543*x)));
++    else if(fabs(eta)<0.7) res = 0.00888309+(0.0626693*exp(-(0.0294153*x)));
++    else if(fabs(eta)<0.9) res = 0.00782271+(0.0561144*exp(-(0.0283303*x)));
++    else if(fabs(eta)<1.15) res = 0.00768489+(0.0548957*exp(-(0.0313757*x)));
++    else if(fabs(eta)<1.4) res = 0.00798309+(0.05238*exp(-(0.03716*x)));
++    else if(fabs(eta)<1.7) res = 0.00587337+(0.0413698*exp(-(0.0361662*x)));
++    else if(fabs(eta)<2.1) res = 0.00481192+(0.0309763*exp(-(0.0349497*x)));
++    else if(fabs(eta)<2.5) res = 0.00493837+(0.0171605*exp(-(0.03278*x)));
 +  }else{
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 0.0177881+(0.103895*exp(-(0.0456757*x)));
-+    else if(fabs(eta)<0.35) res = 0.0172396+(0.100208*exp(-(0.0450741*x)));
-+    else if(fabs(eta)<0.5) res = 0.0145161+(0.0756637*exp(-(0.0350415*x)));
-+    else if(fabs(eta)<0.7) res = 0.0155343+(0.0941835*exp(-(0.0457063*x)));
-+    else if(fabs(eta)<0.9) res = 0.014315+(0.0889841*exp(-(0.04685*x)));
-+    else if(fabs(eta)<1.15) res = 0.013078+(0.0885172*exp(-(0.0514711*x)));
-+    else if(fabs(eta)<1.4) res = 0.0100762+(0.048968*exp(-(0.0368304*x)));
-+    else if(fabs(eta)<1.7) res = 0.00680876+(0.0359006*exp(-(0.0311381*x)));
-+    else if(fabs(eta)<2.1) res = 0.00624161+(0.0320989*exp(-(0.0388069*x)));
-+    else if(fabs(eta)<2.5) res = 0.00655025+(0.0211473*exp(-(0.0432015*x)));
++    if(fabs(eta)<0.17) res = 0.0140728+(0.0570439*exp(-(0.0302108*x)));
++    else if(fabs(eta)<0.35) res = 0.013233+(0.0549494*exp(-(0.0286309*x)));
++    else if(fabs(eta)<0.5) res = 0.0130206+(0.0600864*exp(-(0.0314599*x)));
++    else if(fabs(eta)<0.7) res = 0.0127222+(0.05317*exp(-(0.0313083*x)));
++    else if(fabs(eta)<0.9) res = 0.0120065+(0.0532626*exp(-(0.0335474*x)));
++    else if(fabs(eta)<1.15) res = 0.0108042+(0.0496946*exp(-(0.0347339*x)));
++    else if(fabs(eta)<1.4) res = 0.00977212+(0.0364684*exp(-(0.0315509*x)));
++    else if(fabs(eta)<1.7) res = 0.00667417+(0.0307481*exp(-(0.0289429*x)));
++    else if(fabs(eta)<2.1) res = 0.00518679+(0.0227888*exp(-(0.0281071*x)));
++    else if(fabs(eta)<2.5) res = 0.00439929+(0.0149365*exp(-(0.0222852*x)));
 +  }
 +  return res;
  }
@@ -603,27 +603,28 @@ index 002dca7..0672eb2 100644
 -	}
 -	return res;
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 0.0115234+(0.0787996*exp(-(0.0286719*x)));
-+    else if(fabs(eta)<0.35) res = 0.0114873+(0.0824635*exp(-(0.0293218*x)));
-+    else if(fabs(eta)<0.5) res = 0.0120931+(0.0833827*exp(-(0.0303589*x)));
-+    else if(fabs(eta)<0.7) res = 0.0120645+(0.0924861*exp(-(0.031909*x)));
-+    else if(fabs(eta)<0.9) res = 0.012237+(0.0877141*exp(-(0.0307554*x)));
-+    else if(fabs(eta)<1.15) res = 0.012753+(0.0897745*exp(-(0.0310745*x)));
-+    else if(fabs(eta)<1.4) res = 0.0146851+(0.101599*exp(-(0.0334046*x)));
-+    else if(fabs(eta)<1.7) res = 0.0161827+(0.108869*exp(-(0.0351108*x)));
-+    else if(fabs(eta)<2.1) res = 0.0134742+(0.105458*exp(-(0.0337753*x)));
-+    else if(fabs(eta)<2.5) res = 0.0173201+(0.129248*exp(-(0.0363494*x)));
++    if(fabs(eta)<0.17) res = 0.0111204+(0.0684104*exp(-(0.0268281*x)));
++    else if(fabs(eta)<0.35) res = 0.0112241+(0.0727226*exp(-(0.0273644*x)));
++    else if(fabs(eta)<0.5) res = 0.0116031+(0.0723931*exp(-(0.028171*x)));
++    else if(fabs(eta)<0.7) res = 0.011489+(0.0788516*exp(-(0.0289505*x)));
++    else if(fabs(eta)<0.9) res = 0.0117128+(0.07812*exp(-(0.0289139*x)));
++    else if(fabs(eta)<1.15) res = 0.01207+(0.0772939*exp(-(0.0281633*x)));
++    else if(fabs(eta)<1.4) res = 0.0142121+(0.0852627*exp(-(0.0304293*x)));
++    else if(fabs(eta)<1.7) res = 0.0153332+(0.0964863*exp(-(0.0322744*x)));
++    else if(fabs(eta)<2.1) res = 0.0130291+(0.0922546*exp(-(0.0313966*x)));
++    else if(fabs(eta)<2.5) res = 0.0166475+(0.109598*exp(-(0.0330431*x)));
 +  }else{
-+    if(fabs(eta)<0.17) res = 0.025945+0.16529*exp(-(0.027385*pt));
-+    else if(fabs(eta)<0.35) res = 0.0257294+0.155366*exp(-(0.0268639*pt));
-+    else if(fabs(eta)<0.5) res = 0.0231924+0.166508*exp(-(0.0264153*pt));
-+    else if(fabs(eta)<0.7) res = 0.0252736+0.176977*exp(-(0.0281594*pt));
-+    else if(fabs(eta)<0.9) res = 0.0269299+0.174505*exp(-(0.0295757*pt));
-+    else if(fabs(eta)<1.15) res = 0.0250191+0.178321*exp(-(0.0284006*pt));
-+    else if(fabs(eta)<1.4) res = 0.0242345+0.174682*exp(-(0.027202*pt));
-+    else if(fabs(eta)<1.7) res = 0.0242234+0.199735*exp(-(0.0291262*pt));
-+    else if(fabs(eta)<2.1) res = 0.0300017+0.175617*exp(-(0.0357093*pt));
-+    else if(fabs(eta)<2.5) res = 0.0282978+0.141994*exp(-(0.0383663*pt));
++    double x = pt;
++    if(fabs(eta)<0.17) res = 0.0166719+(0.0619031*exp(-(0.0301288*x)));
++    else if(fabs(eta)<0.35) res = 0.0161585+(0.061002*exp(-(0.0292779*x)));
++    else if(fabs(eta)<0.5) res = 0.0160357+(0.0634612*exp(-(0.0293129*x)));
++    else if(fabs(eta)<0.7) res = 0.0162109+(0.0608479*exp(-(0.029459*x)));
++    else if(fabs(eta)<0.9) res = 0.0162309+(0.066379*exp(-(0.0302915*x)));
++    else if(fabs(eta)<1.15) res = 2.34079+(-2.30729*exp(-(-4.74762e-05*x)));
++    else if(fabs(eta)<1.4) res = 0.0172262+(0.0651941*exp(-(0.0270283*x)));
++    else if(fabs(eta)<1.7) res = 0.0174658+(0.0679269*exp(-(0.0263262*x)));
++    else if(fabs(eta)<2.1) res = 0.0147642+(0.0652381*exp(-(0.0252122*x)));
++    else if(fabs(eta)<2.5) res = 0.0193852+(0.0740927*exp(-(0.0259982*x)));
 +  }
 +  return res;
  }
@@ -711,34 +712,34 @@ index 002dca7..0672eb2 100644
 -		else if(fabs(eta)<2.5) res = 0.0298413+0.13651*exp(-(0.0458475*pt));
 -	}
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 0.0107884+(0.0953517*exp(-(0.0340843*x)));
-+    else if(fabs(eta)<0.35) res = 0.0105696+(0.0909957*exp(-(0.0329897*x)));
-+    else if(fabs(eta)<0.5) res = 0.0107584+(0.0885237*exp(-(0.0321266*x)));
-+    else if(fabs(eta)<0.7) res = 0.0112532+(0.0991583*exp(-(0.0345457*x)));
-+    else if(fabs(eta)<0.9) res = 0.0113671+(0.0996781*exp(-(0.0340341*x)));
-+    else if(fabs(eta)<1.15) res = 0.0123012+(0.10257*exp(-(0.0341753*x)));
-+    else if(fabs(eta)<1.4) res = 0.0159961+(0.113724*exp(-(0.0401424*x)));
-+    else if(fabs(eta)<1.7) res = 0.0148569+(0.112276*exp(-(0.038445*x)));
-+    else if(fabs(eta)<2.1) res = 0.0161016+(0.107015*exp(-(0.0356043*x)));
-+    else if(fabs(eta)<2.5) res = 0.0247843+(0.117144*exp(-(0.0307671*x)));
++    if(fabs(eta)<0.17) res = 0.00944884+(0.0730096*exp(-(0.0282708*x)));
++    else if(fabs(eta)<0.35) res = 0.00952212+(0.0787072*exp(-(0.029685*x)));
++    else if(fabs(eta)<0.5) res = 0.00997013+(0.0724495*exp(-(0.0280479*x)));
++    else if(fabs(eta)<0.7) res = 0.0108036+(0.0778786*exp(-(0.0300963*x)));
++    else if(fabs(eta)<0.9) res = 0.0109458+(0.0798042*exp(-(0.0299867*x)));
++    else if(fabs(eta)<1.15) res = 0.0119368+(0.0847773*exp(-(0.031044*x)));
++    else if(fabs(eta)<1.4) res = 0.0151717+(0.0961578*exp(-(0.0363166*x)));
++    else if(fabs(eta)<1.7) res = 0.0140349+(0.0912084*exp(-(0.033987*x)));
++    else if(fabs(eta)<2.1) res = 0.0149047+(0.0838547*exp(-(0.0301579*x)));
++    else if(fabs(eta)<2.5) res = 0.0236846+(0.0985484*exp(-(0.0274289*x)));
 +  }else{
 +    double x = pt;
-+    if(fabs(eta)<0.17) res = 0.0181541+(0.124508*exp(-(0.048817*x)));
-+    else if(fabs(eta)<0.35) res = 0.0187264+(0.138973*exp(-(0.0520775*x)));
-+    else if(fabs(eta)<0.5) res = 0.01843+(0.132416*exp(-(0.0492988*x)));
-+    else if(fabs(eta)<0.7) res = 0.0187036+(0.124626*exp(-(0.0479235*x)));
-+    else if(fabs(eta)<0.9) res = 0.0193971+(0.126314*exp(-(0.0485071*x)));
-+    else if(fabs(eta)<1.15) res = 0.0202526+(0.141176*exp(-(0.0508113*x)));
-+    else if(fabs(eta)<1.4) res = 0.0195564+(0.0896775*exp(-(0.0360461*x)));
-+    else if(fabs(eta)<1.7) res = 0.0163003+(0.0756327*exp(-(0.0285954*x)));
-+    else if(fabs(eta)<2.1) res = 0.016886+(0.0793998*exp(-(0.028042*x)));
-+    else if(fabs(eta)<2.5) res = 0.0245324+(0.0935296*exp(-(0.0223785*x)));
++    if(fabs(eta)<0.17) res = 3.09832+(-3.0694*exp(-(-2.7499e-05*x)));
++    else if(fabs(eta)<0.35) res = 2.61665+(-2.58694*exp(-(-3.62039e-05*x)));
++    else if(fabs(eta)<0.5) res = 0.0155675+(0.0726562*exp(-(0.0339843*x)));
++    else if(fabs(eta)<0.7) res = 0.0165335+(0.0776824*exp(-(0.0365971*x)));
++    else if(fabs(eta)<0.9) res = 0.016407+(0.0766634*exp(-(0.035447*x)));
++    else if(fabs(eta)<1.15) res = 0.0167188+(0.073928*exp(-(0.0332203*x)));
++    else if(fabs(eta)<1.4) res = 0.0182065+(0.0652987*exp(-(0.030646*x)));
++    else if(fabs(eta)<1.7) res = 0.0156957+(0.0617335*exp(-(0.0268546*x)));
++    else if(fabs(eta)<2.1) res = 0.0158764+(0.0592501*exp(-(0.0235067*x)));
++    else if(fabs(eta)<2.5) res = 0.0237477+(0.0913649*exp(-(0.0230547*x)));
 +  }
    return res;
  }
  
 diff --git a/TopQuarkAnalysis/TopObjectResolutions/interface/MET.h b/TopQuarkAnalysis/TopObjectResolutions/interface/MET.h
-index 17eb796..5cd9fc3 100644
+index 17eb796..be59109 100644
 --- a/TopQuarkAnalysis/TopObjectResolutions/interface/MET.h
 +++ b/TopQuarkAnalysis/TopObjectResolutions/interface/MET.h
 @@ -3,20 +3,20 @@
@@ -790,7 +791,7 @@ index 17eb796..5cd9fc3 100644
  {
 -	double res = -141945+141974*exp(-(-1.20077e-06*pt));
 +  double x = pt;
-+  double res = 36.2773+(29.7363*exp(-(29.7363*x)));
++  double res = 19.4722+(0.386475*x);
    return res;
  }
  
@@ -821,7 +822,7 @@ index 17eb796..5cd9fc3 100644
  {
 -	double res = 0.201336+1.53501*exp(-(0.0216707*pt));
 +  double x = pt;
-+  double res = 0.133218+(1.37283*exp(-(0.0279983*x)));
++  double res = 0.126107+(1.1853*exp(-(0.0252615*x)));
    return res;
  }
  
@@ -841,7 +842,7 @@ index 17eb796..5cd9fc3 100644
  }
  
 diff --git a/TopQuarkAnalysis/TopObjectResolutions/interface/Muon.h b/TopQuarkAnalysis/TopObjectResolutions/interface/Muon.h
-index 926a6c6..cd2bd2d 100644
+index 926a6c6..42b3d19 100644
 --- a/TopQuarkAnalysis/TopObjectResolutions/interface/Muon.h
 +++ b/TopQuarkAnalysis/TopObjectResolutions/interface/Muon.h
 @@ -4,19 +4,19 @@
@@ -999,16 +1000,16 @@ index 926a6c6..cd2bd2d 100644
 -	else if(fabs(eta)<1.9) res = 6.62861e-05+0.000110841*exp(-(0.0640963*pt));
 -	else if(fabs(eta)<2.5) res = 6.3783e-05+0.000122656*exp(-(0.0974097*pt));
 +  double x = pt;
-+  if(fabs(eta)<0.17) res = 0.000386441+(6.96995e-05*exp(-(0.0164976*x)));
-+  else if(fabs(eta)<0.35) res = 0.000326532+(26205.6*exp(-(1.08901*x)));
-+  else if(fabs(eta)<0.5) res = 0.000271633+(0.00010086*exp(-(0.0471498*x)));
-+  else if(fabs(eta)<0.7) res = 0.000242557+(0.000197995*exp(-(0.0852886*x)));
-+  else if(fabs(eta)<0.9) res = 0.000192473+(0.000112804*exp(-(0.0478156*x)));
-+  else if(fabs(eta)<1.15) res = 0.000150052+(0.000273817*exp(-(0.0845128*x)));
-+  else if(fabs(eta)<1.3) res = 0.000119874+(0.000330529*exp(-(0.102055*x)));
-+  else if(fabs(eta)<1.6) res = 3.4292e-05+(0.00017329*exp(-(0.0240175*x)));
-+  else if(fabs(eta)<1.9) res = 5.53397e-05+(15.9198*exp(-(0.676337*x)));
-+  else if(fabs(eta)<2.5) res = 3.45346e-05+(2.09232e-05*exp(-(2.51293e-05*x)));
++  if(fabs(eta)<0.17) res = 0.000394336+(7.41107e-05*exp(-(0.0303013*x)));
++  else if(fabs(eta)<0.35) res = 0.000203889+(0.000123238*exp(-(0.000166733*x)));
++  else if(fabs(eta)<0.5) res = 0.000271909+(0.000364257*exp(-(0.117985*x)));
++  else if(fabs(eta)<0.7) res = 0.000238165+(0.000108602*exp(-(0.0601113*x)));
++  else if(fabs(eta)<0.9) res = 0.000180085+(9.01077e-05*exp(-(0.0276477*x)));
++  else if(fabs(eta)<1.15) res = 0.000145072+(0.00013416*exp(-(0.0507955*x)));
++  else if(fabs(eta)<1.3) res = 0.00011534+(0.000460429*exp(-(0.116113*x)));
++  else if(fabs(eta)<1.6) res = 9.94613e-05+(0.000253477*exp(-(0.0956846*x)));
++  else if(fabs(eta)<1.9) res = 7.02682e-05+(0.000212351*exp(-(0.0905005*x)));
++  else if(fabs(eta)<2.5) res = 5.60714e-05+(0.000196946*exp(-(0.113251*x)));
    return res;
  }
  
@@ -1026,16 +1027,16 @@ index 926a6c6..cd2bd2d 100644
 -	else if(fabs(eta)<1.9) res = 0.000112312+0.000479423*exp(-(0.0513205*pt));
 -	else if(fabs(eta)<2.5) res = 0.000144398+0.000432592*exp(-(0.0400788*pt));
 +  double x = pt;
-+  if(fabs(eta)<0.17) res = 8.88182e-05+(0.000445045*exp(-(0.0785193*x)));
-+  else if(fabs(eta)<0.35) res = 8.99818e-05+(0.000371443*exp(-(0.0691527*x)));
-+  else if(fabs(eta)<0.5) res = 8.81978e-05+(0.000426135*exp(-(0.0725189*x)));
-+  else if(fabs(eta)<0.7) res = 9.20635e-05+(0.000463572*exp(-(0.0738475*x)));
-+  else if(fabs(eta)<0.9) res = 8.51932e-05+(0.000361791*exp(-(0.0514074*x)));
-+  else if(fabs(eta)<1.15) res = 8.65301e-05+(0.000352017*exp(-(0.045075*x)));
-+  else if(fabs(eta)<1.3) res = 9.60648e-05+(0.000546193*exp(-(0.060304*x)));
-+  else if(fabs(eta)<1.6) res = 9.49083e-05+(0.000403888*exp(-(0.0447298*x)));
-+  else if(fabs(eta)<1.9) res = 0.000110893+(0.000486716*exp(-(0.0499581*x)));
-+  else if(fabs(eta)<2.5) res = 0.000149734+(0.000820533*exp(-(0.0671816*x)));
++  if(fabs(eta)<0.17) res = 8.35761e-05+(0.000333179*exp(-(0.0650595*x)));
++  else if(fabs(eta)<0.35) res = 8.24968e-05+(0.000298149*exp(-(0.0569837*x)));
++  else if(fabs(eta)<0.5) res = 8.13396e-05+(0.000289771*exp(-(0.0538629*x)));
++  else if(fabs(eta)<0.7) res = 7.58787e-05+(0.000310774*exp(-(0.0501664*x)));
++  else if(fabs(eta)<0.9) res = 8.14299e-05+(0.000394404*exp(-(0.0538147*x)));
++  else if(fabs(eta)<1.15) res = 8.46224e-05+(0.000341414*exp(-(0.0463285*x)));
++  else if(fabs(eta)<1.3) res = 8.96825e-05+(0.000419904*exp(-(0.0495002*x)));
++  else if(fabs(eta)<1.6) res = 9.35946e-05+(0.000408626*exp(-(0.0453808*x)));
++  else if(fabs(eta)<1.9) res = 0.000114054+(0.000486109*exp(-(0.0549193*x)));
++  else if(fabs(eta)<2.5) res = 0.000149767+(0.000817639*exp(-(0.0678447*x)));
    return res;
  }
  
@@ -1080,19 +1081,19 @@ index 926a6c6..cd2bd2d 100644
 -	else if(fabs(eta)<1.9) res = 0.000144481+0.000260476*exp(-(0.0392984*pt));
 -	else if(fabs(eta)<2.5) res = 0.000158888+0.000442249*exp(-(0.0537515*pt));
 +  double x = pt;
-+  if(fabs(eta)<0.17) res = 0.00039054+(7.16756e-05*exp(-(0.0188293*x)));
-+  else if(fabs(eta)<0.35) res = 0.000343554+(0.00352173*exp(-(0.23572*x)));
-+  else if(fabs(eta)<0.5) res = 0.000294864+(0.000149765*exp(-(0.0601766*x)));
-+  else if(fabs(eta)<0.7) res = 0.000282024+(0.000129567*exp(-(0.0594886*x)));
-+  else if(fabs(eta)<0.9) res = 0.000228941+(0.00013883*exp(-(0.0198254*x)));
-+  else if(fabs(eta)<1.15) res = 0.000232203+(0.000270068*exp(-(0.0604689*x)));
-+  else if(fabs(eta)<1.3) res = 0.000216087+(0.00146479*exp(-(0.145533*x)));
-+  else if(fabs(eta)<1.6) res = 0.000215394+(0.000361573*exp(-(0.0700952*x)));
-+  else if(fabs(eta)<1.9) res = 0.00020372+(0.000573066*exp(-(0.0825839*x)));
-+  else if(fabs(eta)<2.5) res = 0.000202273+(0.00053857*exp(-(0.0735945*x)));
++  if(fabs(eta)<0.17) res = 0.000395423+(8.4213e-05*exp(-(0.0296309*x)));
++  else if(fabs(eta)<0.35) res = 0.000213503+(0.000129625*exp(-(0.000194946*x)));
++  else if(fabs(eta)<0.5) res = 0.00029059+(0.000192177*exp(-(0.066094*x)));
++  else if(fabs(eta)<0.7) res = 0.000280788+(0.000168663*exp(-(0.0676186*x)));
++  else if(fabs(eta)<0.9) res = 0.000251021+(0.000162235*exp(-(0.0436113*x)));
++  else if(fabs(eta)<1.15) res = 0.000228524+(0.000241205*exp(-(0.0546416*x)));
++  else if(fabs(eta)<1.3) res = 0.000199559+(0.000279589*exp(-(0.0546879*x)));
++  else if(fabs(eta)<1.6) res = 0.000211576+(0.000321082*exp(-(0.0628009*x)));
++  else if(fabs(eta)<1.9) res = 0.000203214+(0.000442926*exp(-(0.0763978*x)));
++  else if(fabs(eta)<2.5) res = 0.000193435+(0.000330072*exp(-(0.0510659*x)));
    return res;
  }
  
 -- 
-1.8.3.1
+1.8.4
 
