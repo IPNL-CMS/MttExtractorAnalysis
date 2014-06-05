@@ -182,10 +182,8 @@ void KinFitSortingAlgorithm::work() {
           if (j4 == bj1 || j4 == bj2 || (m_useBTagInCombinatorics && m_jets[j4].isBTagged))
             continue;
 
-          bool res = computeNeutrinoPz(m_jets[bj1].p);
-
-          if (!res)
-            return; // We will never get anything with this event
+          if (!computeNeutrinoPz(m_jets[bj1].p))
+            m_neutrino.SetPz(0.);
 
           TLorentzVector neutrinoP4 = toTLorentzVector(m_neutrino);
           TLorentzVector currentLeptonicBJetP4 = toTLorentzVector(m_jets[bj1].p);
