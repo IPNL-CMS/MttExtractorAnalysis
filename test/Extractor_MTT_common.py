@@ -143,7 +143,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
           ),
 
         jets = cms.PSet(
-          n_sel_max = cms.uint32(8),
+          n_sel_max = cms.uint32(6),
           pt_min = cms.double(30),
           eta_max = cms.double(2.4),
           btag_CSVL = cms.double(0.244),
@@ -196,7 +196,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
                 ),    
             cms.PSet(
                 name = cms.string("kinfit"),
-                enable = cms.bool(False),
+                enable = cms.bool(True),
                 configuration = cms.PSet(
                     # ------------------------------------------------
                     # settings for the KinFitter
