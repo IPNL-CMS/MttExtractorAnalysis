@@ -13,7 +13,7 @@ pset = Extractor_MTT_MC.py
 total_number_of_events = -1
 
 ### Number of events to be processed per job
-events_per_job = 400000
+events_per_job = 100000
 
 ### The output files produced by your application (comma separated list)
 output_file = extracted_mc.root

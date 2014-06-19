@@ -14,7 +14,7 @@ pycfg_params = globalTag=@globaltag@
 total_number_of_lumis = -1
 
 ### Number of events to be processed per job
-lumis_per_job = 1000
+lumis_per_job = 250
 
 ### The output files produced by your application (comma separated list)
 output_file = extracted.root
