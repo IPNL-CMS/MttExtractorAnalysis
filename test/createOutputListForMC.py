@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Launch crab for every datasets in mc_signal_datasets.list
 
-import os, shutil, subprocess, re
+import os, shutil, subprocess, re, glob
 from optparse import OptionParser
 
 isCastor = os.system("uname -n | grep cern &> /dev/null") == 0
@@ -24,7 +24,11 @@ for crabFolder in crabFolders:
   print("Processing %s" % dataset)
   for a in ["semie", "semimu"]:
     outputName = "MTT_%s_%s.list" % (dataset, a)
-    fullPath = "%s/%s/%s_%s" % (options.path, crabFolder, dataset_name, a)
+    paths = glob.glob("%s/%s/*_%s" % (options.path, crabFolder, a))
+    if len(paths) == 0:
+        print "No match for %s/%s/*_%s" % (options.path, crabFolder, a)
+        continue
+    fullPath = paths[0]
     if os.path.exists(outputName):
       print("'%s' already exists. Skipping." % outputName)
       continue

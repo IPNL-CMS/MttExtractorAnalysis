@@ -11,6 +11,7 @@ parser.add_option("", "--status", action="store_true", dest="status", default=Fa
 parser.add_option("", "--get", action="store_true", dest="get", default=False, help="run crab -get")
 parser.add_option("", "--resubmit", action="store_true", dest="resubmit", default=False, help="run crab -resubmit bad")
 parser.add_option("", "--submit", action="store_true", dest="submit", default=False, help="run crab -submit all")
+parser.add_option("", "--kill", action="store_true", dest="kill", default=False, help="run crab -kill all")
 (options, args) = parser.parse_args()
 
 if options.run:
@@ -168,9 +169,8 @@ def processDataset(dataset):
     output_file = "multicrab_MC_%s_%s.cfg" % (dataset_name, d)
     ui_working_dir = ("multicrab_MC_%s") % (dataset_name)
 
-    if options.create_cfg:
-        output_dir_semie = ("HTT/Extracted/MC/Summer12/%s/semie/%s" % (d, dataset_name))
-        output_dir_semimu = ("HTT/Extracted/MC/Summer12/%s/semimu/%s" % (d, dataset_name))
+    output_dir_semie = ("HTT/Extracted/MC/Summer12/%s/semie/%s" % (d, dataset_name))
+    output_dir_semimu = ("HTT/Extracted/MC/Summer12/%s/semimu/%s" % (d, dataset_name))
 
     full_template = copy.copy(multicrab)
     if "EMEnriched" in dataset_path or "BCtoE" in dataset_path:
@@ -187,9 +187,10 @@ def processDataset(dataset):
     print("\tOutput directory (semi-e): %s" % output_dir_semie)
     print("")
 
-    f = open(output_file, "w")
-    f.write(full_template.substitute(ui_working_dir=ui_working_dir, dataset=dataset_path, remote_dir_semie=output_dir_semie, remote_dir_semimu=output_dir_semimu, name=dataset_name, email=email, events=dataset_size))
-    f.close()
+    if options.create_cfg:
+      f = open(output_file, "w")
+      f.write(full_template.substitute(ui_working_dir=ui_working_dir, dataset=dataset_path, remote_dir_semie=output_dir_semie, remote_dir_semimu=output_dir_semimu, name=dataset_name, email=email, events=dataset_size))
+      f.close()
 
     if options.run:
         cmd = "./multicrab.sh -create -submit -cfg %s" % (output_file)
@@ -209,6 +210,10 @@ def processDataset(dataset):
 
     if options.submit:
         cmd = "./multicrab.sh -submit all -c %s" % (ui_working_dir)
+        os.system(cmd)
+
+    if options.kill:
+        cmd = "./multicrab.sh -kill all -c %s" % (ui_working_dir)
         os.system(cmd)
 
 import multiprocessing

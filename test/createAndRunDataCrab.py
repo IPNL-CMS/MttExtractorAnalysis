@@ -6,6 +6,11 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-j", "--process", action="store", dest="cores", type="int", default=1, help="Number of core to use for launching")
 parser.add_option("", "--run", action="store_true", dest="run", default=False, help="run crab")
+parser.add_option("", "--status", action="store_true", dest="status", default=False, help="run crab -status")
+parser.add_option("", "--get", action="store_true", dest="get", default=False, help="run crab -get")
+parser.add_option("", "--resubmit", action="store_true", dest="resubmit", default=False, help="run crab -resubmit bad")
+parser.add_option("", "--submit", action="store_true", dest="submit", default=False, help="run crab -submit all")
+parser.add_option("", "--kill", action="store_true", dest="kill", default=False, help="run crab -kill all")
 (options, args) = parser.parse_args()
 
 datasets = [
@@ -36,7 +41,7 @@ def processDataset(dataset):
     dataset_name = dataset[1]
     dataset_globaltag = dataset[2]
 
-    ui_working_dir = ("crab_data_%s_%s") % (dataset_name, d)
+    ui_working_dir = ("crab_data_%s") % (dataset_name)
     output_file = "crab_data_%s_%s.cfg" % (dataset_name, d)
     output_dir = ("HTT/Extracted/data/%s/%s" % (d, dataset_name))
 
@@ -56,6 +61,26 @@ def processDataset(dataset):
 
     if options.run:
         cmd = "crab -create -submit -cfg %s" % (output_file)
+        os.system(cmd)
+
+    if options.status:
+        cmd = "crab -status -c %s" % (ui_working_dir)
+        os.system(cmd)
+
+    if options.get:
+        cmd = "crab -get -c %s" % (ui_working_dir)
+        os.system(cmd)
+
+    if options.resubmit:
+        cmd = "crab -resubmit bad -c %s" % (ui_working_dir)
+        os.system(cmd)
+
+    if options.submit:
+        cmd = "crab -submit all -c %s" % (ui_working_dir)
+        os.system(cmd)
+
+    if options.kill:
+        cmd = "crab -kill all -c %s" % (ui_working_dir)
         os.system(cmd)
 
 import multiprocessing
