@@ -58,6 +58,7 @@ namespace mtt {
       // TTbar selection
       virtual void analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup, PatExtractor& extractor);
       virtual void analyze(const edm::EventSetup& iSetup, PatExtractor& extractor);
+      void computeEventShapeVariables();
       virtual void endJob() {
         m_reco_bjets->Write(); // Number of tagged B in reco which are true B jets
         m_reco_fake_bjets_among_cjets->Write(); // Number of tagged B in reco which are in reality C jets
@@ -276,6 +277,14 @@ namespace mtt {
       float m_btag_weight;
       float m_btag_weight_error_low;
       float m_btag_weight_error_high;
+
+      // Event shape variables
+      float m_sphericity;
+      float m_aplanarity;
+      float m_circularity;
+      float m_isotropy;
+      float m_D;
+      float m_C;
 
       // Cut ; -1 event drop before arriving to this cut ; 0 cut failed, 1 cut passed
       int m_pass_vertex_cut;

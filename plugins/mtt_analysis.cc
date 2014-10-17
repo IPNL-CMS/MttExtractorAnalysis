@@ -29,6 +29,7 @@
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
 
 #include <FWCore/ParameterSet/interface/FileInPath.h>
+#include "PhysicsTools/CandUtils/interface/EventShapeVariables.h"
 
 #include "Extractors/MttExtractorAnalysis/plugins/BTaggingEfficiencyProvider.h"
 
@@ -132,6 +133,13 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("nBtaggedJets_CSVT" ,  &m_mtt_NBtaggedJets_CSVT    , "nBtaggedJets_CSVT/I");
 
   m_tree_Mtt->Branch("MET"                , &m_mtt_MET                   , "MET/F");
+
+  m_tree_Mtt->Branch("sphericity"                , &m_sphericity                   , "sphericity/F");
+  m_tree_Mtt->Branch("aplanarity"                , &m_aplanarity                   , "aplanarity/F");
+  m_tree_Mtt->Branch("circularity"                , &m_circularity                   , "circularity/F");
+  m_tree_Mtt->Branch("D"                , &m_D                   , "D/F");
+  m_tree_Mtt->Branch("C"                , &m_C                   , "C/F");
+  m_tree_Mtt->Branch("isotropy"                , &m_isotropy                   , "isotropy/F");
 
   m_tree_Mtt->Branch("isSel"              , &m_mtt_isSel                 , "isSel/I");
 
@@ -854,11 +862,39 @@ void mtt_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& extracto
 
   m_mtt_isSel = m_pass_vertex_cut == SUCCESS && m_pass_met_cut == SUCCESS && m_pass_lepton_cut == SUCCESS && m_pass_jet_cut == SUCCESS;
 
+  computeEventShapeVariables();
+
   if (m_do_mtt_reco) {
     loopOverCombinations();
   }
 
   fillTree();
+}
+
+void mtt_analysis::computeEventShapeVariables()
+{
+  std::vector< ROOT::Math::XYZVector > particlesInEventVectors;
+  for (uint32_t i = 0; i < m_jetMet->getSize() ; i++) {
+    TLorentzVector* jetP = m_jetMet->getP4(i);
+    particlesInEventVectors.push_back(ROOT::Math::XYZVector(jetP->Px(), jetP->Py(), jetP->Pz()));
+  }
+  for (uint32_t i = 0; i < m_electron->getSize() ; i++) {
+    TLorentzVector* eleP = m_electron->getEleLorentzVector(i);
+    particlesInEventVectors.push_back(ROOT::Math::XYZVector(eleP->Px(), eleP->Py(), eleP->Pz()));
+  }
+  for (uint32_t i = 0; i < m_muon->getSize() ; i++) {
+    TLorentzVector* muP = m_muon->getMuLorentzVector(i);
+    particlesInEventVectors.push_back(ROOT::Math::XYZVector(muP->Px(), muP->Py(), muP->Pz()));
+  }
+
+  EventShapeVariables eventShapeVar(particlesInEventVectors);
+
+  m_sphericity = eventShapeVar.sphericity();
+  m_aplanarity = eventShapeVar.aplanarity();
+  m_circularity = eventShapeVar.circularity();
+  m_isotropy = eventShapeVar.isotropy();
+  m_D = eventShapeVar.D();
+  m_C = eventShapeVar.C();
 }
 
 void mtt_analysis::loopOverCombinations()
