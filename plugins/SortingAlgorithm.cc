@@ -61,8 +61,8 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
 
       corfact = pt / m_neutrino.Pt();
     } else { // Deltan>=0 and u!=0
-      double pt2 = (v - (sqrt(deltan))) / (2 * u);
-      double pt1 = (v + (sqrt(deltan))) / (2 * u);
+      double pt2 = (-v - (sqrt(deltan))) / (2 * u);
+      double pt1 = (-v + (sqrt(deltan))) / (2 * u);
 
       // Pas de correction car negative
       if (pt1 <= 0 && pt2 <= 0) return 0;
