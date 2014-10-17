@@ -2,6 +2,33 @@
 
 import os, copy, datetime, pwd, re
 
+def check_output(*popenargs, **kwargs):
+    import subprocess
+    r"""Run command with arguments and return its output as a byte string.
+ 
+    Backported from Python 2.7 as it's implemented as pure python on stdlib.
+ 
+    >>> check_output(['/usr/bin/python', '--version'])
+    Python 2.6.2
+    """
+    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        error = subprocess.CalledProcessError(retcode, cmd)
+        error.output = output
+        raise error
+    return output
+
+def getGitTag():
+    if "tag" not in getGitTag.__dict__:
+        getGitTag.tag = check_output(["git", "describe", "--tags"]).rstrip('\n')
+
+    return getGitTag.tag
+
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-j", "--process", action="store", dest="cores", type="int", default=1, help="Number of core to use for launching")
@@ -166,31 +193,31 @@ def processDataset(dataset):
     #dataset_globaltag = re.search('START\d{0,2}_V\d[A-Z]?', dataset_path).group(0)
 
     #publish_name = "%s_%s_%s-v%d" % (dataset_name, dataset_globaltag, d, version)
-    output_file = "multicrab_MC_%s_%s.cfg" % (dataset_name, d)
-    ui_working_dir = ("multicrab_MC_%s") % (dataset_name)
-
-    output_dir_semie = ("HTT/Extracted/MC/Summer12/%s/semie/%s" % (d, dataset_name))
-    output_dir_semimu = ("HTT/Extracted/MC/Summer12/%s/semimu/%s" % (d, dataset_name))
-
-    full_template = copy.copy(multicrab)
-    if "EMEnriched" in dataset_path or "BCtoE" in dataset_path:
-        full_template.template += multicrab_semie
-    elif "MuEnriched" in dataset_path:
-        full_template.template += multicrab_semimu
-    else:
-        full_template.template += multicrab_semie
-        full_template.template += multicrab_semimu
-
-    print("Creating config file for '%s'" % (dataset_path))
-    print("\tName: %s" % dataset_name)
-    print("\tOutput directory (semi-mu): %s" % output_dir_semimu)
-    print("\tOutput directory (semi-e): %s" % output_dir_semie)
-    print("")
+    output_file = "multicrab_MC_%s_%s_extractor_%s.cfg" % (dataset_name, d, getGitTag())
+    ui_working_dir = ("multicrab_MC_%s_extractor_%s") % (dataset_name, getGitTag())
 
     if options.create_cfg:
-      f = open(output_file, "w")
-      f.write(full_template.substitute(ui_working_dir=ui_working_dir, dataset=dataset_path, remote_dir_semie=output_dir_semie, remote_dir_semimu=output_dir_semimu, name=dataset_name, email=email, events=dataset_size))
-      f.close()
+        output_dir_semie = ("HTT/Extracted/MC/Summer12/extractor_%s/%s/semie/%s" % (getGitTag(), d, dataset_name))
+        output_dir_semimu = ("HTT/Extracted/MC/Summer12/extractor_%s/%s/semimu/%s" % (getGitTag(), d, dataset_name))
+
+        full_template = copy.copy(multicrab)
+        if "EMEnriched" in dataset_path or "BCtoE" in dataset_path:
+            full_template.template += multicrab_semie
+        elif "MuEnriched" in dataset_path:
+            full_template.template += multicrab_semimu
+        else:
+            full_template.template += multicrab_semie
+            full_template.template += multicrab_semimu
+
+        print("Creating config file for '%s'" % (dataset_path))
+        print("\tName: %s" % dataset_name)
+        print("\tOutput directory (semi-mu): %s" % output_dir_semimu)
+        print("\tOutput directory (semi-e): %s" % output_dir_semie)
+        print("")
+
+        f = open(output_file, "w")
+        f.write(full_template.substitute(ui_working_dir=ui_working_dir, dataset=dataset_path, remote_dir_semie=output_dir_semie, remote_dir_semimu=output_dir_semimu, name=dataset_name, email=email, events=dataset_size))
+        f.close()
 
     if options.run:
         cmd = "./multicrab.sh -create -submit -cfg %s" % (output_file)

@@ -2,6 +2,33 @@
 
 import os, datetime, pwd
 
+def check_output(*popenargs, **kwargs):
+    import subprocess
+    r"""Run command with arguments and return its output as a byte string.
+ 
+    Backported from Python 2.7 as it's implemented as pure python on stdlib.
+ 
+    >>> check_output(['/usr/bin/python', '--version'])
+    Python 2.6.2
+    """
+    process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+    output, unused_err = process.communicate()
+    retcode = process.poll()
+    if retcode:
+        cmd = kwargs.get("args")
+        if cmd is None:
+            cmd = popenargs[0]
+        error = subprocess.CalledProcessError(retcode, cmd)
+        error.output = output
+        raise error
+    return output
+
+def getGitTag():
+    if "tag" not in getGitTag.__dict__:
+        getGitTag.tag = check_output(["git", "describe", "--tags"]).rstrip('\n')
+
+    return getGitTag.tag
+
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-j", "--process", action="store", dest="cores", type="int", default=1, help="Number of core to use for launching")
@@ -42,8 +69,8 @@ def processDataset(dataset):
     dataset_globaltag = dataset[2]
 
     ui_working_dir = ("crab_data_%s") % (dataset_name)
-    output_file = "crab_data_%s_%s.cfg" % (dataset_name, d)
-    output_dir = ("HTT/Extracted/data/%s/%s" % (d, dataset_name))
+    output_file = "crab_data_%s_%s_extractor_%s.cfg" % (dataset_name, d, getGitTag())
+    output_dir = ("HTT/Extracted/data/extractor_%s/%s/%s" % (getGitTag(), d, dataset_name))
 
     python_config = "";
     if "Electron" in dataset_path:
