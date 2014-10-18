@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 # Launch crab for every datasets in mc_signal_datasets.list
 
-import os, shutil, subprocess
+import os, shutil, subprocess, re
 from optparse import OptionParser
 
 isCastor = os.system("uname -n | grep cern &> /dev/null") == 0
@@ -18,6 +18,8 @@ crabFolders = [name for name in os.listdir(options.path) if os.path.isdir(os.pat
 
 for crabFolder in crabFolders:
   dataset = crabFolder.rstrip("/").replace("crab_data_", "")
+  # Remove extractor version
+  dataset = re.sub(r'_extractor_.*$', "", dataset)
   print("Processing %s" % dataset)
   outputName = "MTT_%s.list" % (dataset)
   fullPath = "%s/%s" % (options.path, crabFolder)
