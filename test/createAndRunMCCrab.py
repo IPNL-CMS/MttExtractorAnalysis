@@ -59,7 +59,7 @@ datasets = [
     # TT + jets
     ["/TT_CT10_TuneZ2star_8TeV-powheg-tauola/chassera-TT_CT10_powheg_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_powheg"],
     ["/TTJets_MassiveBinDECAY_TuneZ2star_8TeV-madgraph-tauola/chassera-TTJets_MassiveBinDECAY_START53_V7C_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_madgraph"],
-    ["/TT_8TeV-mcatnlo/chassera-TT_8TeV-mcatnlo_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_mcatnlo"],
+    #["/TT_8TeV-mcatnlo/chassera-TT_8TeV-mcatnlo_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "TT_mcatnlo"],
     
     # Z + jets
     ["/DY1JetsToLL_M-50_TuneZ2Star_8TeV-madgraph/chassera-DY1JetsToLL_M-50_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "DY1JetsToLL_M-50"],
@@ -74,23 +74,23 @@ datasets = [
     ["/W4JetsToLNu_TuneZ2Star_8TeV-madgraph/chassera-W4JetsToLNu_START53_V7A_03May13-v1-01f389e36b58797d8560cb86e692fc11/USER", "W4JetsToLNu"],
 
     # QCD
-    ["/QCD_Pt_20_30_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_20_30_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_20_30_EMEnriched"],
-    ["/QCD_Pt_30_80_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_30_80_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_30_80_EMEnriched"],
-    ["/QCD_Pt_80_170_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_80_170_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_80_170_EMEnriched"],
-    ["/QCD_Pt_170_250_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_170_250_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_170_250_EMEnriched"],
-    ["/QCD_Pt_250_350_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_250_350_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_250_350_EMEnriched"],
-    ["/QCD_Pt_350_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_350_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_350_EMEnriched"],
+    #["/QCD_Pt_20_30_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_20_30_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_20_30_EMEnriched"],
+    #["/QCD_Pt_30_80_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_30_80_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_30_80_EMEnriched"],
+    #["/QCD_Pt_80_170_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_80_170_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_80_170_EMEnriched"],
+    #["/QCD_Pt_170_250_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_170_250_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_170_250_EMEnriched"],
+    #["/QCD_Pt_250_350_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_250_350_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_250_350_EMEnriched"],
+    #["/QCD_Pt_350_EMEnriched_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_350_EMEnriched_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_350_EMEnriched"],
 
-    ["/QCD_Pt_30_80_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_30_80_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_30_80_BCtoE"],
-    ["/QCD_Pt_80_170_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_80_170_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_80_170_BCtoE"],
-    ["/QCD_Pt_170_250_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_170_250_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_170_250_BCtoE"],
-    ["/QCD_Pt_250_350_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_250_350_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_250_350_BCtoE"],
-    ["/QCD_Pt_350_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_350_BCtoE_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_350_BCtoE"],
+    #["/QCD_Pt_30_80_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_30_80_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_30_80_BCtoE"],
+    #["/QCD_Pt_80_170_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_80_170_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_80_170_BCtoE"],
+    #["/QCD_Pt_170_250_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_170_250_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_170_250_BCtoE"],
+    #["/QCD_Pt_250_350_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_250_350_BCtoE_16Dec13-v1-000dcc01450dd869c68c0ab31d140828/USER", "QCD_Pt_250_350_BCtoE"],
+    #["/QCD_Pt_350_BCtoE_TuneZ2star_8TeV_pythia6/sbrochet-QCD_Pt_350_BCtoE_08Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_Pt_350_BCtoE"],
 
-    ["/QCD_pt15to30_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt15to30_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt15to30_bEnriched_MuEnrichedPt14"],
-    ["/QCD_pt30to50_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt30to50_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt30to50_bEnriched_MuEnrichedPt14"],
-    ["/QCD_pt50to150_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt50to150_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt50to150_bEnriched_MuEnrichedPt14"],
-    ["/QCD_pt150_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt150_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt150_bEnriched_MuEnrichedPt14"],
+    #["/QCD_pt15to30_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt15to30_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt15to30_bEnriched_MuEnrichedPt14"],
+    #["/QCD_pt30to50_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt30to50_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt30to50_bEnriched_MuEnrichedPt14"],
+    #["/QCD_pt50to150_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt50to150_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt50to150_bEnriched_MuEnrichedPt14"],
+    #["/QCD_pt150_bEnriched_MuEnrichedPt14_TuneZ2star_8TeV-pythia6/sbrochet-QCD_pt150_bEnriched_MuEnrichedPt14_START53_V7A_08Dec13-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "QCD_pt150_bEnriched_MuEnrichedPt14"],
     
     # Signal
     ["/S0_S_i_M400_cpl1_pseudoscalar_15Dec13_START53_V7C-GEN/sbrochet-S0_S_i_M400_cpl1_pseudoscalar_START53_V7C_09Jan14-v1-2051feb9cae877bd6999b7eb77fd9c68/USER", "S0_S_i_M400_cpl1_pseudoscalar"],
@@ -194,7 +194,7 @@ def processDataset(dataset):
 
     #publish_name = "%s_%s_%s-v%d" % (dataset_name, dataset_globaltag, d, version)
     output_file = "multicrab_MC_%s_%s_extractor_%s.cfg" % (dataset_name, d, getGitTag())
-    ui_working_dir = ("multicrab_MC_%s_extractor_%s") % (dataset_name, getGitTag())
+    ui_working_dir = ("multicrab_MC_%s_extractor") % (dataset_name)
 
     if options.create_cfg:
         output_dir_semie = ("HTT/Extracted/MC/Summer12/extractor_%s/%s/semie/%s" % (getGitTag(), d, dataset_name))

@@ -27,6 +27,8 @@ def getGitTag():
     if "tag" not in getGitTag.__dict__:
         getGitTag.tag = check_output(["git", "describe", "--tags"]).rstrip('\n')
 
+    #return getGitTag.tag
+
 from optparse import OptionParser
 parser = OptionParser()
 parser.add_option("-j", "--process", action="store", dest="cores", type="int", default=1, help="Number of core to use for launching")
@@ -109,7 +111,7 @@ def processDataset(dataset):
 
     #publish_name = "%s_%s_%s-v%d" % (dataset_name, dataset_globaltag, d, version)
     output_file = "multicrab_MC_%s_%s_extractor_%s.cfg" % (dataset_name, d, getGitTag())
-    ui_working_dir = ("multicrab_MC_%s_extractor_%s") % (dataset_name, getGitTag())
+    ui_working_dir = ("multicrab_MC_%s_extractor") % (dataset_name)
 
     if options.create_cfg:
         output_dir_semie = ("HTT/Extracted/Systematics/extractor_%s/%s/semie/%s" % (getGitTag(), d, dataset_name))
