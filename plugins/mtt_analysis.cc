@@ -689,7 +689,51 @@ int mtt_analysis::JetSel()
         m_selected_jets_flavor_btagged->Fill(flavorBin);
     }
 
-    if (m_mtt_NBtaggedJets_CSVM == 1) {
+    if (m_mtt_NBtaggedJets_CSVM > 1) {
+
+      // In this case, the weight is simply the product
+      // of the two leading B jets scale factors
+
+      int nBTag = 0;
+      m_btag_weight = 1;
+      for (size_t i = 0; i < m_selJetsIds.size(); i++) {
+        if (jetIsBTagged[i]) {
+          nBTag++;
+        } else {
+          continue;
+        }
+
+        if (nBTag > 2)
+          break;
+
+        int mcFlavor = fabs(jetFlavor[i]);
+        int flavor = 0;
+        if (mcFlavor == 4) {
+          flavor = 1;
+        } else if ((mcFlavor <= 3) || (mcFlavor == 21)) {
+          // If mcFlavor == 0, assume it's a light jet
+          flavor = 2;
+        }
+        m_2b_sf_flavor->Fill(flavor);
+
+        ScaleFactor sf = jetSF[i];
+
+        float sf_i = sf.getValue();
+
+        float error_sf_i_up = jetSF[i].getErrorHigh();
+        float error_sf_i_low = jetSF[i].getErrorLow();
+
+        m_btag_weight *= sf_i;
+        m_btag_weight_error_high += (error_sf_i_up * error_sf_i_up) / (sf_i * sf_i);
+        m_btag_weight_error_low += (error_sf_i_low * error_sf_i_low) / (sf_i * sf_i);
+      }
+
+      m_2b_sf->Fill(m_btag_weight);
+      float btag_eff_squared = m_btag_weight * m_btag_weight;
+      m_btag_weight_error_high *= btag_eff_squared;
+      m_btag_weight_error_low *= btag_eff_squared;
+
+    } else {
 
       // We use method 1.a) from https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagSFMethods
 
@@ -750,50 +794,6 @@ int mtt_analysis::JetSel()
       m_btag_weight_error_low = (error_tagged_squared_low + error_untagged_squared_low) * btag_eff_squared;
 
       m_1b_sf->Fill(m_btag_weight);
-
-    } else if (m_mtt_NBtaggedJets_CSVM > 1) {
-
-      // In this case, the weight is simply the product
-      // of the two leading B jets scale factors
-
-      int nBTag = 0;
-      m_btag_weight = 1;
-      for (size_t i = 0; i < m_selJetsIds.size(); i++) {
-        if (jetIsBTagged[i]) {
-          nBTag++;
-        } else {
-          continue;
-        }
-
-        if (nBTag > 2)
-          break;
-
-        int mcFlavor = fabs(jetFlavor[i]);
-        int flavor = 0;
-        if (mcFlavor == 4) {
-          flavor = 1;
-        } else if ((mcFlavor <= 3) || (mcFlavor == 21)) {
-          // If mcFlavor == 0, assume it's a light jet
-          flavor = 2;
-        }
-        m_2b_sf_flavor->Fill(flavor);
-
-        ScaleFactor sf = jetSF[i];
-
-        float sf_i = sf.getValue();
-
-        float error_sf_i_up = jetSF[i].getErrorHigh();
-        float error_sf_i_low = jetSF[i].getErrorLow();
-
-        m_btag_weight *= sf_i;
-        m_btag_weight_error_high += (error_sf_i_up * error_sf_i_up) / (sf_i * sf_i);
-        m_btag_weight_error_low += (error_sf_i_low * error_sf_i_low) / (sf_i * sf_i);
-      }
-
-      m_2b_sf->Fill(m_btag_weight);
-      float btag_eff_squared = m_btag_weight * m_btag_weight;
-      m_btag_weight_error_high *= btag_eff_squared;
-      m_btag_weight_error_low *= btag_eff_squared;
     }
   }
 
