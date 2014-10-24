@@ -101,6 +101,7 @@ void Chi2SortingAlgorithm::addBranches(TTree& tree) {
   tree.Branch("mtt_AfterChi2"          , &m_mtt_AfterChi2         , "mtt_AfterChi2/F");
 
   tree.Branch("neutrino_no_real_solution_AfterChi2", &m_neutrino_no_real_solution_AfterChi2, "neutrino_no_real_solution_AfterChi2/I");
+  tree.Branch("neutrino_pt_corrected_AfterChi2", &m_neutrino_pt_corrected_AfterChi2, "neutrino_pt_corrected_AfterChi2/I");
 
   tree.Branch("selectedLeptonicBIndex_AfterChi2"     , &m_selectedLeptonicBIndex_AfterChi2    , "selectedLeptonicBIndex_AfterChi2/I");
   tree.Branch("selectedHadronicBIndex_AfterChi2"     , &m_selectedHadronicBIndex_AfterChi2    , "selectedHadronicBIndex_AfterChi2/I");
@@ -195,9 +196,11 @@ void Chi2SortingAlgorithm::work() {
 
     // Correct MET again
     bool no_real_sol = false;
-    computeNeutrinoPz(leptonicBJet.p, &no_real_sol);
+    bool pt_corrected = false;
+    computeNeutrinoPz(leptonicBJet.p, &no_real_sol, &pt_corrected);
 
     m_neutrino_no_real_solution_AfterChi2 = (no_real_sol) ? 1 : 0;
+    m_neutrino_pt_corrected_AfterChi2 = (pt_corrected) ? 1 : 0;
 
     // Copy P4 for Tree
     *m_selectedNeutrinoP4_AfterChi2 = m_neutrino;
@@ -266,6 +269,7 @@ double Chi2SortingAlgorithm::chi2(const LorentzVector& leptonicBJet, const Loren
 
 void Chi2SortingAlgorithm::reset() {
   m_neutrino_no_real_solution_AfterChi2 = -1;
+  m_neutrino_pt_corrected_AfterChi2 = -1;
 
   m_mtt_recoJetsAssociatedWithChi2 = false;
   m_mtt_recoJetsAssociatedWellPlacedWithChi2 = false;

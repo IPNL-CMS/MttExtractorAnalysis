@@ -61,7 +61,7 @@ class SortingAlgorithm {
     };
 
   protected:
-    bool computeNeutrinoPz(const LorentzVector& leptonicBjet, bool* no_real_sol = nullptr);
+    bool computeNeutrinoPz(const LorentzVector& leptonicBjet, bool* no_real_sol = nullptr, bool* pt_corrected = nullptr);
 
     float m_mtt_gen;
 

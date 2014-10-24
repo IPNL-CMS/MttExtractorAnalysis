@@ -6,12 +6,16 @@ void SortingAlgorithm::setObjects(const std::vector<Jet>& jets, const Lepton& le
   m_met = met;
 }
 
-bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_real_sol/* = nullptr*/) {
-  if (m_lepton.p.E() == 0)
+bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_real_sol/* = nullptr*/, bool* pt_corrected/* = nullptr*/) {
+  if (m_lepton.p.E() == 0) {
     return false;
+  }
 
   if (no_real_sol)
     *no_real_sol = false;
+
+  if (pt_corrected)
+    *pt_corrected = false;
   
   m_neutrino = m_met;
   m_neutrino.SetM(0.);
@@ -24,8 +28,9 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
   double b = -2. * (m_lepton.p.Pz() / m_lepton.p.E()) * x;
   double c = m_neutrino.Pt() * m_neutrino.Pt() - x * x;
 
-  if (!a && !b)
+  if (!a && !b) {
     return false;
+  }
 
   if (!a) {     
     m_neutrino.SetPz(-1 * c / b);
@@ -36,28 +41,36 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
   double delta = b * b - 4 * a *c;
 
   if (delta < 0) {   // No solution, try to correct MET
+    if (no_real_sol)
+      *no_real_sol = true;
+
     double rat = m_neutrino.Py() / m_neutrino.Px();
-
-    double u = 4. / (m_lepton.p.E() * m_lepton.p.E()) * ((m_lepton.p.Px() + rat * m_lepton.p.Py()) * (m_lepton.p.Px() + rat * m_lepton.p.Py()) / (1 + rat * rat)
-        - (m_lepton.p.E() * m_lepton.p.E()) + (m_lepton.p.Pz() * m_lepton.p.Pz()));
-
-    double v = 4. / (m_lepton.p.E() * m_lepton.p.E()) * (m_w * m_w - m_lepton.p.M() * m_lepton.p.M())
-      * (m_lepton.p.Px() + rat * m_lepton.p.Py()) / sqrt(1 + rat * rat);
-
-    double w = (m_w * m_w - m_lepton.p.M() * m_lepton.p.M()) * (m_w * m_w - m_lepton.p.M() * m_lepton.p.M()) / (m_lepton.p.E() * m_lepton.p.E());
+    double gamma_x = m_lepton.p.Px() * 1. / std::sqrt(1. + std::pow(rat, 2));
+    double gamma_y = m_lepton.p.Py() * 1. / std::sqrt(1. + std::pow(1. / rat, 2));
+    if (m_neutrino.Px() < 0.) {
+      gamma_x *= -1.;
+    }
+    if (m_neutrino.Py() < 0.) {
+      gamma_y *= -1.;
+    }
+    double u = std::pow(m_lepton.p.Pz() / m_lepton.p.E(), 2) + std::pow((gamma_x + gamma_y) / m_lepton.p.E(), 2) - 1.;
+    double v = std::pow(1. / m_lepton.p.E(), 2) * (gamma_x + gamma_y) * (std::pow(m_w, 2) - std::pow(m_lepton.p.M(), 2));
+    double w = std::pow((std::pow(m_w, 2) - std::pow(m_lepton.p.M(), 2)) / (2 * m_lepton.p.E()), 2);
 
     double deltan = v * v - 4 * u * w;
 
-    if (deltan < 0)
+    if (deltan < 0) {
       return false; // Hopeless, MET can't be corrected
+    }
 
     double pt      = 0.;
     double corfact = 0.;
 
     if (u == 0) {
       pt = -w / v;
-      if (pt <= 0)
+      if (pt <= 0) {
         return false; // There is no way out...
+      }
 
       corfact = pt / m_neutrino.Pt();
     } else { // Deltan>=0 and u!=0
@@ -65,7 +78,9 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
       double pt1 = (-v + (sqrt(deltan))) / (2 * u);
 
       // Pas de correction car negative
-      if (pt1 <= 0 && pt2 <= 0) return 0;
+      if (pt1 <= 0 && pt2 <= 0) {
+        return false;
+      }
 
       if (pt1 > 0 && pt2 < 0) pt = pt1;
       if (pt2 > 0 && pt1 < 0) pt = pt2;
@@ -85,20 +100,22 @@ bool SortingAlgorithm::computeNeutrinoPz(const LorentzVector& bJet, bool* no_rea
 
     // Recompute the new parameters
 
-    x = (m_w * m_w - m_lepton.p.M() * m_lepton.p.M() + 2.*(m_neutrino.Px() * m_lepton.p.Px() + m_neutrino.Py() * m_lepton.p.Py())) / (2 * m_lepton.p.E());
+    x = (m_w * m_w - m_lepton.p.M() * m_lepton.p.M() + 2. * (m_neutrino.Px() * m_lepton.p.Px() + m_neutrino.Py() * m_lepton.p.Py())) / (2 * m_lepton.p.E());
     a = 1 - (m_lepton.p.Pz() * m_lepton.p.Pz()) / (m_lepton.p.E() * m_lepton.p.E());
-    b = -2.*(m_lepton.p.Pz() / m_lepton.p.E()) * x;
-    c = m_neutrino.Px() * m_neutrino.Px() + m_neutrino.Py() * m_neutrino.Py() - x * x;
+    b = -2. * (m_lepton.p.Pz() / m_lepton.p.E()) * x;
+    c = m_neutrino.Pt() * m_neutrino.Pt() - x * x;
 
     delta = b * b - 4 * a * c;
 
     if (fabs(delta) < 0.000001) delta = 0.;
 
-    if (delta != 0)
+    if (delta != 0) {
+      std::cout << "---> !!!!! Delta after neutrino pt correction is non-zero: THIS SHOULD NOT HAPPEN !!!!!" << std::endl;
       return false; // This should not happen, but who knows...
+    }
 
-    if (no_real_sol)
-      *no_real_sol = true;
+    if (pt_corrected)
+      *pt_corrected = true;
   }
 
   // We can go back to the normal path: 

@@ -67,6 +67,7 @@ class Chi2SortingAlgorithm: public SortingAlgorithm {
     float m_mLepW_AfterChi2;
 
     int   m_neutrino_no_real_solution_AfterChi2;
+    int   m_neutrino_pt_corrected_AfterChi2;
 
     float m_lepTopPt_AfterChi2;
     float m_lepTopEta_AfterChi2;
