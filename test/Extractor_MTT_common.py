@@ -28,7 +28,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   process.load('Configuration/StandardSequences/EndOfProcess_cff')
   process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
   process.load("FWCore.MessageLogger.MessageLogger_cfi")
-  process.load("Extractors.PatExtractor.PAT_extractor_cff")
+  process.load("Extractors.PatExtractor.PAT_extractor_lyonPatTuples_cff")
 
   process.maxEvents = cms.untracked.PSet(
       input = cms.untracked.int32(10) #
@@ -37,7 +37,7 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   #Global tag and data type choice
   process.GlobalTag.globaltag = '%s::All' % globalTag
   process.PATextraction.isMC  = isMC
-  process.PATextraction.doMC  = isMC
+  process.PATextraction.extractors.MC.enable  = isMC
 
   #Input PAT file to extract
   process.source = cms.Source("PoolSource",
@@ -66,48 +66,34 @@ def createExtractorProcess(isMC, isSemiMu, useShiftCorrectedMET, globalTag):
   #
   # Here we just extract, and don't perform any analysis
 
-  process.PATextraction.doMuon     = True
-  process.PATextraction.doElectron = True
-  process.PATextraction.doJet      = True
-
-  process.PATextraction.doMET      = True
-  if useShiftCorrectedMET:
-    process.PATextraction.MET_PF.input = cms.InputTag("patMETsShiftCorrPFlow")
-  else:
-    process.PATextraction.MET_PF.input  = cms.InputTag("patMETsPFlow")
-
-  process.PATextraction.doVertex   = True
-  process.PATextraction.vtx_tag    = cms.InputTag( "goodOfflinePrimaryVertices" )
-  process.PATextraction.doHLT      = True
-
   if not isMC:
     if isSemiMu:
-      process.PATextraction.triggersXML = readFile("triggers_mu.xml")
+      process.PATextraction.extractors.HLT.parameters.triggers = readFile("triggers_mu.xml")
     else:
-      process.PATextraction.triggersXML = readFile("triggers_e.xml")
+      process.PATextraction.extractors.HLT.parameters.triggers = readFile("triggers_e.xml")
 
   # Jets correction : needs a valid global tags, or an external DB where JEC are stored
-  process.PATextraction.jet_PF.redoJetCorrection = True
+  process.PATextraction.extractors.jetmet.parameters.redoJetCorrection = True
 
   if isMC:
-    process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3"
+    process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3"
   else:
-    process.PATextraction.jet_PF.jetCorrectorLabel = "ak5PFchsL1FastL2L3Residual"
+    process.PATextraction.extractors.jetmet.parameters.jetCorrectorLabel = "ak4PFCHSL1FastL2L3Residual"
 
-  process.PATextraction.jet_PF.doJER = True # Disable automatically on data
+  process.PATextraction.extractors.jetmet.parameters.doJER = True # Disabled automatically on data
 
   # JER systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
-  process.PATextraction.jet_PF.jerSign = 0
+  process.PATextraction.extractors.jetmet.parameters.jerSign = 0
 
   # JES systematics:
   # Use -1 for 1-sigma down, 0 for nominal correction, and 1 for 1-sigma up
-  process.PATextraction.jet_PF.jesSign = 0
+  process.PATextraction.extractors.jetmet.parameters.jesSign = 0
   # If uncommented, use the specifiec file for jes uncertainties instead of global tag values
-  process.PATextraction.jet_PF.jes_uncertainties_file = cms.untracked.string("")
+  process.PATextraction.extractors.jetmet.parameters.jes_uncertainties_file = cms.untracked.string("")
 
-  process.PATextraction.MET_PF.redoMetPhiCorrection   = True
-  process.PATextraction.MET_PF.redoMetTypeICorrection = True # Automatically true if redoJetCorrection is True
+  process.PATextraction.extractors.jetmet.parameters.redoMetPhiCorrection   = True
+  process.PATextraction.extractors.jetmet.parameters.redoMetTypeICorrection = True # Automatically true if redoJetCorrection is True
 
   # MTT analysis configuration
   process.PATextraction.plugins = cms.PSet(

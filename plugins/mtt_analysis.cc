@@ -12,12 +12,11 @@
 
 #include "TMVA/Reader.h"
 
-#include "Extractors/PatExtractor/interface/AnalysisSettings.h"
 #include "Extractors/PatExtractor/interface/MCExtractor.h"
 #include "Extractors/PatExtractor/interface/HLTExtractor.h"
+#include "Extractors/PatExtractor/interface/JetMETExtractor.h"
 #include "Extractors/PatExtractor/interface/MuonExtractor.h"
 #include "Extractors/PatExtractor/interface/ElectronExtractor.h"
-#include "Extractors/PatExtractor/interface/METExtractor.h"
 #include "Extractors/PatExtractor/interface/VertexExtractor.h"
 #include "Extractors/PatExtractor/interface/EventExtractor.h"
 #include "Extractors/PatExtractor/interface/PatExtractor.h"
@@ -819,15 +818,15 @@ void mtt_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& extracto
   m_refLept  = nullptr;
   m_refLeptCharge = 0;
 
-  m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("vertex"));
+  m_vertex   = std::static_pointer_cast<VertexExtractor>(extractor.getExtractor("Vertices"));
 
-  m_muon     = std::static_pointer_cast<MuonExtractor>(extractor.getExtractor("muons"));
+  m_muon     = std::static_pointer_cast<MuonExtractor>(extractor.getExtractor("muon_PF"));
   m_muon_loose = std::static_pointer_cast<MuonExtractor>(extractor.getExtractor("muons_loose"));
 
-  m_electron = std::static_pointer_cast<ElectronExtractor>(extractor.getExtractor("electrons"));
+  m_electron = std::static_pointer_cast<ElectronExtractor>(extractor.getExtractor("electron_PF"));
   m_electron_loose = std::static_pointer_cast<ElectronExtractor>(extractor.getExtractor("electrons_loose"));
 
-  m_jetMet   = std::static_pointer_cast<JetMETExtractor>(extractor.getExtractor("JetMET"));
+  m_jetMet   = std::static_pointer_cast<JetMETExtractor>(extractor.getExtractor("jetmet"));
 
   m_event    = std::static_pointer_cast<EventExtractor>(extractor.getExtractor("event"));
 
