@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import os, copy, datetime, pwd, re
+from CRABClient.UserUtilities import getUsernameFromSiteDB
 
 def check_output(*popenargs, **kwargs):
     import subprocess
@@ -160,30 +161,6 @@ version = 1
 print("Creating configs for crab. Today is %s, you are %s and it's version %d" % (d, email, version))
 print("")
 
-from string import Template
-multicrab = Template(r"""[MULTICRAB]
-cfg=crab_MC.cfg.template.ipnl
-
-[COMMON]
-USER.ui_working_dir = ${ui_working_dir}
-USER.eMail = ${email}
-CMSSW.datasetpath = ${dataset}
-CMSSW.total_number_of_events = ${events}
-"""
-)
-
-multicrab_semie = r"""
-[${name}_semie]
-CMSSW.pset = Extractor_MTT_MC_semie.py
-USER.user_remote_dir = ${remote_dir_semie}
-"""
-
-multicrab_semimu = r"""
-[${name}_semimu]
-CMSSW.pset = Extractor_MTT_MC_semimu.py
-USER.user_remote_dir = ${remote_dir_semimu}
-"""
-
 def processDataset(dataset):
     dataset_name = dataset[1]
     dataset_path = dataset[0]
@@ -192,57 +169,48 @@ def processDataset(dataset):
         dataset_size = dataset[2]
     #dataset_globaltag = re.search('START\d{0,2}_V\d[A-Z]?', dataset_path).group(0)
 
-    #publish_name = "%s_%s_%s-v%d" % (dataset_name, dataset_globaltag, d, version)
-    output_file = "multicrab_MC_%s_%s_extractor_%s.cfg" % (dataset_name, d, getGitTag())
-    ui_working_dir = ("multicrab_MC_%s_extractor") % (dataset_name)
+    for type in ["semie", "semimu"]:
+      ui_working_dir = ("MC_%s_%s") % (dataset_name, type)
+      output_file = (os.path.join("tasks","crab_MC_%s_%s.py" % (dataset_name, type)))
+      try:
+          getUsernameFromSiteDB()
+      except Exception as e:
+          print("Error when trying to find CERN username")
+          print e
+          sys.exit
+      output_dir = ("/store/user/%s/HTT/Extracted/MC/Run2/extractor_%s/%s/%s/%s" % (getUsernameFromSiteDB(), getGitTag(), d, type, dataset_name))
 
-    if options.create_cfg:
-        output_dir_semie = ("HTT/Extracted/MC/Summer12/extractor_%s/%s/semie/%s" % (getGitTag(), d, dataset_name))
-        output_dir_semimu = ("HTT/Extracted/MC/Summer12/extractor_%s/%s/semimu/%s" % (getGitTag(), d, dataset_name))
-
-        full_template = copy.copy(multicrab)
-        if "EMEnriched" in dataset_path or "BCtoE" in dataset_path:
-            full_template.template += multicrab_semie
-        elif "MuEnriched" in dataset_path:
-            full_template.template += multicrab_semimu
-        else:
-            full_template.template += multicrab_semie
-            full_template.template += multicrab_semimu
-
-        print("Creating config file for '%s'" % (dataset_path))
+      if options.submit:
+        print("Creating config file for '%s', category %s" % (dataset_path, type))
         print("\tName: %s" % dataset_name)
-        print("\tOutput directory (semi-mu): %s" % output_dir_semimu)
-        print("\tOutput directory (semi-e): %s" % output_dir_semie)
         print("")
 
-        f = open(output_file, "w")
-        f.write(full_template.substitute(ui_working_dir=ui_working_dir, dataset=dataset_path, remote_dir_semie=output_dir_semie, remote_dir_semimu=output_dir_semimu, name=dataset_name, email=email, events=dataset_size))
-        f.close()
+        if "/USER" in dataset_path:
+            dbs_url = "phys03"
+        else:
+            dbs_url = "global"
 
-    if options.run:
-        cmd = "./multicrab.sh -create -submit -cfg %s" % (output_file)
+        os.system("sed -e \"s#@datasetname@#%s#\" -e \"s#@uiworkingdir@#%s#g\" -e \"s#@remote_dir@#%s#g\" -e \"s#@email@#%s#g\" -e \"s#@dbs_url@#%s#g\" crab_MC_%s_template.py > %s" % (dataset_path, ui_working_dir, output_dir, email, dbs_url, type, output_file))
+
+
+      if options.submit:
+        cmd = "crab submit -c %s" % (output_file)
         os.system(cmd)
 
-    if options.status:
-        cmd = "./multicrab.sh -status -c %s" % (ui_working_dir)
+      correct_ui_working_dir = "crab_%s" % ui_working_dir
+      ui_working_dir_area = (os.path.join("tasks", correct_ui_working_dir)) 
+
+      if options.status:
+        cmd = "crab status -d %s" % ui_working_dir_area
         os.system(cmd)
 
-    if options.get:
-        cmd = "./multicrab.sh -get -c %s" % (ui_working_dir)
-        os.system(cmd)
-
-    if options.resubmit:
-        cmd = "./multicrab.sh -resubmit bad -c %s" % (ui_working_dir)
-        os.system(cmd)
-
-    if options.submit:
-        cmd = "./multicrab.sh -submit all -c %s" % (ui_working_dir)
-        os.system(cmd)
-
-    if options.kill:
-        cmd = "./multicrab.sh -kill all -c %s" % (ui_working_dir)
+      if options.get:
+        cmd = "crab getlog -d %s" % ui_working_dir_area
         os.system(cmd)
 
 import multiprocessing
 pool = multiprocessing.Pool(options.cores)
 pool.map(processDataset, datasets)
+
+
+
