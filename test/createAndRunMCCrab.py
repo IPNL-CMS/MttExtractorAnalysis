@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import os, copy, datetime, pwd, re
+import os, copy, datetime, pwd, re, sys
 from CRABClient.UserUtilities import getUsernameFromSiteDB
 
 def check_output(*popenargs, **kwargs):
