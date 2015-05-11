@@ -125,6 +125,7 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("nJets"              , &m_mtt_NJets              , "nJets/I");
   m_tree_Mtt->Branch("jetEta"             , &m_mtt_JetEta             , "jetEta[nJets]/F");
   m_tree_Mtt->Branch("jetPt"              , &m_mtt_JetPt              , "jetPt[nJets]/F");
+  m_tree_Mtt->Branch("jetPuId"            , &m_mtt_JetPuId            , "jetPuId[nJets]/F");
 
   m_tree_Mtt->Branch("nBtaggedJets_TCHPT" , &m_mtt_NBtaggedJets_TCHPT    , "nBtaggedJets_TCHPT/I");
   m_tree_Mtt->Branch("nBtaggedJets_CSVL" ,  &m_mtt_NBtaggedJets_CSVL    , "nBtaggedJets_CSVL/I");
@@ -583,6 +584,7 @@ int mtt_analysis::JetSel()
 
     m_mtt_JetEta[m_mtt_NJets] = jetP->Eta();
     m_mtt_JetPt[m_mtt_NJets]  = jetP->Pt();
+    m_mtt_JetPuId[i]      =  m_jetMet->getPuJetFullId(i);
     if (m_isMC) {
       jetSF.push_back(m_jetMet->getScaleFactor(i));
       jetFlavor.push_back(m_jetMet->getAlgoPartonFlavor(i));
@@ -1396,6 +1398,7 @@ void mtt_analysis::reset()
   {
     m_mtt_JetEta[tmp]     = 1000.;
     m_mtt_JetPt[tmp]      = 0.;
+    m_mtt_JetPuId[tmp]      = -1;
   }
 
   m_mtt_MET = 0.;

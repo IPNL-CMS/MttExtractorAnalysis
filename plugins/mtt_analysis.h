@@ -248,6 +248,7 @@ namespace mtt {
       float m_mtt_GoodJetEta[1000];
       float m_mtt_JetEta[1000];
       float m_mtt_JetPt[1000];
+      int 	m_mtt_JetPuId[1000];
 
       //generic variables for 2D cut
       int pass2Dcut;
