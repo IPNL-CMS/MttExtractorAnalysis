@@ -950,15 +950,6 @@ void mtt_analysis::loopOverCombinations()
 
 #define ID_W (24)
 
-int mtt_analysis::patIndexToExtractorIndex(int patIndex) const {
-
-  for (int i = 0; i < m_MC->getSize() ; i++) {
-    if (m_MC->getPatIndex(i) == patIndex)
-      return i;
-  }
-
-  return -1;
-}
 
 void mtt_analysis::MCidentification()
 {
@@ -998,10 +989,10 @@ void mtt_analysis::MCidentification()
       continue;
     }
 
-    int motherIndex = patIndexToExtractorIndex(m_MC->getMom1Index(i));
+    int motherIndex = m_MC->getMom1Index(i);
     int grandMotherIndex = -1;
     if (motherIndex != -1)
-      grandMotherIndex = patIndexToExtractorIndex(m_MC->getMom1Index(motherIndex));
+      grandMotherIndex = m_MC->getMom1Index(motherIndex);
 
     if (motherIndex == -1)
       continue;
@@ -1109,10 +1100,10 @@ void mtt_analysis::MCidentification()
   bool keepEvent = true;
   for (int i = 0; i < n_MC; i++) {
 
-    int motherIndex = patIndexToExtractorIndex(m_MC->getMom1Index(i));
+    int motherIndex = m_MC->getMom1Index(i);
     int grandMotherIndex = -1;
     if (motherIndex != -1)
-      grandMotherIndex = patIndexToExtractorIndex(m_MC->getMom1Index(motherIndex));
+      grandMotherIndex = m_MC->getMom1Index(motherIndex);
 
     if (motherIndex == -1 || grandMotherIndex == -1)
       continue;
@@ -1204,7 +1195,7 @@ void mtt_analysis::MCidentification()
   }
 
   // Reorder B jet indexes
-  if (patIndexToExtractorIndex(m_MC->getMom1Index(m_leptonicBIndex)) != m_leptonicTopIndex) {
+  if (m_MC->getMom1Index(m_leptonicBIndex) != m_leptonicTopIndex) {
     // Wrong combinaison, swap
     std::swap(m_leptonicBIndex, m_hadronicBIndex);
   }

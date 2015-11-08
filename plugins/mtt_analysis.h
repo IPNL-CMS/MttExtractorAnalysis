@@ -96,7 +96,6 @@ namespace mtt {
       int METSel();
 
       void loopOverCombinations();
-      int patIndexToExtractorIndex(int patIndex) const;
       bool hasRecoPartner(int mcIndex) const;
       bool jetComesFromTTDecay(int mcIndex) const;
       void checkIfSolutionIsCorrect();
