@@ -953,121 +953,134 @@ void mtt_analysis::loopOverCombinations()
 
 void mtt_analysis::MCidentification()
 {
-  nEle    = 0;
-  nMu     = 0;
-  nTau    = 0;
-  nNuEle  = 0;
-  nNuMu   = 0;
-  nNuTau  = 0;
-  nQuarkb = 0;
+  int n_MC = m_MC->getSize();
+  
+  if (n_MC == 0)
+    return;
+  
+  
+  // Count top quarks and also leptons and b quarks stemming from their decays
   nTop    = 0;
   Top.clear();
   std::vector<int> topIndexes;
-
-  int n_MC = m_MC->getSize();
-
-  if (!n_MC)
-    return;
+  nEle    = 0;
+  nMu     = 0;
+  nTau    = 0;
+  nQuarkb = 0;
 
   for (int i = 0; i < n_MC ; ++i)
   {
-
-    if (abs(m_MC->getType(i)) == ID_T) {
-
+    int const absPgdId = abs(m_MC->getType(i));
+    
+    
+    // First save information about top quarks
+    if (absPgdId == ID_T)
+    {
+      // Make sure this top quark has not been encountered before. Though, how could it be?!
       if (std::find(topIndexes.begin(), topIndexes.end(), i) != topIndexes.end())
         continue;
 
       topIndexes.push_back(i);
-      TLorentzVector TL_Top(m_MC->getPx(i),
-          m_MC->getPy(i),
-          m_MC->getPz(i),
-          m_MC->getE(i));
-
-      Top.push_back(TL_Top);
+      Top.push_back(m_MC->p4(i));
       nTop++;
-
-      continue;
     }
-
-    int motherIndex = m_MC->getMom1Index(i);
-    int grandMotherIndex = -1;
-    if (motherIndex != -1)
-      grandMotherIndex = m_MC->getMom1Index(motherIndex);
-
+    
+    
+    // Then select particles from decays of top quarks. Only consider b quarks and stable charged
+    //leptons
+    if (not (absPgdId == ID_B or
+     (m_MC->getIsLastCopy(i) and (absPgdId == ID_E or absPgdId == ID_MU or absPgdId == ID_TAU))))
+      continue;
+    
+    
+    // Make sure the particles stems form decay of a top quark
+    int motherIndex = i;
+    
+    while (motherIndex != -1)
+    {
+      motherIndex = m_MC->getMom1Index(motherIndex);
+      
+      if (abs(m_MC->getType(motherIndex)) == ID_T)
+        break;
+    }
+    
     if (motherIndex == -1)
       continue;
-
-    if (false) {
-      std::cout << "Type: " << m_MC->getType(i) << std::endl;
-      std::cout << "Mother type: " << m_MC->getType(motherIndex) << std::endl;
-      if (grandMotherIndex != -1)
-        std::cout << "Grandmother type: " << m_MC->getType(grandMotherIndex) << std::endl;
-    }
-
-    if (abs(m_MC->getType(motherIndex)) == ID_T || (grandMotherIndex != -1 && abs(m_MC->getType(grandMotherIndex) == ID_T)))
+    
+    #if 0
+    std::cout << "Type: " << m_MC->getType(i) << std::endl;
+    std::cout << "Type of first stored ancestor: " << m_MC->getType(m_MC->getMom1Index(i)) <<
+     std::endl;
+    #endif
+    
+    
+    // Count selected particles
+    switch (absPgdId)
     {
-      /// Count the number of leptons and neutrinos from Top->W
-      if (fabs(m_MC->getType(i)) == 11) ++nEle;   //Electron from WTop
-      if (fabs(m_MC->getType(i)) == 13) ++nMu;    //Muon	   from WTop
-      if (fabs(m_MC->getType(i)) == 15) ++nTau;   //Tau	   from WTop
-      if (fabs(m_MC->getType(i)) == 12) ++nNuEle; //NuEle    from WTop
-      if (fabs(m_MC->getType(i)) == 14) ++nNuMu;  //NuMu	   from WTop
-      if (fabs(m_MC->getType(i)) == 16) ++nNuTau; //NuTau    from WTop
-    }
-
-    /// Count the number of b quark from Top
-    if (abs(m_MC->getType(i)) == ID_B && abs(m_MC->getType(motherIndex)) == ID_T)
-    {
-      nQuarkb++; //Quark b from Top
+      case ID_B:
+        ++nQuarkb;
+        break;
+      
+      case ID_E:
+        ++nEle;
+        break;
+      
+      case ID_MU:
+        ++nMu;
+        break;
+      
+      case ID_TAU:
+        ++nTau;
+        break;
     }
   }
 
-  if (nEle == 1 && nNuEle == 1 && nMu == 0 && nNuMu == 0 && nTau == 0 && nNuTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 1 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 1;
   }
 
-  if (nEle == 0 && nNuEle == 0 && nMu == 1 && nNuMu == 1 && nTau == 0 && nNuTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 1 && nTau == 0 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 2;
   }
 
-  if (nEle == 0 && nNuEle == 0 && nMu == 0 && nNuMu == 0 && nTau == 1 && nNuTau == 1 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 0 && nTau == 1 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 3;
   }
 
-  if (nEle == 0 && nNuEle == 0 && nMu == 0 && nNuMu == 0 && nTau == 0 && nNuTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 4;
   }
 
-  if (nEle == 2 && nNuEle == 2 && nMu == 0 && nNuMu == 0 && nTau == 0 && nNuTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 2 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 5;
   }
 
-  if (nEle == 0 && nNuEle == 0 && nMu == 2 && nNuMu == 2 && nTau == 0 && nNuTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 2 && nTau == 0 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 6;
   }
 
-  if (nEle == 0 && nNuEle == 0 && nMu == 0 && nNuMu == 0 && nTau == 2 && nNuTau == 2 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 0 && nTau == 2 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 7;
   }
 
-  if (nEle == 1 && nNuEle == 1 && nMu == 1 && nNuMu == 1 && nTau == 0 && nNuTau == 0 && nQuarkb == 2 && nTop == 2)
+  if (nEle == 1 && nMu == 1 && nTau == 0 && nQuarkb == 2 && nTop == 2)
   {
     m_MC_channel = 8 ;
   }
 
-  if (nEle == 1 && nNuEle == 1 && nMu == 0 && nNuMu == 0 && nTau == 1 && nNuTau == 1 && nQuarkb == 2 && nTop == 2)
+  if (nEle == 1 && nMu == 0 && nTau == 1 && nQuarkb == 2 && nTop == 2)
   {
     m_MC_channel = 9 ;
   }
 
-  if (nEle == 0 && nNuEle == 0 && nMu == 1 && nNuMu == 1 && nTau == 1 && nNuTau == 1 && nQuarkb == 2 && nTop == 2)
+  if (nEle == 0 && nMu == 1 && nTau == 1 && nQuarkb == 2 && nTop == 2)
   {
     m_MC_channel = 10;
   }
