@@ -42,16 +42,16 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
 
   m_MAIN_doSemiMu = cmsswSettings.getParameter<bool>("do_semimu");
 
-  m_MC_lepton_p4 = new TClonesArray("TLorentzVector");
+  m_MC_lepton_p4 = new TLorentzVector();
 
-  m_MC_leptonic_B_p4 = new TClonesArray("TLorentzVector");
-  m_MC_hadronic_B_p4 = new TClonesArray("TLorentzVector");
+  m_MC_leptonic_B_p4 = new TLorentzVector();
+  m_MC_hadronic_B_p4 = new TLorentzVector();
 
-  m_MC_lightJet1_p4 = new TClonesArray("TLorentzVector");
-  m_MC_lightJet2_p4 = new TClonesArray("TLorentzVector");
+  m_MC_lightJet1_p4 = new TLorentzVector();
+  m_MC_lightJet2_p4 = new TLorentzVector();
 
-  m_MC_Top1_p4 = new TClonesArray("TLorentzVector");
-  m_MC_Top2_p4 = new TClonesArray("TLorentzVector");
+  m_MC_Top1_p4 = new TLorentzVector();
+  m_MC_Top2_p4 = new TLorentzVector();
 
   m_selectedLeptonP4 = new TClonesArray("TLorentzVector");
 
@@ -235,6 +235,21 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
 
   m_b_tagging_efficiency_provider = std::make_shared<BTaggingEfficiencyProvider>(cmsswSettings);
 }
+
+
+mtt_analysis::~mtt_analysis()
+{
+  delete m_MC_lepton_p4;
+  delete m_MC_leptonic_B_p4;
+  delete m_MC_hadronic_B_p4;
+  delete m_MC_lightJet1_p4;
+  delete m_MC_lightJet2_p4;
+  delete m_MC_Top1_p4;
+  delete m_MC_Top2_p4;
+  
+  delete m_selectedLeptonP4;
+}
+
 
 const int NO_MTT_RECO = -1;
 const int FAILURE = 0;
@@ -1106,9 +1121,9 @@ void mtt_analysis::MCidentification()
     m_MC_pt_tt = mc_resonance.Pt();
     m_MC_eta_tt = mc_resonance.Eta();
     m_MC_beta_tt = fabs(mc_resonance.Pz() / mc_resonance.E());
-
-    new ((*m_MC_Top1_p4)[0]) TLorentzVector(Top[0]);
-    new ((*m_MC_Top2_p4)[0]) TLorentzVector(Top[1]);
+    
+    *m_MC_Top1_p4 = Top[0];
+    *m_MC_Top2_p4 = Top[1];
   }
   
   
@@ -1207,14 +1222,14 @@ void mtt_analysis::MCidentification()
     hasRecoPartner(m_secondJetIndex);
   
   
-  // Store ref to various P4
-  new ((*m_MC_lepton_p4)[0]) TLorentzVector(m_MC->p4(m_leptonIndex));
+  // Store four-momenta
+  *m_MC_lepton_p4 = m_MC->p4(m_leptonIndex);
 
-  new ((*m_MC_leptonic_B_p4)[0]) TLorentzVector(m_MC->p4(m_leptonicBIndex));
-  new ((*m_MC_hadronic_B_p4)[0]) TLorentzVector(m_MC->p4(m_hadronicBIndex));
+  *m_MC_leptonic_B_p4 = m_MC->p4(m_leptonicBIndex);
+  *m_MC_hadronic_B_p4 = m_MC->p4(m_hadronicBIndex);
 
-  new ((*m_MC_lightJet1_p4)[0]) TLorentzVector(m_MC->p4(m_firstJetIndex));
-  new ((*m_MC_lightJet2_p4)[0]) TLorentzVector(m_MC->p4(m_secondJetIndex));
+  *m_MC_lightJet1_p4 = m_MC->p4(m_firstJetIndex);
+  *m_MC_lightJet2_p4 = m_MC->p4(m_secondJetIndex);
 }
 
 bool mtt_analysis::hasRecoPartner(int mcIndex) const {

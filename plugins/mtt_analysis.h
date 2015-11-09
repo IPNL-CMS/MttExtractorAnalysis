@@ -174,16 +174,10 @@ namespace mtt {
       float m_MC_eta_tt;
       float m_MC_beta_tt;
 
-      TClonesArray* m_MC_lepton_p4;
-
-      TClonesArray* m_MC_leptonic_B_p4;
-      TClonesArray* m_MC_hadronic_B_p4;
-
-      TClonesArray* m_MC_lightJet1_p4;
-      TClonesArray* m_MC_lightJet2_p4;
-
-      TClonesArray* m_MC_Top1_p4;
-      TClonesArray* m_MC_Top2_p4;
+      TLorentzVector *m_MC_lepton_p4;
+      TLorentzVector *m_MC_leptonic_B_p4, *m_MC_hadronic_B_p4;
+      TLorentzVector *m_MC_lightJet1_p4, *m_MC_lightJet2_p4;
+      TLorentzVector *m_MC_Top1_p4, *m_MC_Top2_p4;
 
       /// Number of lepton/neutrino from Top->W and quark b from Top
       int nEle;
