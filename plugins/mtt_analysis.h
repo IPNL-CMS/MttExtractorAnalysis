@@ -175,7 +175,6 @@ namespace mtt {
       float m_MC_beta_tt;
 
       TClonesArray* m_MC_lepton_p4;
-      TClonesArray* m_MC_neutrino_p4;
 
       TClonesArray* m_MC_leptonic_B_p4;
       TClonesArray* m_MC_hadronic_B_p4;

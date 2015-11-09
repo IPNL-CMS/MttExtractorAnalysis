@@ -43,7 +43,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_MAIN_doSemiMu = cmsswSettings.getParameter<bool>("do_semimu");
 
   m_MC_lepton_p4 = new TClonesArray("TLorentzVector");
-  m_MC_neutrino_p4 = new TClonesArray("TLorentzVector");
 
   m_MC_leptonic_B_p4 = new TClonesArray("TLorentzVector");
   m_MC_hadronic_B_p4 = new TClonesArray("TLorentzVector");
@@ -94,7 +93,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
 
   // Easy access
   m_tree_Mtt->Branch("MC_lepton_p4"      , &m_MC_lepton_p4, 32000, -1);
-  m_tree_Mtt->Branch("MC_neutrino_p4"    , &m_MC_neutrino_p4, 32000, -1);
   m_tree_Mtt->Branch("MC_leptonic_B_p4"  , &m_MC_leptonic_B_p4, 32000, -1);
   m_tree_Mtt->Branch("MC_hadronic_B_p4"  , &m_MC_hadronic_B_p4, 32000, -1);
   m_tree_Mtt->Branch("MC_lightJet1_B_p4" , &m_MC_lightJet1_p4, 32000, -1);
@@ -1321,7 +1319,6 @@ void mtt_analysis::reset()
   m_mtt_eventIsAssociable = false;
 
   m_MC_lepton_p4->Clear("C");
-  m_MC_neutrino_p4->Clear("C");
 
   m_MC_leptonic_B_p4->Clear("C");
   m_MC_hadronic_B_p4->Clear("C");
