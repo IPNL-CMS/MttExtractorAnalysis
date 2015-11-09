@@ -962,25 +962,27 @@ void mtt_analysis::MCidentification()
   // Count top quarks and also leptons and b quarks stemming from their decays
   nTop    = 0;
   Top.clear();
-  std::vector<int> topIndexes;
   nEle    = 0;
   nMu     = 0;
   nTau    = 0;
   nQuarkb = 0;
+  std::vector<int> leptonIndices, bTopIndices;
+  //^ Will contain indices of particles from decays of top quarks
+  std::vector<int> leptonicTopIndices;
+  //^ Will contain indices of top quarks decaying semileptonically
+  std::vector<int> topIndicesAlignedWithB;
+  //^ Will contain indices of all top quarks, ordered in the same way as their decay products in
+  //the bTopIndices vector
 
   for (int i = 0; i < n_MC ; ++i)
   {
     int const absPgdId = abs(m_MC->getType(i));
     
     
-    // First save information about top quarks
-    if (absPgdId == ID_T)
+    // First save information about top quarks. Make they do not contain other top quarks among
+    //descendants
+    if (absPgdId == ID_T and m_MC->getIsLastCopy(i))
     {
-      // Make sure this top quark has not been encountered before. Though, how could it be?!
-      if (std::find(topIndexes.begin(), topIndexes.end(), i) != topIndexes.end())
-        continue;
-
-      topIndexes.push_back(i);
       Top.push_back(m_MC->p4(i));
       nTop++;
     }
@@ -993,14 +995,14 @@ void mtt_analysis::MCidentification()
       continue;
     
     
-    // Make sure the particles stems form decay of a top quark
+    // Make sure the particle stems form decay of a top quark
     int motherIndex = i;
     
-    while (motherIndex != -1)
+    while (abs(m_MC->getType(motherIndex)) != ID_T)
     {
       motherIndex = m_MC->getMom1Index(motherIndex);
       
-      if (abs(m_MC->getType(motherIndex)) == ID_T)
+      if (motherIndex == -1)
         break;
     }
     
@@ -1033,8 +1035,24 @@ void mtt_analysis::MCidentification()
         ++nTau;
         break;
     }
+    
+    
+    // Save indices of selected particles and top quarks
+    if (absPgdId == ID_B)
+    {
+      bTopIndices.emplace_back(i);
+      topIndicesAlignedWithB.emplace_back(motherIndex);
+      //^ Here motherIndex still points to the ancestor top quark
+    }
+    else  // must be a charged lepton according to the previous selection
+    {
+      leptonIndices.emplace_back(i);
+      leptonicTopIndices.emplace_back(motherIndex);
+    }
   }
-
+  
+  
+  // Event classification
   if (nEle == 1 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
   {
     m_MC_channel = 1;
@@ -1084,7 +1102,9 @@ void mtt_analysis::MCidentification()
   {
     m_MC_channel = 10;
   }
-
+  
+  
+  // Reconstruct the tt resonance and save its kinematics
   if (nTop == 2) {
 
     TLorentzVector mc_resonance = Top[0] + Top[1];
@@ -1097,141 +1117,100 @@ void mtt_analysis::MCidentification()
     new ((*m_MC_Top1_p4)[0]) TLorentzVector(Top[0]);
     new ((*m_MC_Top2_p4)[0]) TLorentzVector(Top[1]);
   }
-
-  if (m_MC_channel != 1 && m_MC_channel != 2) {
+  
+  
+  // Analyse further semileptonic ttbar events with decays to electrons or muons, as they are
+  //targeted by the search
+  if (m_MC_channel != 1 and m_MC_channel != 2) {
     return;
   }
-
-  // Extract index of semi-leptonic event, and store them in tree. Useful if you want to know how many jets you have selected right
-  if (false) {
-    std::cout << "New event" << std::endl;
-    for (int i = 0; i < n_MC; i++) {
-      std::cout << "\t[" << i << "] Type: " << m_MC->getType(i) << std::endl;
-    }
-  }
-
-  bool keepEvent = true;
+  
+  #if 0
+  std::cout << "New semileptonic event" << std::endl;
   for (int i = 0; i < n_MC; i++) {
-
-    int motherIndex = m_MC->getMom1Index(i);
-    int grandMotherIndex = -1;
-    if (motherIndex != -1)
-      grandMotherIndex = m_MC->getMom1Index(motherIndex);
-
-    if (motherIndex == -1 || grandMotherIndex == -1)
+    std::cout << "\t[" << i << "] Type: " << m_MC->getType(i) << std::endl;
+  }
+  #endif
+  
+  
+  // Store indices of charged leptons and b quarks from decays of the top quarks
+  if (leptonIndices.size() != 1 or bTopIndices.size() != 2 or topIndicesAlignedWithB.size() != 2 or
+   leptonicTopIndices.size() != 1)
+    throw std::runtime_error("Sanity check in semileptonic ttbar event failed.");
+  
+  m_leptonIndex = leptonIndices.at(0);
+  m_leptonicTopIndex = leptonicTopIndices.at(0);
+  
+  if (topIndicesAlignedWithB.at(0) == m_leptonicBIndex)
+  {
+    m_leptonicBIndex = bTopIndices.at(0);
+    m_hadronicBIndex = bTopIndices.at(1);
+  }
+  else
+  {
+    m_leptonicBIndex = bTopIndices.at(1);
+    m_hadronicBIndex = bTopIndices.at(0);
+  }
+  
+  
+  // Find light-flavour quarks from the hadronic decay of a top quark and store their indices
+  m_firstJetIndex = m_secondJetIndex = -1;
+  
+  for (int i = 0; i < n_MC ; ++i)
+  {
+    if (abs(m_MC->getType(i)) >= ID_B)
       continue;
-
-    // Look only event coming (directly / indirectly) from a top
-    if (abs(m_MC->getType(motherIndex)) == ID_T || abs(m_MC->getType(grandMotherIndex)) == ID_T)  {
-
-      int type = abs(m_MC->getType(i));
-      // W? Continue
-      if (type == ID_W)
-        continue;
-
-      // Only semi-mu or semi-e events are interesting, so throw away event with a tau
-      if (type == ID_TAU) {
-        keepEvent = false;
-        break;
-      }
-
-      switch (type) {
-        case ID_E:
-          if (m_leptonIndex != -1) {
-            keepEvent = false;
-            break;
-          }
-          m_leptonIndex = i;
-          break;
-
-        case ID_MU:
-          if (m_leptonIndex != -1) {
-            keepEvent = false;
-            break;
-          }
-          m_leptonIndex = i;
-          break;
-
-        case ID_NEUTRINO_E:
-        case ID_NEUTRINO_MU:
-        case ID_NEUTRINO_TAU:
-          if (m_neutrinoIndex != -1) {
-            keepEvent = false;
-            break;
-          }
-          m_neutrinoIndex = i;
-
-          // In some case, Madgraph does not output a W in the LHE
-          if (abs(m_MC->getType(grandMotherIndex)) == ID_T)
-            m_leptonicTopIndex = grandMotherIndex;
-          else
-            m_leptonicTopIndex = motherIndex;
-
-          break;
-
-        case ID_B:
-          if (m_leptonicBIndex == -1) {
-            m_leptonicBIndex = i;
-          } else {
-            if (m_hadronicBIndex != -1) {
-              keepEvent = false;
-              break;
-            }
-            m_hadronicBIndex = i;
-          }
-          break;
-
-        default: // Other jets
-          if (m_firstJetIndex == -1) {
-            m_firstJetIndex = i;
-          } else {
-            if (m_secondJetIndex != -1) {
-              keepEvent = false;
-              break;
-            }
-            m_secondJetIndex = i;
-          }
-          break;
-      }
-
-      if (! keepEvent)
+    
+    
+    // Make sure the particle stems form decay of a top quark
+    int motherIndex = i;
+    
+    while (abs(m_MC->getType(motherIndex)) != ID_T)
+    {
+      motherIndex = m_MC->getMom1Index(motherIndex);
+      
+      if (motherIndex == -1)
         break;
     }
+    
+    if (motherIndex == -1)
+      continue;
+    
+    
+    // Store the indices
+    if (m_firstJetIndex == -1)
+      m_firstJetIndex = i;
+    else if (m_secondJetIndex == -1)
+    {
+      m_secondJetIndex = i;
+      break;
+    }
   }
+  
+  
+  // Order the two light-flavour quarks in pt
+  if (m_MC->p4(m_firstJetIndex).Pt() < m_MC->p4(m_secondJetIndex).Pt())
+    std::swap(m_firstJetIndex, m_secondJetIndex);
+  
 
-  if (m_leptonIndex == -1 || m_neutrinoIndex == -1 || m_leptonicBIndex == -1 || m_hadronicBIndex == -1 || m_firstJetIndex == -1 || m_secondJetIndex == -1)
-    keepEvent = false;
+  #if 0
+  std::cout << "Lepton index: " << m_leptonIndex << std::endl;
+  std::cout << "Leptonic B index: " << m_leptonicBIndex << std::endl;
+  std::cout << "Hadronic B index: " << m_hadronicBIndex << std::endl;
+  std::cout << "First jet index: " << m_firstJetIndex << std::endl;
+  std::cout << "Second jet index: " << m_secondJetIndex << std::endl;
+  #endif
 
-  if (! keepEvent) {
-    m_leptonIndex = m_leptonicBIndex = m_hadronicBIndex = m_neutrinoIndex = m_firstJetIndex = m_secondJetIndex = m_leptonicTopIndex = -1;
-    return;
-  }
-
-  // Reorder B jet indexes
-  if (m_MC->getMom1Index(m_leptonicBIndex) != m_leptonicTopIndex) {
-    // Wrong combinaison, swap
-    std::swap(m_leptonicBIndex, m_hadronicBIndex);
-  }
-
-  if (false) {
-    std::cout << "Lepton index: " << m_leptonIndex << std::endl;
-    std::cout << "Neutrino index: " << m_neutrinoIndex << std::endl;
-    std::cout << "Leptonic B index: " << m_leptonicBIndex << std::endl;
-    std::cout << "Hadronic B index: " << m_hadronicBIndex << std::endl;
-    std::cout << "First jet index: " << m_firstJetIndex << std::endl;
-    std::cout << "Second jet index: " << m_secondJetIndex << std::endl;
-  }
-
-  // First, check if the event is associable. It is if each parton from the
-  // tt system (lepton, b jets & light jets) have a associated RECO object
-
-  // Only check jets
+  
+  // Check if there are nearby reconstructed jets in the vicinity of each of the four quarks in the
+  //final state tt->bbqq
   m_mtt_eventIsAssociable =
     hasRecoPartner(m_leptonicBIndex) &&
     hasRecoPartner(m_hadronicBIndex) &&
     hasRecoPartner(m_firstJetIndex) &&
     hasRecoPartner(m_secondJetIndex);
-
+  
+  
   // Compute masses
   TLorentzVector mc_hadr_W = *m_MC->getP4(m_firstJetIndex) + *m_MC->getP4(m_secondJetIndex);
   m_MC_hadronicWMass = mc_hadr_W.M();
@@ -1239,15 +1218,15 @@ void mtt_analysis::MCidentification()
   TLorentzVector mc_hadr_top = mc_hadr_W + *m_MC->getP4(m_hadronicBIndex);
   m_MC_hadronicTopMass = mc_hadr_top.M();
 
-  TLorentzVector mc_lept_W = *m_MC->getP4(m_neutrinoIndex) + *m_MC->getP4(m_leptonIndex);
-  m_MC_leptonicWMass = mc_lept_W.M();
+  // TLorentzVector mc_lept_W = *m_MC->getP4(m_neutrinoIndex) + *m_MC->getP4(m_leptonIndex);
+  // m_MC_leptonicWMass = mc_lept_W.M();
 
-  TLorentzVector mc_lept_top = mc_lept_W + *m_MC->getP4(m_leptonicBIndex);
-  m_MC_leptonicTopMass = mc_lept_top.M();
-
+  // TLorentzVector mc_lept_top = mc_lept_W + *m_MC->getP4(m_leptonicBIndex);
+  // m_MC_leptonicTopMass = mc_lept_top.M();
+  
+  
   // Store ref to various P4
   new ((*m_MC_lepton_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonIndex));
-  new ((*m_MC_neutrino_p4)[0]) TLorentzVector(*m_MC->getP4(m_neutrinoIndex));
 
   new ((*m_MC_leptonic_B_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonicBIndex));
   new ((*m_MC_hadronic_B_p4)[0]) TLorentzVector(*m_MC->getP4(m_hadronicBIndex));
