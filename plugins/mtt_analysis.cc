@@ -1130,6 +1130,23 @@ void mtt_analysis::MCidentification()
   // Analyse further semileptonic ttbar events with decays to electrons or muons, as they are
   //targeted by the search
   if (m_MC_channel != 1 and m_MC_channel != 2) {
+    
+    // Set defaults
+    m_leptonIndex = -1;
+    m_leptonicBIndex = m_hadronicBIndex = -1;
+    m_leptonicTopIndex = -1;
+    m_firstJetIndex = m_secondJetIndex = -1;
+    
+    m_mtt_eventIsAssociable = false;
+    
+    m_MC_lepton_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_leptonic_B_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_hadronic_B_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_lightJet1_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_lightJet2_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_Top1_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_Top2_p4->SetPxPyPzE(0., 0., 0., 0.);
+    
     return;
   }
   
