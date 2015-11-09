@@ -1207,13 +1207,13 @@ void mtt_analysis::MCidentification()
   
   
   // Store ref to various P4
-  new ((*m_MC_lepton_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonIndex));
+  new ((*m_MC_lepton_p4)[0]) TLorentzVector(m_MC->p4(m_leptonIndex));
 
-  new ((*m_MC_leptonic_B_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonicBIndex));
-  new ((*m_MC_hadronic_B_p4)[0]) TLorentzVector(*m_MC->getP4(m_hadronicBIndex));
+  new ((*m_MC_leptonic_B_p4)[0]) TLorentzVector(m_MC->p4(m_leptonicBIndex));
+  new ((*m_MC_hadronic_B_p4)[0]) TLorentzVector(m_MC->p4(m_hadronicBIndex));
 
-  new ((*m_MC_lightJet1_p4)[0]) TLorentzVector(*m_MC->getP4(m_firstJetIndex));
-  new ((*m_MC_lightJet2_p4)[0]) TLorentzVector(*m_MC->getP4(m_secondJetIndex));
+  new ((*m_MC_lightJet1_p4)[0]) TLorentzVector(m_MC->p4(m_firstJetIndex));
+  new ((*m_MC_lightJet2_p4)[0]) TLorentzVector(m_MC->p4(m_secondJetIndex));
 }
 
 bool mtt_analysis::hasRecoPartner(int mcIndex) const {
