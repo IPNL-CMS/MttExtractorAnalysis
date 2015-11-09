@@ -1182,6 +1182,9 @@ void mtt_analysis::MCidentification()
     }
   }
   
+  if (m_secondJetIndex == -1 or m_firstJetIndex == -1)
+    throw std::runtime_error("Failed to find light-flavour quarks in semileptonic ttbar event.");
+  
   
   // Order the two light-flavour quarks in pt
   if (m_MC->p4(m_firstJetIndex).Pt() < m_MC->p4(m_secondJetIndex).Pt())
