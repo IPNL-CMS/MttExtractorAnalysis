@@ -81,7 +81,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
 
   // Indexes of gen particles inside the MC collection. Only valid for semi-lept events
   m_tree_Mtt->Branch("MC_leptonIndex"     , &m_leptonIndex            , "MC_leptonIndex/I");
-  m_tree_Mtt->Branch("MC_neutrinoIndex"   , &m_neutrinoIndex          , "MC_neutrinoIndex/I");
   m_tree_Mtt->Branch("MC_leptonicTopIndex", &m_leptonicTopIndex       , "MC_leptonicTopIndex/I");
   m_tree_Mtt->Branch("MC_leptonicBIndex"  , &m_leptonicBIndex         , "MC_leptonicBIndex/I");
 
@@ -89,10 +88,6 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
   m_tree_Mtt->Branch("MC_hadronicFirstJetIndex" , &m_firstJetIndex    , "MC_hadronicFirstJetIndex/I");
   m_tree_Mtt->Branch("MC_hadronicSecondJetIndex", &m_secondJetIndex   , "MC_hadronicSecondJetIndex/I");
 
-  m_tree_Mtt->Branch("MC_hadronicWMass"   , &m_MC_hadronicWMass       , "MC_hadronicWMass/F");
-  m_tree_Mtt->Branch("MC_leptonicWMass"   , &m_MC_leptonicWMass       , "MC_leptonicWMass/F");
-  m_tree_Mtt->Branch("MC_hadronicTopMass" , &m_MC_hadronicTopMass     , "MC_hadronicTopMass/F");
-  m_tree_Mtt->Branch("MC_leptonicTopMass" , &m_MC_leptonicTopMass     , "MC_leptonicTopMass/F");
   m_tree_Mtt->Branch("MC_pt_tt"           , &m_MC_pt_tt               , "MC_pt_tt/F");
   m_tree_Mtt->Branch("MC_eta_tt"          , &m_MC_eta_tt              , "MC_eta_tt/F");
   m_tree_Mtt->Branch("MC_beta_tt"         , &m_MC_beta_tt             , "MC_beta_tt/F");
@@ -1211,20 +1206,6 @@ void mtt_analysis::MCidentification()
     hasRecoPartner(m_secondJetIndex);
   
   
-  // Compute masses
-  TLorentzVector mc_hadr_W = *m_MC->getP4(m_firstJetIndex) + *m_MC->getP4(m_secondJetIndex);
-  m_MC_hadronicWMass = mc_hadr_W.M();
-
-  TLorentzVector mc_hadr_top = mc_hadr_W + *m_MC->getP4(m_hadronicBIndex);
-  m_MC_hadronicTopMass = mc_hadr_top.M();
-
-  // TLorentzVector mc_lept_W = *m_MC->getP4(m_neutrinoIndex) + *m_MC->getP4(m_leptonIndex);
-  // m_MC_leptonicWMass = mc_lept_W.M();
-
-  // TLorentzVector mc_lept_top = mc_lept_W + *m_MC->getP4(m_leptonicBIndex);
-  // m_MC_leptonicTopMass = mc_lept_top.M();
-  
-  
   // Store ref to various P4
   new ((*m_MC_lepton_p4)[0]) TLorentzVector(*m_MC->getP4(m_leptonIndex));
 
@@ -1390,7 +1371,6 @@ void mtt_analysis::reset()
   m_MC_mtt     = -1.;
 
   m_leptonIndex = -1;
-  m_neutrinoIndex = -1;
 
   m_leptonicBIndex = -1;
   m_hadronicBIndex = -1;
@@ -1404,10 +1384,6 @@ void mtt_analysis::reset()
   m_MC_pt_tt         = -1;
   m_MC_eta_tt        = -1;
   m_MC_beta_tt       = -1;
-  m_MC_hadronicWMass = -1;
-  m_MC_leptonicWMass = -1;
-  m_MC_hadronicTopMass = -1;
-  m_MC_leptonicTopMass = -1;
 
   m_selectedLeptonP4->Clear("C");
 

@@ -162,7 +162,6 @@ namespace mtt {
 
       // Indexes of gen particle in a semi-lept event
       int m_leptonIndex;
-      int m_neutrinoIndex;
 
       int m_leptonicBIndex;
       int m_hadronicBIndex;
@@ -171,10 +170,6 @@ namespace mtt {
       int m_firstJetIndex;
       int m_secondJetIndex;
 
-      float m_MC_hadronicWMass;
-      float m_MC_leptonicWMass;
-      float m_MC_hadronicTopMass;
-      float m_MC_leptonicTopMass;
       float m_MC_pt_tt;
       float m_MC_eta_tt;
       float m_MC_beta_tt;
