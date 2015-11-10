@@ -76,7 +76,7 @@ mtt_analysis::mtt_analysis(const edm::ParameterSet& cmsswSettings):
 
   m_tree_Mtt->Branch("MC_channel"         , &m_MC_channel             , "MC_channel/I");
   m_tree_Mtt->Branch("MC_mtt"             , &m_MC_mtt                 , "MC_mtt/F");
-  m_tree_Mtt->Branch("MC_nPU"             , &m_nPU                    , "m_nPU/I");
+  m_tree_Mtt->Branch("MC_nPU"             , &m_nPU                    , "m_nPU/F");
 
   // Indexes of gen particles inside the MC collection. Only valid for semi-lept events
   m_tree_Mtt->Branch("MC_leptonIndex"     , &m_leptonIndex            , "MC_leptonIndex/I");
@@ -849,7 +849,7 @@ void mtt_analysis::analyze(const edm::EventSetup& iSetup, PatExtractor& extracto
     MCidentification();
   }
 
-  m_nPU = m_event->nPU();
+  m_nPU = m_event->nTrueInteractions();
 
   m_do_mtt_reco = true;
 

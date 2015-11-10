@@ -158,7 +158,7 @@ namespace mtt {
       //MC stuff
       int m_MC_channel;
       float m_MC_mtt;
-      int m_nPU; // number of interactions
+      float m_nPU; // number of interactions
 
       // Indexes of gen particle in a semi-lept event
       int m_leptonIndex;
