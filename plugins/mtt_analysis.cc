@@ -999,7 +999,7 @@ void mtt_analysis::MCidentification()
     // Then select particles from decays of top quarks. Only consider b quarks and stable charged
     //leptons
     if (not (absPgdId == ID_B or
-     (m_MC->getIsLastCopy(i) and (absPgdId == ID_E or absPgdId == ID_MU or absPgdId == ID_TAU))))
+     (m_MC->getIsPromptFinalState(i) and (absPgdId == ID_E or absPgdId == ID_MU))))
       continue;
     
     
