@@ -1125,6 +1125,16 @@ void mtt_analysis::MCidentification()
     *m_MC_Top1_p4 = Top[0];
     *m_MC_Top2_p4 = Top[1];
   }
+  else
+  {
+    m_MC_mtt = 0.f;
+    m_MC_pt_tt = 0.f;
+    m_MC_eta_tt = 0.f;
+    m_MC_beta_tt = 0.f;
+    
+    m_MC_Top1_p4->SetPxPyPzE(0., 0., 0., 0.);
+    m_MC_Top2_p4->SetPxPyPzE(0., 0., 0., 0.);
+  }
   
   
   // Analyse further semileptonic ttbar events with decays to electrons or muons, as they are
