@@ -996,10 +996,18 @@ void mtt_analysis::MCidentification()
     }
     
     
-    // Then select particles from decays of top quarks. Only consider b quarks and stable charged
-    //leptons
-    if (not (absPgdId == ID_B or
+    // Then select particles from decays of top quarks. Consider b quarks, tau leptons, and
+    //electrons and muons from the final state
+    if (not (absPgdId == ID_B or absPgdId == ID_TAU or
      (m_MC->getIsPromptFinalState(i) and (absPgdId == ID_E or absPgdId == ID_MU))))
+      continue;
+    
+    
+    // Keep only first instances of b quarks and tau leptons in the history. Since quarks will
+    //shower and tau leptons are not stable, it does not matter much which of the copies are
+    //selected, but it is important to eliminate duplicates
+    if ((absPgdId == ID_B or absPgdId == ID_TAU) and
+     (m_MC->getMom1Index(i) == -1 or abs(m_MC->getType(m_MC->getMom1Index(i))) == absPgdId))
       continue;
     
     
@@ -1060,57 +1068,78 @@ void mtt_analysis::MCidentification()
   }
   
   
+  // Count light-flavour quarks from decays of top quarks
+  unsigned nQuarkLight = 0;
+  
+  for (int i = 0; i < n_MC; ++i)
+  {
+    if (abs(m_MC->getType(i)) >= ID_B)
+      continue;
+    
+    // Consider only immediate daughters of t and W
+    int const motherIndex = m_MC->getMom1Index(i);
+    
+    if (motherIndex == -1)
+      continue;
+    
+    int const motherPdgId = abs(m_MC->getType(motherIndex));
+    
+    if (motherPdgId == ID_T or motherPdgId == ID_W)
+      ++nQuarkLight;
+  }
+  
+  
   // Event classification
-  if (nEle == 1 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 1 && nMu == 0 && nTau == 0 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 2)
   {
     m_MC_channel = 1;
   }
 
-  if (nEle == 0 && nMu == 1 && nTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 1 && nTau == 0 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 2)
   {
     m_MC_channel = 2;
   }
 
-  if (nEle == 0 && nMu == 0 && nTau == 1 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 0 && nTau == 1 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 2)
   {
     m_MC_channel = 3;
   }
 
-  if (nEle == 0 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 0 && nTau == 0 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 4)
   {
     m_MC_channel = 4;
   }
 
-  if (nEle == 2 && nMu == 0 && nTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 2 && nMu == 0 && nTau == 0 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 0)
   {
     m_MC_channel = 5;
   }
 
-  if (nEle == 0 && nMu == 2 && nTau == 0 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 2 && nTau == 0 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 0)
   {
     m_MC_channel = 6;
   }
 
-  if (nEle == 0 && nMu == 0 && nTau == 2 && nQuarkb > 1 && nTop == 2)
+  if (nEle == 0 && nMu == 0 && nTau == 2 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 0)
   {
     m_MC_channel = 7;
   }
 
-  if (nEle == 1 && nMu == 1 && nTau == 0 && nQuarkb == 2 && nTop == 2)
+  if (nEle == 1 && nMu == 1 && nTau == 0 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 0)
   {
     m_MC_channel = 8 ;
   }
 
-  if (nEle == 1 && nMu == 0 && nTau == 1 && nQuarkb == 2 && nTop == 2)
+  if (nEle == 1 && nMu == 0 && nTau == 1 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 0)
   {
     m_MC_channel = 9 ;
   }
 
-  if (nEle == 0 && nMu == 1 && nTau == 1 && nQuarkb == 2 && nTop == 2)
+  if (nEle == 0 && nMu == 1 && nTau == 1 && nTop == 2 && nQuarkb == 2 && nQuarkLight == 0)
   {
     m_MC_channel = 10;
   }
-  
+    
   
   // Reconstruct the tt resonance and save its kinematics
   if (nTop == 2) {
@@ -1165,6 +1194,7 @@ void mtt_analysis::MCidentification()
   for (int i = 0; i < n_MC; i++) {
     std::cout << "\t[" << i << "] Type: " << m_MC->getType(i) << std::endl;
   }
+  std::cout << "nEle: " << nEle << ", nMu: " << nMu << ", nTau: " << nTau << std::endl;
   #endif
   
   
